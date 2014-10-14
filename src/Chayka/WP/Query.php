@@ -45,7 +45,7 @@ class Query extends WP_Query {
         $isForbidden = ApplicationDispatcher::isForbiddenRoute($requestUri);
         $canProcess = ApplicationDispatcher::canProcess($requestUri);
         $isHome = !$requestUri || $requestUri == '/';
-        $isAPI = preg_match('%^\/api\/)', $requestUri);
+        $isAPI = preg_match('%^\/api\/%)', $requestUri);
 
         self::setIs404($isForbidden);
 
