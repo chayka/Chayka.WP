@@ -14,6 +14,19 @@
         "PSR-4": {
             "Chayka\\": "src/"
         }
+    },
+    "repositories": [
+        {
+            "name" : "chayka/mvc",
+            "type" : "git",
+            "url" : "~/PhpstormProjects/Chayka.MVC"
+        }
+    ],
+    "require":{
+        "chayka/mvc": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.4.x-dev"
     }
 
 }
