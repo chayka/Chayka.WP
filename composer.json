@@ -19,7 +19,7 @@
         {
             "name" : "chayka/mvc",
             "type" : "git",
-            "url" : "~/PhpstormProjects/Chayka.MVC"
+            "url" : "/Users/borismossounov/PhpstormProjects/Chayka.MVC"
         }
     ],
     "require":{
