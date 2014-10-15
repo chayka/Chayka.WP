@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "PSR-4": {
-            "Chayka\\WP\\": "src/Chayka/WP/"
+            "Chayka\\WP\\": "src/Chayka/WP"
         }
     },
     "repositories": [
