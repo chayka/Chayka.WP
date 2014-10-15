@@ -4,6 +4,7 @@ namespace Chayka\WP;
 
 use Chayka\Helpers\Util;
 use Chayka\Helpers\InputHelper;
+use Chayka\Helpers\FsHelper;
 use Chayka\MVC\ApplicationDispatcher;
 use Chayka\MVC\Application;
 use Chayka\MVC\View;
@@ -32,6 +33,8 @@ abstract class Plugin{
     protected $appId;
 
     protected $application;
+
+    protected $bower;
 
     protected static $uriProcessing = false;
 
@@ -63,6 +66,7 @@ abstract class Plugin{
             || define($APP_ID.'_APP_PATH', $this->basePath.'app');
 
         $minimize = OptionHelper::getOption('minimizeMedia');
+        $this->getBower($minimize);
         $this->registerResources($minimize);
         $this->addRoute('default');
         $this->registerRoutes();
@@ -141,6 +145,25 @@ abstract class Plugin{
      */
     public function getBasePath(){
         return $this->basePath;
+    }
+
+    /**
+     * Get abs path for relative path
+     * @param String $path
+     * @return String
+     */
+    public function getPath($path = ''){
+        return $this->getBasePath().$path;
+    }
+
+    /**
+     * Get abs res for path relative to '/res'
+     *
+     * @param $relativeResPath
+     * @return String
+     */
+    public function getPathRes($relativeResPath){
+        return $this->getPath('res/'.$relativeResPath);
     }
 
     /**
@@ -412,6 +435,151 @@ abstract class Plugin{
     public function registerScriptNls($handle, $relativeResPath, $dependencies = array()){
 //        TODO: Zend independent NslHelper
 //        NlsHelper::registerScriptNls($handle, $relativeResJsPath, $dependencies, null, null, $this->basePath);
+    }
+
+    /**
+     * Read and parse bower config
+     *
+     * @param bool $minimize
+     * @return array|bool
+     */
+    public function getBower($minimize = false){
+        if($this->bower !== false){
+            $this->bower = false;
+            $bowerFile = $this->basePath.'/bower.json';
+            if(file_exists($bowerFile)){
+                $json = FsHelper::readFile($bowerFile);
+                $bowerData = json_decode($json);
+
+                $bowerDir = $this->basePath.'/bower_components/';
+
+                $bowerRcFile = $this->basePath.'/.bowerrc';
+                $bowerRcData = null;
+                if(file_exists($bowerRcFile)) {
+                    $json = FsHelper::readFile($bowerRcFile);
+                    $bowerRcData = json_decode($json);
+                    $bowerDir = Util::getItem($bowerRcData, 'directory', 'bower_components').'/';
+                }
+                if(is_dir($this->basePath.'/'.$bowerDir)){
+                    $this->bower = array(
+                        'bower.json' => $bowerData,
+                        '.bowerrc' => $bowerRcData,
+                        'dir' => $bowerDir,
+                        'minimize' => $minimize,
+                    );
+                }
+            }
+        }
+
+        return $this->bower;
+    }
+
+    /**
+     * This function discovers installed bower packages and registers them if they are not already registered
+     * if true passed, newer versions will override older ones
+     *
+     * @param boolean $overrideWithNew
+     */
+    public function registerBowerResources($overrideWithNew = true){
+        $bower = $this->getBower();
+
+        if($bower){
+            $bowerData = Util::getItem($bower, 'bower.json');
+            $libs = Util::getItem($bowerData, 'dependencies', array());
+            $bowerDir = Util::getItem($bower, 'dir');
+
+            foreach($libs as $lib => $ver){
+                $this->registerBowerComponent($lib, $bowerDir.$lib, $overrideWithNew);
+            }
+        }
+    }
+
+    /**
+     * Registers bower component
+     * $path is relative to baseDir
+     *
+     * @param string $name
+     * @param string $path
+     * @param bool $overrideWithNew
+     */
+    public function registerBowerComponent($name, $path = null, $overrideWithNew = true){
+        global $wp_styles, $wp_scripts;
+
+        $bower = $this->getBower();
+
+        if(!$path && $bower){
+            $path = Util::getItem($bower, 'dir').$name;
+        }
+
+        if($path) {
+            $bowerFile = $this->basePath . '/' . $path . '/bower.json';
+            if (file_exists($bowerFile)) {
+                $json = FsHelper::readFile($bowerFile);
+                $bowerData = json_decode($json);
+                $bowerVer = Util::getItem($bowerData, 'version', '0.0.0');
+                $needOverrideJs = false;
+                if ($overrideWithNew) {
+                    $registered = Util::getItem($wp_scripts, 'registered');
+                    $existing = Util::getItem($registered, $name);
+                    if ($existing) {
+                        $existingVer = Util::getItem($existing, 'ver', '0.0.0');
+                        $needOverrideJs = Util::cmpVersion($bowerVer, $existingVer) > 0;
+                    }
+                }
+                $needOverrideCss = false;
+                if ($overrideWithNew) {
+                    $registered = Util::getItem($wp_styles, 'registered');
+                    $existing = Util::getItem($registered, $name);
+                    if ($existing) {
+                        $existingVer = Util::getItem($existing, 'ver', '0.0.0');
+                        $needOverrideCss = Util::cmpVersion($bowerVer, $existingVer) > 0;
+                    }
+                }
+
+                $mainFiles = Util::getItem($bowerData, 'main');
+                if ($mainFiles) {
+                    if (!is_array($mainFiles)) {
+                        $mainFiles = array($mainFiles);
+                    }
+                    $dependencies = array();
+                    $bowerDependencies = Util::getItem($bowerData, 'dependencies');
+                    if ($bowerDependencies) {
+                        $dependencies = array_keys(get_object_vars($bowerDependencies));
+                    }
+
+                    foreach ($mainFiles as $file) {
+                        $ext = FsHelper::getExtension($file);
+                        $filePath = realpath($this->basePath . '/' . $path . '/' . $file);
+                        $minimize = Util::getItem($bower, 'minimize');
+                        if($minimize){
+                            $filePathMin = FsHelper::setExtensionPrefix($filePath, 'min');
+                            $filePath = file_exists($filePathMin)?$filePathMin:$filePath;
+                        }
+                        if (basename($file, '.' . $ext) == $name) {
+                            $relPath = str_replace($this->basePath, '', $filePath);
+                            switch ($ext) {
+                                case 'css':
+                                    if ($needOverrideCss) {
+                                        wp_deregister_script($name);
+                                    }
+                                    wp_register_style($name, $this->getUrl($relPath));
+                                    break;
+                                case 'js':
+                                    foreach ($dependencies as $dep) {
+                                        $depPath = preg_replace("%$name$%", $dep, $path);
+                                        $this->registerBowerComponent($dep, $depPath, $overrideWithNew);
+                                    }
+                                    if ($needOverrideJs) {
+                                        wp_deregister_script($name);
+                                    }
+                                    wp_register_script($name, $this->getUrl($relPath), $dependencies, $bowerVer);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
