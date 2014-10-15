@@ -77,7 +77,7 @@ abstract class Plugin{
     /**
      * Get singleton instance
      *
-     * @return Plugin
+     * @return static
      */
     public static function getInstance(){
         if(!static::$instance){
