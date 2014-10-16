@@ -17,9 +17,14 @@
     },
     "repositories": [
         {
+            "name" : "chayka/helpers",
+            "type" : "git",
+            "url" : "git@github.com:chayka/Chayka.Helpers.git"
+        },
+        {
             "name" : "chayka/mvc",
             "type" : "git",
-            "url" : "/Users/borismossounov/PhpstormProjects/Chayka.MVC"
+            "url" : "git@github.com:chayka/Chayka.MVC.git"
         }
     ],
     "require":{
