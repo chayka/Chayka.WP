@@ -1,5 +1,4 @@
-<?php
-global $post;
+<?php global $post;
 the_post();
 get_header();
 echo $post->post_content;
