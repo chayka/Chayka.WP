@@ -56,7 +56,7 @@ class Query extends WP_Query {
             if($isAPI){
                 die(ApplicationDispatcher::dispatch($requestUri));
             }
-            add_filter('single_template', array('Query', 'renderResponse'), 1, 2);
+            add_filter('single_template', array('Chayka\\WP\\Query', 'renderResponse'), 1, 2);
 
 
 //            $args = array(
@@ -259,7 +259,7 @@ class Query extends WP_Query {
 //        global $wp_the_query;
 //        global $wp_query;
 
-//        $this->request = '';
+        $this->request = '';
 //        $this->is_home = self::getIsMainPage();
 //        if(self::getNotFound()){
 //            $response = ApplicationDispatcher::dispatch('/not-found-404/');

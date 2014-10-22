@@ -36,6 +36,8 @@ abstract class Plugin{
 
     protected $bower;
 
+    protected $composer;
+
     protected static $uriProcessing = false;
 
     protected static $instance = null;
@@ -49,13 +51,11 @@ abstract class Plugin{
     public function __construct($__file__, $routes = array()) {
         $this->basePath = plugin_dir_path( $__file__ );
         $this->baseUrl = preg_replace('%^[\w\d]+\:\/\/[\w\d\.\-]+%', '',plugin_dir_url($__file__));
-
         $namespace = $this->getNamespace();
-        $this->appId = $namespace ? str_replace('\\', '_', $namespace) : $this->getClassName();
+        $this->appId = $namespace ? $namespace : $this->getClassName();
         $this->application = new Application($this->basePath.'app', $this->appId);
 
-        $APP_ID = strtoupper($this->appId);
-
+        $APP_ID = strtoupper(str_replace('\\', '_', $this->appId));
         ApplicationDispatcher::registerApplication($this->appId, $this->application, $routes);
 
         defined($APP_ID.'_PATH')
@@ -583,6 +583,33 @@ abstract class Plugin{
     }
 
     /**
+     * Read and parse composer config
+     *
+     * @return array|bool
+     */
+    public function getComposer(){
+        if($this->composer !== false){
+            $this->composer = false;
+            $composerFile = $this->basePath.'/composer.json';
+            if(file_exists($composerFile)){
+                $json = FsHelper::readFile($composerFile);
+                $composerData = json_decode($json);
+
+                $composerDir = $this->basePath.'/vendor/';
+
+                if(is_dir($composerDir)){
+                    $this->composer = array(
+                        'composer.json' => $composerData,
+                        'dir' => $composerDir,
+                    );
+                }
+            }
+        }
+
+        return $this->composer;
+    }
+
+    /**
      * Go through vendor folder if it exests.
      * Find composer.json
      * Call "wp-init" callback.
@@ -591,20 +618,44 @@ abstract class Plugin{
      *
      */
     public function registerComposerPlugins(){
-        $vendorsPath = $this->getBasePath().'/vendors/';
-        if(is_dir($vendorsPath)){
-            $d = dir($vendorsPath); //$img_set_folder
-            while ($file = $d->read()) {
-                if ($file != "." && $file != ".." && file_exists($vendorsPath.$file.'/composer.json')) {
-                    $composerJson = json_decode(file_get_contents($vendorsPath.$file.'/composer.json'));
-                    $plugin = Util::getItem($composerJson, 'chayka-wp-plugin');
-                    if($plugin){
-                        call_user_func(array($plugin, 'init'));
-                    }
+        $composer = $this->getComposer();
+        if($composer){
+            $composerData = Util::getItem($composer, 'composer.json');
+            $libs = Util::getItem($composerData, 'require', array());
+            $composerDir = Util::getItem($composer, 'dir');
+
+            foreach($libs as $lib => $ver){
+                $this->registerComposerPlugin($lib, $composerDir.$lib);
+            }
+        }
+
+    }
+
+    /**
+     * Register composer plugin
+     *
+     * @param string $name
+     * @param string $path
+     */
+    public function registerComposerPlugin($name, $path = null){
+        $composer = $this->getComposer();
+
+        if(!$path && $composer){
+            $path = Util::getItem($composer, 'dir').$name;
+        }
+
+        if($path) {
+            $composerFile = $path . '/composer.json';
+            if (file_exists($composerFile)) {
+                $json = FsHelper::readFile($composerFile);
+                $composerData = json_decode($json);
+                $plugin = Util::getItem($composerData, 'chayka-wp-plugin');
+                if($plugin){
+                    call_user_func(array($plugin, 'init'));
                 }
             }
-            $d->close();
         }
+
     }
 
     /**
