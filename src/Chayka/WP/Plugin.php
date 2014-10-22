@@ -583,6 +583,31 @@ abstract class Plugin{
     }
 
     /**
+     * Go through vendor folder if it exests.
+     * Find composer.json
+     * Call "wp-init" callback.
+     *
+     * '$ composer install' should be called before
+     *
+     */
+    public function registerComposerPlugins(){
+        $vendorsPath = $this->getBasePath().'/vendors/';
+        if(is_dir($vendorsPath)){
+            $d = dir($vendorsPath); //$img_set_folder
+            while ($file = $d->read()) {
+                if ($file != "." && $file != ".." && file_exists($vendorsPath.$file.'/composer.json')) {
+                    $composerJson = json_decode(file_get_contents($vendorsPath.$file.'/composer.json'));
+                    $plugin = Util::getItem($composerJson, 'chayka-wp-plugin');
+                    if($plugin){
+                        call_user_func(array($plugin, 'init'));
+                    }
+                }
+            }
+            $d->close();
+        }
+    }
+
+    /**
      * Register your action hooks here using $this->addAction();
      */
     abstract public function registerActions();

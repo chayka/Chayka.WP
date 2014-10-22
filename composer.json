@@ -15,20 +15,8 @@
             "Chayka\\WP\\": "src/Chayka/WP"
         }
     },
-    "repositories": [
-        {
-            "name" : "chayka/helpers",
-            "type" : "git",
-            "url" : "git@github.com:chayka/Chayka.Helpers.git"
-        },
-        {
-            "name" : "chayka/mvc",
-            "type" : "git",
-            "url" : "git@github.com:chayka/Chayka.MVC.git"
-        }
-    ],
     "require":{
-        "chayka/mvc": "*"
+        "chayka/mvc": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "4.4.x-dev"
