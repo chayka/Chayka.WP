@@ -34,7 +34,7 @@ class JsonHelper extends Helpers\JsonHelper {
         $codes = $errors->get_error_codes();
         $json = array();
         foreach ($codes as $code) {
-            $json[$code] = $errors->get_error_message($code);
+            $json[$code] = preg_replace('%<strong>[^<]*</strong>:\s*%m', '', $errors->get_error_message($code));
         }
         return $json;
     }

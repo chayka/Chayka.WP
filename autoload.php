@@ -2,7 +2,7 @@
 if (file_exists(realpath(__DIR__.'/../Chayka.MVC/autoload.php'))){
     require_once realpath(__DIR__.'/../Chayka.MVC/autoload.php');
 } elseif (file_exists('vendors/autoload.php')) {
-    require_once 'vendors/autoload.php';
+    require_once 'vendor/autoload.php';
 }
 
 spl_autoload_register(function ($class) {

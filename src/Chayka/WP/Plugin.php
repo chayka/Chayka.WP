@@ -54,7 +54,7 @@ abstract class Plugin{
         $namespace = $this->getNamespace();
         $this->appId = $namespace ? $namespace : $this->getClassName();
         $this->application = new Application($this->basePath.'app', $this->appId);
-
+        set_include_path($this->basePath.PATH_SEPARATOR.get_include_path());
         $APP_ID = strtoupper(str_replace('\\', '_', $this->appId));
         ApplicationDispatcher::registerApplication($this->appId, $this->application, $routes);
 
@@ -598,6 +598,9 @@ abstract class Plugin{
                 $composerDir = $this->basePath.'/vendor/';
 
                 if(is_dir($composerDir)){
+                    if(file_exists($composerDir.'autoload.php')){
+                        require_once $composerDir.'autoload.php';
+                    }
                     $this->composer = array(
                         'composer.json' => $composerData,
                         'dir' => $composerDir,
