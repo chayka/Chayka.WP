@@ -34,9 +34,9 @@ abstract class Plugin{
 
     protected $application;
 
-    protected $bower;
+    protected $bower = null;
 
-    protected $composer;
+    protected $composer = null;
 
     protected static $uriProcessing = false;
 
@@ -65,7 +65,8 @@ abstract class Plugin{
         defined($APP_ID.'_APP_PATH')
             || define($APP_ID.'_APP_PATH', $this->basePath.'app');
 
-        $minimize = OptionHelper::getOption('minimizeMedia');
+        $minimize = OptionHelper::getOption('MinimizeMedia');
+//        die($minimize);
         $this->getBower($minimize);
         $this->registerResources($minimize);
         $this->addRoute('default');
@@ -444,7 +445,7 @@ abstract class Plugin{
      * @return array|bool
      */
     public function getBower($minimize = false){
-        if($this->bower !== false){
+        if($this->bower === null){
             $this->bower = false;
             $bowerFile = $this->basePath.'/bower.json';
             if(file_exists($bowerFile)){
@@ -470,7 +471,6 @@ abstract class Plugin{
                 }
             }
         }
-
         return $this->bower;
     }
 
@@ -588,13 +588,18 @@ abstract class Plugin{
      * @return array|bool
      */
     public function getComposer(){
-        if($this->composer !== false){
+        if($this->composer === null){
             $this->composer = false;
             $composerFile = $this->basePath.'/composer.json';
+            $composerLockFile = $this->basePath.'/composer.lock';
             if(file_exists($composerFile)){
                 $json = FsHelper::readFile($composerFile);
                 $composerData = json_decode($json);
-
+                $composerLock = array();
+                if(file_exists($composerLockFile)) {
+                    $lock = FsHelper::readFile($composerLockFile);
+                    $composerLock = json_decode($lock);
+                }
                 $composerDir = $this->basePath.'/vendor/';
 
                 if(is_dir($composerDir)){
@@ -603,6 +608,7 @@ abstract class Plugin{
                     }
                     $this->composer = array(
                         'composer.json' => $composerData,
+                        'composer.lock' => $composerLock,
                         'dir' => $composerDir,
                     );
                 }
@@ -624,12 +630,22 @@ abstract class Plugin{
         $composer = $this->getComposer();
         if($composer){
             $composerData = Util::getItem($composer, 'composer.json');
-            $libs = Util::getItem($composerData, 'require', array());
+            $composerLock = Util::getItem($composer, 'composer.lock');
             $composerDir = Util::getItem($composer, 'dir');
 
-            foreach($libs as $lib => $ver){
-                $this->registerComposerPlugin($lib, $composerDir.$lib);
+            if($composerLock){
+                $packages = Util::getItem($composerLock, 'packages', array());
+                foreach($packages as $pkg){
+                    $lib = $pkg->name;
+                    $this->registerComposerPlugin($lib, $composerDir.$lib);
+                }
+            }else{
+                $libs = Util::getItem($composerData, 'require', array());
+                foreach($libs as $lib => $ver){
+                    $this->registerComposerPlugin($lib, $composerDir.$lib);
+                }
             }
+
         }
 
     }

@@ -17,15 +17,16 @@ class Query extends WP_Query {
 
     public static function checkSingleDomain(){
         $server = Util::serverName();
-        switch(OptionHelper::getOption('singleDomain')){
+        switch(OptionHelper::getOption('SingleDomain')){
             case 'www':
-                if(false === strpos($_SERVER['SERVER_NAME'], 'www.'.$server)){
+//                die($_SERVER['SERVER_NAME'].' ! '.$server);
+                if($_SERVER['SERVER_NAME'] !== 'www.'.$server){
                     header('Location: //www.'.$server.$_SERVER['REQUEST_URI'], true, 301);
                     die();
                 }
                 break;
             case 'no-www':
-                if(false !== strpos($_SERVER['SERVER_NAME'], 'www.'.$server)){
+                if($_SERVER['SERVER_NAME'] === 'www.'.$server){
                     header('Location: //'.$server.$_SERVER['REQUEST_URI'], true, 301);
                     die();
                 }
