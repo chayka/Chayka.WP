@@ -744,20 +744,19 @@ abstract class Plugin{
      * Add Console Page. Much like add_menu_page,
      * but instead of callback you provide some controller uri (e.g. 'admin/some-action')
      *
-     * @param string $pageTitle
-     * @param string $menuTitle
+     * @param string $title
      * @param string $capability
      * @param string $menuSlug
      * @param string $renderUri
      * @param string $relativeResIconUrl
      * @param integer $position
      */
-    public function addConsolePage($pageTitle, $menuTitle, $capability, $menuSlug,
+    public function addConsolePage($title, $capability, $menuSlug,
         $renderUri='', $relativeResIconUrl='', $position=null){
 
         $this->consolePageUris[$menuSlug] = $renderUri;
 
-        add_menu_page($pageTitle, $menuTitle, $capability, $menuSlug,
+        add_menu_page($title, $title, $capability, $menuSlug,
             $this->getCallbackMethod('renderConsolePage'), 
             $relativeResIconUrl?$this->getUrlRes($relativeResIconUrl):'', $position);
     }
@@ -767,18 +766,17 @@ abstract class Plugin{
      * but instead of callback you provide some controller uri (e.g. 'admin/some-action')
      *
      * @param $parentSlug
-     * @param $pageTitle
-     * @param $menuTitle
-     * @param $capapbility
+     * @param $title
+     * @param $capability
      * @param $menuSlug
      * @param string $renderUri
      */
-    public function addConsoleSubPage($parentSlug, $pageTitle, $menuTitle,
-            $capapbility, $menuSlug, $renderUri=''){
+    public function addConsoleSubPage($parentSlug, $title,
+            $capability, $menuSlug, $renderUri=''){
 
         $this->consolePageUris[$menuSlug] = $renderUri;
         
-        add_submenu_page($parentSlug, $pageTitle, $menuTitle, $capapbility, $menuSlug, 
+        add_submenu_page($parentSlug, $title, $title, $capability, $menuSlug,
             $this->getCallbackMethod('renderConsolePage'));
     }
     
