@@ -4,6 +4,7 @@ namespace Chayka\WP;
 
 use Chayka\Helpers\Util;
 use Chayka\MVC\ApplicationDispatcher;
+use Chayka\WP\Helpers\JsonHelper;
 use Chayka\WP\Helpers\OptionHelper;
 use Chayka\WP\Models\PostModel;
 use WP_Query;
@@ -55,7 +56,12 @@ class Query extends WP_Query {
             ini_set('display_errors', 1);
             error_reporting(E_ALL);
             if($isAPI){
-                die(ApplicationDispatcher::dispatch($requestUri));
+                try{
+                    echo ApplicationDispatcher::dispatch($requestUri);
+                }catch(\Exception $e){
+                    JsonHelper::respondException($e, 'exception');
+                }
+                die();
             }
             add_filter('single_template', array('Chayka\\WP\\Query', 'renderResponse'), 1, 2);
 
