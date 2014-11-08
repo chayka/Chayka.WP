@@ -27,7 +27,6 @@ class DbHelper {
     public static function dbInstall($currentVersion, $versionOptionName, $sqlPath, $versionHistory = array('1.0')) {
         global $wpdb;
         $installedVer = get_option($versionOptionName);
-        
         $queries = array();
         if(!$installedVer){
             $filename = $sqlPath.'/install.'.$currentVersion.'.sql';
@@ -73,7 +72,7 @@ class DbHelper {
      * @param array $versionHistory array that contains all the versions of db structure (e.g. array('1.0', '1.1'))
      */
     public static function dbUpdate($currentVersion, $versionOptionName, $sqlPath, $versionHistory = array('1.0')) {
-        if (get_site_option($versionOptionName) != $currentVersion) {
+        if (get_option($versionOptionName) != $currentVersion) {
             self::dbInstall($currentVersion, $versionOptionName, $sqlPath, $versionHistory);
         }
     }
@@ -101,7 +100,8 @@ class DbHelper {
         $wpdb = self::wpdb();
         if($data instanceof DbReady){
             if(!$table){
-                $table = $data->getDbTable();
+                $class = get_class($data);
+                $table = call_user_func(array($class, 'getDbTable'));
             }
             $data = $data->packDbRecord(false);
         }elseif(!is_array($data)){
@@ -123,11 +123,12 @@ class DbHelper {
     public static function update($data, $table = '', $where = array()) {
         $wpdb = self::wpdb();
         if($data instanceof DbReady){
+            $class = get_class($data);
             if(!$table){
-                $table = $data->getDbTable();
+                $table = call_user_func(array($class, 'getDbTable'));
             }
             if(empty($where)){
-                $key = $data->getDbIdColumn();
+                $key = call_user_func(array($class, 'getDbIdColumn'));
                 $where[$key] = $data->getId();
             }
             $data = $data->packDbRecord(false);
@@ -150,9 +151,10 @@ class DbHelper {
      */
     public static function delete($table, $key = '', $value = 0, $format = '%d') {
         if($table instanceof DbReady){
-            $key = $table->getDbIdColumn();
+            $class = get_class($table);
             $value = $table->getId();
-            $table = $table->getDbTable();
+            $key = call_user_func(array($class, 'getDbIdColumn'));
+            $table = call_user_func(array($class, 'getDbTable'));
         }
         $wpdb = self::wpdb();
         return $wpdb->query(
@@ -203,13 +205,32 @@ class DbHelper {
      * @param $id
      * @param $class
      * @param string $format
-     * @return mixed|null
+     * @return DbReady|null
      */
     public static function selectById($id, $class, $format = '%d'){
         $wpdb = self::wpdb();
         $table = call_user_func(array($class, 'getDbTable'));
         $key = call_user_func(array($class, 'getDbIdColumn'));
         $sql = $wpdb->prepare("SELECT * FROM $table WHERE $key = $format", $id);
+        $dbRecord = $wpdb->get_row($sql);
+        return $dbRecord?call_user_func(array($class, 'unpackDbRecord'), $dbRecord):null;
+    }
+
+    /**
+     * Select DbReady object from db by some unique key.
+     * Use unique-indexed column.
+     *
+     * @param $param
+     * @param $value
+     * @param $class
+     * @param string $format
+     * @internal param $id
+     * @return DbReady|null
+     */
+    public static function selectBy($param, $value, $class, $format = '%s'){
+        $wpdb = self::wpdb();
+        $table = call_user_func(array($class, 'getDbTable'));
+        $sql = $wpdb->prepare("SELECT * FROM $table WHERE $param = $format", $value);
         $dbRecord = $wpdb->get_row($sql);
         return $dbRecord?call_user_func(array($class, 'unpackDbRecord'), $dbRecord):null;
     }

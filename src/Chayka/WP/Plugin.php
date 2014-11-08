@@ -212,7 +212,7 @@ abstract class Plugin{
     public function dbUpdate($versionHistory = array('1.0')){
         $this->currentDbVersion = end($versionHistory);
         reset($versionHistory);
-        DbHelper::dbUpdate($this->currentDbVersion, strtolower($this->getAppId()).'_db_version', $this->getBasePath().'res/sql', $versionHistory);
+        DbHelper::dbUpdate($this->currentDbVersion, $this->getAppId().'.dbVersion', $this->getBasePath().'app/sql', $versionHistory);
     }
 
     /**
