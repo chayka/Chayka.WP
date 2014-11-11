@@ -131,7 +131,7 @@ class DbHelper {
                 $key = call_user_func(array($class, 'getDbIdColumn'));
                 $where[$key] = $data->getId();
             }
-            $data = $data->packDbRecord(false);
+            $data = $data->packDbRecord(true);
         }elseif(!is_array($data)){
             $data = get_object_vars($data);
         }    

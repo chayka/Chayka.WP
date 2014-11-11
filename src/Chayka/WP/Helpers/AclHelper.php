@@ -6,9 +6,6 @@ use Chayka\Helpers\InputHelper;
 use Chayka\WP\Models\CommentModel;
 use Chayka\WP\Models\PostModel;
 use Chayka\WP\Models\UserModel;
-//require_once 'Zend/Acl.php';
-//require_once 'Zend/Acl/Role.php';
-//require_once 'Zend/Acl/Resource.php';
 
 class AclHelper {
 
@@ -21,119 +18,125 @@ class AclHelper {
 
     const ERROR_AUTH_REQUIRED = 'auth_required';
     const ERROR_PERMISSION_REQUIRED = 'permission_required';
-    
-//    protected static $acl = null;
-    
-//    public static function getInstance() {
-//        if (empty(self::$acl)) {
-//
-//            $acl = new Zend_Acl();
-//
-//            // Add groups to the Role registry using Zend_Acl_Role
-//            // Guest does not inherit access controls
-//            $acl->addRole(new Zend_Acl_Role(self::ROLE_GUEST));
-//
-//            // Member inherits from guest
-//            $acl->addRole(new Zend_Acl_Role(self::ROLE_SUBSCRIBER), 'guest');
-//            $acl->addRole(new Zend_Acl_Role(self::ROLE_CONTRIBUTOR), 'subscriber');
-//            $acl->addRole(new Zend_Acl_Role(self::ROLE_AUTHOR), 'contributor');
-//            $acl->addRole(new Zend_Acl_Role(self::ROLE_EDITOR), 'author');
-//
-//            // Administrator does not inherit access controls
-//            $acl->addRole(new Zend_Acl_Role(self::ROLE_ADMINISTRATOR));
-//
-////            $acl->add(new Zend_Acl_Resource('answer'));
-//            $acl->add(new Zend_Acl_Resource('auth'));
-////            $acl->add(new Zend_Acl_Resource('autocomplete'));
-////            $acl->add(new Zend_Acl_Resource('comment'));
-////            $acl->add(new Zend_Acl_Resource('question'));
-////            $acl->add(new Zend_Acl_Resource('search'));
-////            $acl->add(new Zend_Acl_Resource('user'));
-////            $acl->add(new Zend_Acl_Resource('vote'));
-//
-//            $acl->allow(null, 'auth', array('login', 'logout', 'join', 'forgot-password', 'change-password', 'check-email', 'check-name'));
-//
-//            // Guest may only view content
-////            $acl->allow(self::ROLE_GUEST, 'index');
-//
-//            // Member inherits view privilege from guest, but also needs additional privileges
-////            $acl->allow('member', 'search');
-////            $acl->allow('member', 'user', array('edit', 'get', 'update', 'profile'));
-////            $acl->allow('member', 'comment');
-////            $acl->allow('guest', 'question', 'view');
-////            $acl->allow('member', 'question');
-////            $acl->allow('member', 'answer');
-////            $acl->allow('member', 'vote');
-//
-////            $acl->deny('advert', 'user', 'delete');
-////            $acl->deny('advert', 'user', 'register');
-//
-//            // Administrator inherits nothing, but is allowed all privileges
-//            $acl->allow(self::ROLE_ADMINISTRATOR);
-////            $acl->deny('administrator', 'user', 'register');
-//
-//            self::$acl = $acl;
-//        }
-//
-//        return self::$acl;
-//    }
-//
-    public static function isAllowed($privilege = null, $resource = null, $role = null) {
-        if (empty($role)) {
-            $role = UserModel::currentUser()->getRole();
+
+    /**
+     * Register role
+     *
+     * @param string $role
+     * @param string $displayName
+     * @param array $capabilities
+     * @return null|\WP_Role
+     */
+    public static function addRole($role, $displayName = '', $capabilities = array()){
+        return add_role($role, $displayName?$displayName:$role, $capabilities);
+    }
+
+    /**
+     * Allow capability for resource to the role
+     *
+     * @param string $role
+     * @param string|array $capability
+     * @param string|array $resource
+     * @param bool $grant
+     */
+    public static function allow($role, $capability, $resource = '', $grant = true){
+        if(is_array($resource)){
+            foreach($resource as $res){
+                self::allow($role, $capability, $res);
+            }
+            return;
         }
+        if(is_array($capability)){
+            foreach($capability as $cap){
+                self::allow($role, $cap, $resource);
+            }
+            return;
+        }
+        $role = get_role($role);
+        if(!$role){
+            $role = self::addRole($role);
+        }
+        $role->add_cap($resource?$capability.'_'.$resource:$capability, $grant);
+
+        return;
+    }
+
+    /**
+     * Deny capability for resource to the role
+     *
+     * @param $role
+     * @param $capability
+     * @param string $resource
+     */
+    public static function deny($role, $capability, $resource = ''){
+        self::allow($role, $capability, $resource, false);
+    }
+
+    /**
+     * Check if current user has privilege on specified resource
+     *
+     * @param null $privilege
+     * @param null $resource
+     * @return bool
+     */
+    public static function isAllowed($privilege = null, $resource = null) {
         if (empty($resource)) {
-            $resource = InputHelper::getParam('controller');
+            $resource = InputHelper::getParam('controller', '*');
         }
         if (empty($privilege)) {
-            $privilege = InputHelper::getParam('action');
+            $privilege = InputHelper::getParam('action', '*');
         }
 
-        $res = true; //self::getInstance()->isAllowed($role, $resource, $privilege);
+        $res = current_user_can($privilege)
+            || current_user_can($privilege.'_'.$resource)
+            || $privilege !== '*' && current_user_can('*_'.$resource)
+            || $resource !== '*' &&  $privilege !== '*' && current_user_can('*_*'); //self::getInstance()->isAllowed($role, $resource, $privilege);
 
         return $res;
-
-    }
-    
-    public static function denyAccess($message = ''){
-        if(!$message){
-            $message = NlsHelper::_('Dear user, access to this page is forbidden for you.');
-        }
-        JsonHelper::respondError($message, self::ERROR_AUTH_REQUIRED, UserModel::currentUser());
     }
 
-    public static function apiAuthRequired($message = ''){
+    /**
+     * Check whether user is logged in
+     *
+     * @return bool
+     */
+    public static function isLoggedIn(){
         $userId = get_current_user_id();
-        if(!$userId){
+        return !!$userId;
+    }
+
+    /**
+     * Respond with api error if user is not logged in
+     *
+     * @param string $message
+     */
+    public static function apiAuthRequired($message = ''){
+        if(!self::isLoggedIn()){
             if(!$message){
                 $message = NlsHelper::_('You need to sign in to proceed');
             }
             JsonHelper::respondError($message, self::ERROR_AUTH_REQUIRED, UserModel::currentUser());
         }
     }
-    
-    public static function permissionRequired($message = '', $privilege = null, $resource = null, $role = null){
-        if(!self::isAllowed($privilege, $resource, $role)){
+
+    /**
+     * Respond with api error if user has no privilege for specified resource
+     *
+     * @param string $message
+     */
+    public static function apiPermissionRequired($message = '', $privilege = null, $resource = null){
+        if(!self::isAllowed($privilege, $resource)){
             if(!$message){
                 $message = NlsHelper::_('Access denied');
             }
-            self::denyAccess($message);
-            return false;
+            JsonHelper::respondError($message, self::ERROR_PERMISSION_REQUIRED, UserModel::currentUser());
         }
         
-        return true;
     }
     
-//    public static function userHasPermission($message = '', $privilege = null, $resource = null, $role = null){
-//        return self::permissionRequired($message, $privilege, $resource, $role);
-//    }
-    
-    public static function isAuthorized(){
-        $userId = get_current_user_id();
-        return !empty ($userId);
-    }
-
     /**
+     * Check if user is the owner of specified object
+     *
      * @param PostModel|CommentModel $obj
      * @return bool
      */
@@ -149,8 +152,14 @@ class AclHelper {
         }
         return ($isOwner || $user->hasRole('administrator'));
     }
-    
-    public static function apiOwnershipRequired(/*PostModel*/ $obj, $message = ''){
+
+    /**
+     * Respond with api error if user is not the owner of specified object
+     *
+     * @param PostModel|CommentModel $obj
+     * @param string $message
+     */
+    public static function apiOwnershipRequired($obj, $message = ''){
         $valid = self::isOwner($obj);
         if(!$valid){
             if(!$message){
@@ -161,6 +170,8 @@ class AclHelper {
     }
 
     /**
+     * Check if user is not the owner of specified object
+     *
      * @param PostModel|CommentModel $obj
      * @return bool
      */
@@ -173,8 +184,14 @@ class AclHelper {
         }
         return (!$isOwner || $user->hasRole('administrator'));
     }
-    
-    public static function apiOwnershipForbidden(/*PostModel*/ $obj, $message = ''){
+
+    /**
+     * Respond with api error if user is the owner of specified object
+     *
+     * @param $obj
+     * @param string $message
+     */
+    public static function apiOwnershipForbidden($obj, $message = ''){
         if(self::isNotOwner($obj)){
             if(!$message){
                 $message = 'Данная операция с собственным объектом невозможна';
@@ -182,8 +199,15 @@ class AclHelper {
             JsonHelper::respondError($message, self::ERROR_PERMISSION_REQUIRED, UserModel::currentUser());
         }
     }
-    
-    public static function isUserRole($role, $user = null){
+
+    /**
+     * Check if user has role
+     *
+     * @param string $role
+     * @param null|UserModel $user
+     * @return bool
+     */
+    public static function userHasRole($role, $user = null){
         if(!$user){
             $user = UserModel::currentUser();
         }elseif(!($user instanceof UserModel)){
@@ -192,21 +216,54 @@ class AclHelper {
         return ($user->hasRole($role));
     }
 
+    /**
+     * Check if user is admin
+     *
+     * @param null|UserModel $user
+     * @return bool
+     */
     public static function isAdmin($user = null){
-        return self::isUserRole('administrator', $user);
+        return self::userHasRole('administrator', $user);
     }
 
+    /**
+     * Check if user is editor
+     *
+     * @param null|UserModel $user
+     * @return bool
+     */
     public static function isEditor($user = null){
-        return self::isUserRole('editor', $user);
+        return self::userHasRole('editor', $user);
     }
 
+    /**
+     * Check if user is author
+     *
+     * @param null|UserModel $user
+     * @return bool
+     */
     public static function isAuthor($user = null){
-        return self::isUserRole('author', $user);
+        return self::userHasRole('author', $user);
     }
 
-//    public static function show404() {
-//        header("Location: /not-found-404/");
-//        die();
-//    }
+    /**
+     * Check if user is author
+     *
+     * @param null|UserModel $user
+     * @return bool
+     */
+    public static function isContributor($user = null){
+        return self::userHasRole('contributor', $user);
+    }
+
+    /**
+     * Check if user is author
+     *
+     * @param null|UserModel $user
+     * @return bool
+     */
+    public static function isSubscriber($user = null){
+        return self::userHasRole('subscriber', $user);
+    }
 
 }

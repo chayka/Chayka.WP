@@ -7,10 +7,8 @@ use Chayka\Helpers\JsonReady;
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\InputHelper;
 use Chayka\Helpers\DateHelper;
-use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Helpers\AclHelper;
-use Chayka\WP\Helpers\NlsHelper;
 use Chayka\WP\Queries\UserQuery;
 use DateTime;
 use WP_User_Query;
@@ -319,10 +317,10 @@ class UserModel implements DbReady, JsonReady, InputReady{
      * Check if user has capability
      *
      * @param $capability
-     * @return mixed
+     * @return boolean
      */
     public function hasCapability($capability){
-        return Util::getItem($this->getCapabilities(), $capability);
+        return !!Util::getItem($this->getCapabilities(), $capability);
     }
 
     /**
