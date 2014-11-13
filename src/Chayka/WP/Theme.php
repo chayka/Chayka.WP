@@ -10,7 +10,7 @@ abstract class Theme extends Plugin{
     
     protected $excerptLength = 30;
     protected $excerptMore = '...';
-    protected $adminBar = true;
+//    protected $adminBar = true;
 
     /**
      * Theme Constructor

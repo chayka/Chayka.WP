@@ -16,6 +16,8 @@ use WP_Post;
 
 abstract class Plugin{
 
+    protected static $adminBar;
+
     protected $needStyles = true;
     
     protected $currentDbVersion = '1.0';
@@ -937,6 +939,37 @@ abstract class Plugin{
         }
         return "";
     }
+
+    public function showAdminBar($show = true){
+        self::$adminBar = $show;
+        $this->addFilter('show_admin_bar', 'isAdminBarShown', 1, 1);
+    }
+
+    /** deprecated **/
+    public function hideAdminBar(){
+        self::$adminBar = false;
+        $this->addFilter('show_admin_bar', 'isAdminBarShown', 1, 1);
+    }
+
+    /** deprecated **/
+    public function showAdminBarToAdminOnly(){
+        self::$adminBar = 'admin';
+        $this->addFilter('show_admin_bar', 'isAdminBarShown', 1, 1);
+    }
+
+    /** deprecated **/
+    public function isAdminBarShown($show){
+        if(self::$adminBar){
+            if(self::$adminBar == 'admin'){
+                return current_user_can('administrator') || is_admin();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
 
 }
 
