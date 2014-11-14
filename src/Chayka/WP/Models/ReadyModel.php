@@ -50,7 +50,7 @@ abstract class ReadyModel implements DbReady, JsonReady{
      * @return mixed
      */
     public static function deleteById($id) {
-        return DbHelper::delete(self::getDbTable(), self::getDbIdColumn(), $id);
+        return DbHelper::delete(static::getDbTable(), static::getDbIdColumn(), $id);
     }
 
     /**
@@ -61,7 +61,7 @@ abstract class ReadyModel implements DbReady, JsonReady{
      * @return mixed
      */
     public static function deleteBy($key, $value) {
-        return DbHelper::delete(self::getDbTable(), $key, $value);
+        return DbHelper::delete(static::getDbTable(), $key, $value);
     }
 
     /**

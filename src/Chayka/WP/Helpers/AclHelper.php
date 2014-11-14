@@ -87,7 +87,8 @@ class AclHelper {
             $privilege = InputHelper::getParam('action', '*');
         }
 
-        $res = current_user_can($privilege)
+        $res = self::isAdmin()
+            || current_user_can($privilege)
             || current_user_can($privilege.'_'.$resource)
             || $privilege !== '*' && current_user_can('*_'.$resource)
             || $resource !== '*' &&  $privilege !== '*' && current_user_can('*_*'); //self::getInstance()->isAllowed($role, $resource, $privilege);

@@ -681,6 +681,7 @@ class UserModel implements DbReady, JsonReady, InputReady{
      * @return boolean
      */
     public static function deleteById($userId = 0, $reassignUserId = 0) {
+        require_once 'wp-admin/includes/user.php';
         $item = Util::getItem(self::$userCacheById, $userId);
         if($item){
             unset(self::$userCacheByEmail[$item->getEmail()]);
