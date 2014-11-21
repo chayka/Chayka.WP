@@ -78,15 +78,37 @@ abstract class ReadyModel implements DbReady, JsonReady{
 
     /**
      * Select instance from db by some unique key.
+     * Mind to ensure index on $key field.
      *
      * @param $key
      * @param $value
      * @param string $format
      * @return DbReady|null
      */
-    protected static function selectBy($key, $value, $format = '%s'){
+    public static function selectBy($key, $value, $format = '%s'){
         $obj = new static();
         return DbHelper::selectBy($key, $value, get_class($obj), $format);
+    }
+
+    /**
+     * Select data using sql query.
+     * You can use {table} placeholder, that will be replaced with self::getDbTable().
+     * Accepts slq-prepare format (sql with placeholders and optional params as values)
+     * @param $sql
+     * @return array
+     */
+    public static function selectSql($sql){
+        $args = func_get_args();
+
+        if(count($args)>1){
+            $sql = call_user_func_array(array('Chayka\\WP\\Helpers\\DbHelper', 'prepare'), $args);
+        }
+
+        return DbHelper::selectSql($sql, new static());
+    }
+
+    public static function selectAll(){
+        return static::selectSql('SELECT SQL_CALC_FOUND_ROWS * FROM {table}');
     }
 
     /**

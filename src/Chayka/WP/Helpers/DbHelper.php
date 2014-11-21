@@ -169,6 +169,7 @@ class DbHelper {
     /**
      * Select several rows using sql.
      * If DbReady $className provided, then raw data will be unpacked.
+     * You can use {table} placeholder, that will be replaced with $className::getDbTable()
      *
      * @param $sql
      * @param string/DbReady $className
@@ -176,11 +177,16 @@ class DbHelper {
      */
     public static function selectSql($sql, $className = null){
         $wpdb = self::wpdb();
-        $dbRecords = $wpdb->get_results($sql);
         if($className) {
-            if(is_object($className)){
+            if (is_object($className)) {
                 $className = get_class($className);
             }
+            $table = call_user_func(array($className, 'getDbTable'));
+
+            $sql = str_replace('{table}', $table, $sql);
+        }
+        $dbRecords = $wpdb->get_results($sql);
+        if($className) {
             foreach ($dbRecords as $i=>$dbRecord) {
                 $dbRecords[$i] = call_user_func(array($className, 'unpackDbRecord'), $dbRecord);
             }
