@@ -134,7 +134,7 @@ class DbHelper {
             $data = $data->packDbRecord(true);
         }elseif(!is_array($data)){
             $data = get_object_vars($data);
-        }    
+        }
         $res = $wpdb->update($table, $data, $where);
         return !($res===false);
     }

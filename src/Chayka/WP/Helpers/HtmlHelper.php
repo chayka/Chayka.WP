@@ -23,12 +23,12 @@ class HtmlHelper extends Helpers\HtmlHelper{
         }
         
         self::setHeadTitle($post->getTitle());
-        $pmdesc = $post->getMeta('description');
-        self::setMetaDescription($pmdesc?$pmdesc:$post->getExcerpt());
+        $postMetaDescription = $post->getMeta('description');
+        self::setMetaDescription($postMetaDescription?$postMetaDescription:$post->getExcerpt());
         $terms = $post->loadTerms();
-        $pmkw = $post->getMeta('keywords');
-        if($pmkw){
-            self::setMetaKeywords($pmkw);
+        $postMetaKeywords = $post->getMeta('keywords');
+        if($postMetaKeywords){
+            self::setMetaKeywords($postMetaKeywords);
         }else{
             $keywords = array();
             if($terms){

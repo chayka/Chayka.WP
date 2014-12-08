@@ -15,11 +15,12 @@ abstract class Theme extends Plugin{
     /**
      * Theme Constructor
      *
+     * @param string $__file__
      * @param array $routes
      */
-    public function __construct($routes = array()) {
-        $this->basePath = TEMPLATEPATH.'/';
-        $this->baseUrl = preg_replace('%^[\w\d]+\:\/\/[\w\d\.\-]+%', '', get_bloginfo('template_url', 'display' )).'/';
+    public function __construct($__file__, $routes = array()) {
+        $this->basePath = self::dirPath( $__file__ );
+        $this->baseUrl = self::dirUrl($__file__);
 
         $namespace = $this->getNamespace();
         $this->appId = $namespace ? str_replace('\\', '_', $namespace) : $this->getClassName();

@@ -51,8 +51,8 @@ abstract class Plugin{
      * @param array $routes
      */
     public function __construct($__file__, $routes = array()) {
-        $this->basePath = plugin_dir_path( $__file__ );
-        $this->baseUrl = preg_replace('%^[\w\d]+\:\/\/[\w\d\.\-]+%', '',plugin_dir_url($__file__));
+        $this->basePath = self::dirPath( $__file__ );
+        $this->baseUrl = self::dirUrl($__file__);
         $namespace = $this->getNamespace();
         $this->appId = $namespace ? $namespace : $this->getClassName();
         $this->application = new Application($this->basePath.'app', $this->appId);
@@ -91,6 +91,28 @@ abstract class Plugin{
             static::$instance = static::init();
         }
         return static::$instance;
+    }
+
+    /**
+     * Returns file's dir path
+     *
+     * @param string $__file__ use __FILE__
+     * @return string
+     */
+    protected static function dirPath($__file__){
+        return realpath(dirname($__file__)).'/';
+    }
+
+    /**
+     * Returns file's dir url
+     *
+     * @param string $__file__ use __FILE__
+     * @return string
+     */
+    protected static function dirUrl($__file__){
+        $path = self::dirPath($__file__);
+        $relPath = preg_replace('%^.*wp-content%', '/wp-content', $path);
+        return str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
     }
 
     /**
@@ -829,9 +851,11 @@ abstract class Plugin{
         }
 
         foreach($this->metaBoxUris as $id=>$uri){
+            $action = preg_replace(array('%^\/?metabox\/%', '%\/$%'), '', $uri['renderUri']);
+//            $nonce = Util::getItem($_POST, $id.'_nonce');
+            $nonce = Util::getItem($_POST, $action.'_nonce');
 
-            $nonce = Util::getItem($_POST, $id.'_nonce');
-            if (!wp_verify_nonce($nonce, $id)) {
+            if (!wp_verify_nonce($nonce, $action)) {
                 continue;
             }
 
@@ -839,7 +863,7 @@ abstract class Plugin{
             foreach($params as $key => $value){
                 $match = array();
 
-                if(preg_match('%^metabox_\.([\w\d_]+)$%i', $key, $match)){
+                if(preg_match('%^metabox-([\w\d_]+)$%i', $key, $match)){
                     if($value){
                         PostModel::updatePostMeta($postId, $match[1], $value);
                     }else{
@@ -848,7 +872,6 @@ abstract class Plugin{
                 }
             }
         }
-
         return;
     }
     

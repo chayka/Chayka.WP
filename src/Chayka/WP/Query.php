@@ -35,6 +35,12 @@ class Query extends WP_Query {
         }
     }
 
+    /**
+     * This function is called on parse_request hook.
+     * If it detects url that can be processed by any registered application it replaces
+     * $wp_the_query with this modified WP_Query extended instance.
+     * On get_posts it will return modified $post with MVC Application rendered content.
+     */
     public static function parseRequest(){
         global $wp_the_query, $wp_query;
 
@@ -63,26 +69,8 @@ class Query extends WP_Query {
                 }
                 die();
             }
-            add_filter('single_template', array('Chayka\\WP\\Query', 'renderResponse'), 1, 2);
+            add_filter('single_template', array('Chayka\\WP\\Query', 'renderResponse'), 1, 1);
 
-
-//            $args = array(
-//                'public' => false,
-//                'publicly_queryable' => false,
-//                'show_ui' => false,
-//                'show_in_menu' => false,
-//                'query_var' => false,
-//                'rewrite' => false,
-//                'capability_type' => 'post',
-//                'has_archive' => true,
-//                'hierarchical' => false,
-//                //            'supports' => array('title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments')
-//            );
-//            register_post_type('zf', $args);
-//            register_post_type('zf-api', $args);
-//            if($isAPI){
-//                $GLOBALS['is_zf_api_call'] = true;
-//            }
             remove_filter ('the_content','wpautop');
             $q = new Query();
             $q->copyFrom($wp_the_query);
@@ -91,6 +79,11 @@ class Query extends WP_Query {
         }
     }
 
+    /**
+     * Get all the data from provided query.
+     *
+     * @param WP_Query $wp_query
+     */
     public function copyFrom(WP_Query $wp_query) {
         $vars = get_object_vars($wp_query);
         foreach ($vars as $name => $value) {
@@ -98,6 +91,13 @@ class Query extends WP_Query {
         }
     }
 
+    /**
+     * Set post data that will be returned by get_posts().
+     * 'post_content' will be replaced by MVC Application response.
+     *
+     * @param PostModel|WP_Post $post
+     * @return PostModel
+     */
     public static function setPost($post){
         if(!($post instanceof PostModel)){
             $post = PostModel::unpackDbRecord($post);
@@ -120,97 +120,6 @@ class Query extends WP_Query {
         return self::$_post;
     }
 
-//    public static function setPostId($val){
-//        self::getPost()->setId($val);
-//    }
-//
-//    public static function getPostId(){
-//        return self::getPost()->getId();
-//    }
-//
-//    public static function setPostAuthor($val){
-//        self::getPost()->setUserId($val);
-//    }
-//
-//    public static function getPostAuthor(){
-//        return self::getPost()->getUserId();
-//    }
-//
-//    public static function setPostDate($val){
-//        self::getPost()->setDtCreated($val);
-//    }
-//
-//    public static function getPostDate(){
-//        return self::getPost()->getDtCreated();
-//    }
-//
-//    public static function setPostContent($val){
-//        self::getPost()->setContent($val);
-//    }
-//
-//    public static function getPostContent(){
-//        return self::getPost()->getContent();
-//    }
-//
-//    public static function setPostTitle($val){
-//        self::getPost()->setTitle($val);
-//    }
-//
-//    public static function getPostTitle(){
-//        return self::getPost()->getTitle();
-//    }
-//
-//    public static function setPostSlug($val){
-//        self::getPost()->setSlug($val);
-//    }
-//
-//    public static function getPostSlug(){
-//        return self::getPost()->getSlug();
-//    }
-//
-//    public static function setPostExcerpt($val){
-//        self::getPost()->setExcerpt($val);
-//    }
-//
-//    public static function getPostExcerpt(){
-//        return self::getPost()->getExcerpt();
-//    }
-//
-//    public static function setPostType($val){
-//        self::getPost()->setType($val);
-//    }
-//
-//    public static function getPostType(){
-//        return self::getPost()->getType();
-//    }
-//
-//    public static function setPostStatus($val){
-//        self::getPost()->setStatus($val);
-//    }
-//
-//    public static function getPostStatus(){
-//        return self::getPost()->getStatus();
-//    }
-//
-//    public static function setCommentStatus($val){
-//        self::getPost()->setCommentStatus($val);
-//    }
-//
-//    public static function getCommentStatus(){
-//        return self::getPost()->getCommentStatus();
-//    }
-//
-//    public static function setPingStatus($val){
-//        self::getPost()->setPingStatus($val);
-//    }
-//
-//    public static function getPingStatus(){
-//        return self::getPost()->getPingStatus();
-//    }
-//
-//    public static function getOptions(){
-//        return self::$options;
-//    }
 
     public static function getProperty($key, $default = ''){
         global $wp_the_query;
@@ -254,51 +163,10 @@ class Query extends WP_Query {
         self::setProperty('is_404', $notFound);
     }
 
-//    public static function getPageTemplate() {
-//        return self::getOption('page-template');
-//    }
-//
-//    public static function setPageTemplate($pageTemplate) {
-//        self::setOption('page-template', $pageTemplate);
-//    }
 
     public function &get_posts() {
-//        global $wp_the_query;
-//        global $wp_query;
 
         $this->request = '';
-//        $this->is_home = self::getIsMainPage();
-//        if(self::getNotFound()){
-//            $response = ApplicationDispatcher::dispatch('/not-found-404/');
-//        }
-//        $post_zf = array(
-//            "ID" => self::getPostId(),//WpHelper::getPostId(),
-//            "post_author" => self::getPostAuthor(),//WpHelper::getPostAuthor(),
-//            "post_date" => '',
-//            "post_date_gmt" => '',
-//            "post_content" => $response,
-//            "post_title" => self::getPostTitle(),//HtmlHelper::getHeadTitle(),
-//            "post_excerpt" => self::getPostExcerpt(),//HtmlHelper::getMetaDescription(),
-//            "post_status" => self::getPostStatus(),//"publish",
-//            "comment_status" => self::getCommentStatus(),//"closed",
-//            "ping_status" =>  self::getPingStatus(),//"closed",
-//            "post_password" => "",
-//            "post_name" => self::getPostSlug(),//"",
-//            "to_ping" => "",
-//            "pinged" => "",
-//            "post_modified" => "",
-//            "post_modified_gmt" => "",
-//            "post_content_filtered" => "",
-//            "post_parent" => 0,
-//            "guid" => "",
-//            "menu_order" => 1,
-//            "post_type" => 'zf',
-//            "post_mime_type" => "",
-//            "comment_count" => "0",
-//            "ancestors" => array(),
-//            "filter" => "",
-//            "page_template" => self::getPageTemplate(),
-//        );
 
         $richPost = self::getPost();
         if(!self::getIs404()){
@@ -308,7 +176,6 @@ class Query extends WP_Query {
         }
         if(!self::getIs404()){
             global $post;
-            $post = new WP_Post((object)$richPost->packDbRecord());
             $this->post = $post;
             $this->is_single = true;
             $this->posts = array($post);
@@ -324,22 +191,9 @@ class Query extends WP_Query {
         }
         $this->current_post = -1;
 
-//        $this->is_search = self::getIsSearch();
-//        $this->is_page = false;
-//        $this->is_404 = self::getNotFound();
-//        $this->is_archive = self::getIsArchive();
-//        $this->is_home = 0;//self::getIsMainPage();
-//        $this->comment = null;
-//        $this->comments = array();
-//        $this->comment_count = 0;
-//        $wp_the_query = $this;
-
-
-//        global $wp_filter;
-//        unset($wp_filter['template_redirect']);
-
         return $this->posts;
     }
+
 
     public static function renderResponse($template){
         return __DIR__.'/index.php';
@@ -347,4 +201,3 @@ class Query extends WP_Query {
 
 }
 
-//require_once 'widgets-ZF-Core.php';
