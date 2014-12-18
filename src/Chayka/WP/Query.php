@@ -16,25 +16,7 @@ class Query extends WP_Query {
 
     protected static $_post = null;
 
-    public static function checkSingleDomain(){
-        $server = Util::serverName();
-        switch(OptionHelper::getOption('SingleDomain')){
-            case 'www':
-//                die($_SERVER['SERVER_NAME'].' ! '.$server);
-                if($_SERVER['SERVER_NAME'] !== 'www.'.$server){
-                    header('Location: //www.'.$server.$_SERVER['REQUEST_URI'], true, 301);
-                    die();
-                }
-                break;
-            case 'no-www':
-                if($_SERVER['SERVER_NAME'] === 'www.'.$server){
-                    header('Location: //'.$server.$_SERVER['REQUEST_URI'], true, 301);
-                    die();
-                }
-                break;
-        }
-    }
-
+    //
     /**
      * This function is called on parse_request hook.
      * If it detects url that can be processed by any registered application it replaces
@@ -44,7 +26,7 @@ class Query extends WP_Query {
     public static function parseRequest(){
         global $wp_the_query, $wp_query;
 
-        self::checkSingleDomain();
+//        self::checkSingleDomain();
 //  TODO: implement BlockadeHelper
 //        BlockadeHelper::inspectUri($_SERVER['REQUEST_URI']);
 

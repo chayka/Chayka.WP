@@ -261,7 +261,9 @@ abstract class Plugin{
     /**
      * Routes are to be added here via $this->addRoute();
      */
-    abstract public function registerRoutes();
+    public function registerRoutes(){
+
+    }
 
     /**
      * @param string $label
@@ -296,17 +298,23 @@ abstract class Plugin{
     /**
      * Custom post type are to be added here
      */
-    abstract public function registerCustomPostTypes();
+    public function registerCustomPostTypes(){
+
+    }
 
     /**
      * Custom Taxonomies are to be added here
      */
-    abstract public function registerTaxonomies();
+    public function registerTaxonomies(){
+
+    }
 
     /**
      * Custom Sidebars are to be added here via $this->registerSidbar();
      */
-    abstract public function registerSidebars();
+    public function registerSidebars(){
+
+    }
 
     /**
      * Register custom sidbar
@@ -426,7 +434,9 @@ abstract class Plugin{
      *
      * @param bool $minimize
      */
-    abstract public function registerResources($minimize = false);
+    public function registerResources($minimize = false){
+
+    }
 
     /**
      * Alias to wp_register_style, but the path is relative to '/res'
@@ -704,7 +714,9 @@ abstract class Plugin{
     /**
      * Register your action hooks here using $this->addAction();
      */
-    abstract public function registerActions();
+    public function registerActions(){
+
+    }
 
     /**
      * Alias to add_action, but if the $method is a string then
@@ -723,7 +735,9 @@ abstract class Plugin{
     /**
      * Register your action hooks here using $this->addFilter();
      */
-    abstract public function registerFilters();
+    public function registerFilters(){
+
+    }
 
     /**
      * Alias to add_filter, but if the $method is a string then

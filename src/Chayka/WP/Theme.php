@@ -53,7 +53,9 @@ abstract class Theme extends Plugin{
     /**
      * Register your nav menus here using $this->registerNavMenu();
      */
-    abstract public function registerNavMenus();
+    public function registerNavMenus(){
+
+    }
 
     /**
      * Alias of register_nav_menu
