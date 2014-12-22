@@ -897,7 +897,7 @@ abstract class Plugin{
      * @param string $renderUri
      * @param string $context 'normal', 'advanced', or 'side'
      * @param string $priority 'high', 'core', 'default' or 'low'
-     * @param string $screen post type
+     * @param string|array $screen post type
      */
     public function addMetaBox($id, $title, $renderUri, $context = 'advanced', $priority = 'default', $screen = null){
         $this->metaBoxUris[$id] = array(

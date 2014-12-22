@@ -82,12 +82,13 @@ abstract class ReadyModel implements DbReady, JsonReady{
      *
      * @param $key
      * @param $value
+     * @param bool $multiple
      * @param string $format
-     * @return DbReady|null
+     * @return array|DbReady|null
      */
-    public static function selectBy($key, $value, $format = '%s'){
+    public static function selectBy($key, $value, $multiple = false, $format = '%s'){
         $obj = new static();
-        return DbHelper::selectBy($key, $value, get_class($obj), $format);
+        return DbHelper::selectBy($key, $value, get_class($obj), $multiple, $format);
     }
 
     /**

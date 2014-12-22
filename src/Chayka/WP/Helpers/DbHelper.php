@@ -229,14 +229,24 @@ class DbHelper {
      * @param $param
      * @param $value
      * @param $class
+     * @param bool $multiple
      * @param string $format
+     * @return DbReady|array|null
      * @internal param $id
-     * @return DbReady|null
      */
-    public static function selectBy($param, $value, $class, $format = '%s'){
+    public static function selectBy($param, $value, $class, $multiple = false, $format = '%s'){
         $wpdb = self::wpdb();
         $table = call_user_func(array($class, 'getDbTable'));
         $sql = $wpdb->prepare("SELECT * FROM $table WHERE $param = $format", $value);
+        if($multiple){
+            $dbRecords = $wpdb->get_results($sql);
+            if($class) {
+                foreach ($dbRecords as $i=>$dbRecord) {
+                    $dbRecords[$i] = call_user_func(array($class, 'unpackDbRecord'), $dbRecord);
+                }
+            }
+            return $dbRecords;
+        }
         $dbRecord = $wpdb->get_row($sql);
         return $dbRecord?call_user_func(array($class, 'unpackDbRecord'), $dbRecord):null;
     }

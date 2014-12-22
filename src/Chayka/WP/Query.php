@@ -155,9 +155,7 @@ class Query extends WP_Query {
             $response = ApplicationDispatcher::dispatch();
             $richPost = self::getPost();
             $richPost->setContent($response);
-        }
-        if(!self::getIs404()){
-            global $post;
+            $post = (object)$richPost->packDbRecord();
             $this->post = $post;
             $this->is_single = true;
             $this->posts = array($post);
