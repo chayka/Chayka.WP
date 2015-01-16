@@ -1482,9 +1482,10 @@ class PostModel implements DbReady, JsonReady, InputReady{
     /**
      * Populates this post for old school WP use.
      * Defines global variables $post, $authordata, $wp_the_query, etc.
-     * 
+     *
      * @global WP_Post $post
      * @global WP_Query $wp_the_query
+     * @return null|WP_Post
      */
     public function populateWpGlobals(){
         global $post, $wp_the_query;
@@ -1495,6 +1496,7 @@ class PostModel implements DbReady, JsonReady, InputReady{
             $wp_the_query->comments[] = $comment->getWpComment();
         }
         $wp_the_query->comment_count = $this->getCommentCount();
+        return $post;
     }
 
     /**

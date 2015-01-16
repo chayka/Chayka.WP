@@ -909,12 +909,14 @@ class CommentModel implements DbReady, JsonReady, InputReady{
     /**
      * Populates this comment for old school WP use.
      * Defines global variable $comment.
-     * 
+     *
      * @global object $comment
+     * @return array|bool|null|object
      */
     public function populateWpGlobals(){
         global $comment;
         $comment = $this->getWpComment();
+        return $comment;
     }
 
     /**

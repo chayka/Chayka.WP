@@ -232,7 +232,6 @@ class DbHelper {
      * @param bool $multiple
      * @param string $format
      * @return DbReady|array|null
-     * @internal param $id
      */
     public static function selectBy($param, $value, $class, $multiple = false, $format = '%s'){
         $wpdb = self::wpdb();

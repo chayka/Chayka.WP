@@ -10,6 +10,7 @@ use Chayka\MVC\Application;
 use Chayka\MVC\View;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\OptionHelper;
+use Chayka\WP\Helpers\ResourceHelper;
 use Chayka\WP\Models\PostModel;
 use Exception;
 use WP_Post;
@@ -31,7 +32,13 @@ abstract class Plugin{
     protected $baseUrl;
     
     protected $basePath;
-    
+
+    protected $resSrcDir = "";
+
+    protected $resDistDir = "";
+
+    protected $mediaMinimized = false;
+
     protected $appId;
 
     protected $application;
@@ -57,18 +64,19 @@ abstract class Plugin{
         $this->appId = $namespace ? $namespace : $this->getClassName();
         $this->application = new Application($this->basePath.'app', $this->appId);
         set_include_path($this->basePath.PATH_SEPARATOR.get_include_path());
-        $APP_ID = strtoupper(str_replace('\\', '_', $this->appId));
         ApplicationDispatcher::registerApplication($this->appId, $this->application, $routes);
 
-        defined($APP_ID.'_PATH')
-            || define($APP_ID.'_PATH', $this->basePath);
-        defined($APP_ID.'_URL')
-            || define($APP_ID.'_URL',  $this->baseUrl);
-        defined($APP_ID.'_APP_PATH')
-            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
+//        $APP_ID = strtoupper(str_replace('\\', '_', $this->appId));
+//        defined($APP_ID.'_PATH')
+//            || define($APP_ID.'_PATH', $this->basePath);
+//        defined($APP_ID.'_URL')
+//            || define($APP_ID.'_URL',  $this->baseUrl);
+//        defined($APP_ID.'_APP_PATH')
+//            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
 
         $minimize = OptionHelper::getOption('MinimizeMedia');
-//        die($minimize);
+        ResourceHelper::setMediaMinimized($minimize);
+        $this->setMediaMinimized($minimize);
         $this->getBower($minimize);
         $this->registerResources($minimize);
         $this->addRoute('default');
@@ -234,9 +242,11 @@ abstract class Plugin{
      * @param array(String) $versionHistory
      */
     public function dbUpdate($versionHistory = array('1.0')){
-        $this->currentDbVersion = end($versionHistory);
-        reset($versionHistory);
-        DbHelper::dbUpdate($this->currentDbVersion, $this->getAppId().'.dbVersion', $this->getBasePath().'app/sql', $versionHistory);
+        if(count($versionHistory)){
+            $this->currentDbVersion = end($versionHistory);
+            reset($versionHistory);
+            DbHelper::dbUpdate($this->currentDbVersion, $this->getAppId().'.dbVersion', $this->getBasePath().'app/sql', $versionHistory);
+        }
     }
 
     /**
@@ -430,6 +440,60 @@ abstract class Plugin{
     }
 
     /**
+     * Check if media minimization is enabled
+     *
+     * @return boolean
+     */
+    public function isMediaMinimized() {
+        return $this->mediaMinimized;
+    }
+
+    /**
+     * Enable or disable media minimization
+     *
+     * @param boolean $mediaMinimized
+     */
+    public function setMediaMinimized($mediaMinimized) {
+        $this->mediaMinimized = $mediaMinimized;
+    }
+
+    /**
+     * Get /res relative 'src' dir
+     *
+     * @return string
+     */
+    public function getResSrcDir() {
+        return $this->resSrcDir;
+    }
+
+    /**
+     * Set /res relative 'src' dir
+     *
+     * @param string $resSrcDir
+     */
+    public function setResSrcDir($resSrcDir) {
+        $this->resSrcDir = $resSrcDir;
+    }
+
+    /**
+     * Get /res relative 'dist' dir
+     *
+     * @return mixed
+     */
+    public function getResDistDir() {
+        return $this->resDistDir;
+    }
+
+    /**
+     * Set /res relative 'dist' dir
+     *
+     * @param mixed $resDistDir
+     */
+    public function setResDistDir($resDistDir) {
+        $this->resDistDir = $resDistDir;
+    }
+
+    /**
      * Register scripts and styles here using $this->registerScript() and $this->registerStyle()
      *
      * @param bool $minimize
@@ -445,8 +509,22 @@ abstract class Plugin{
      * @param $relativeResPath
      * @param array $dependencies
      */
-    public  function registerStyle($handle, $relativeResPath, $dependencies = array()){
-        wp_register_style($handle, $this->getUrlRes($relativeResPath), $dependencies);
+    public function registerStyle($handle, $relativeResPath, $dependencies = array()){
+        $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+        ResourceHelper::registerStyle($handle, $this->getUrlRes($relativeResPath), $dependencies);
+    }
+
+
+    /**
+     * Register minimized style file that contains all the min-cat styles defined by $handles.
+     *
+     * @param string $minHandle
+     * @param string $relativeResDistPath
+     * @param array $handles
+     */
+    public function registerMinimizedStyle($minHandle, $relativeResDistPath, $handles){
+        $relativeResPath = $this->getResDistDir() . $relativeResDistPath;
+        ResourceHelper::registerMinimizedStyle($minHandle, $this->getUrlRes($relativeResPath), $handles);
     }
 
     /**
@@ -457,7 +535,20 @@ abstract class Plugin{
      * @param array $dependencies
      */
     public function registerScript($handle, $relativeResPath, $dependencies = array()){
-        wp_register_script($handle, $this->getUrlRes($relativeResPath), $dependencies);
+        $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+        ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies);
+    }
+
+    /**
+     * Register minimized script file that contains all the min-cat scripts defined by $handles.
+     *
+     * @param string $minHandle
+     * @param string $relativeResDistPath
+     * @param array $handles
+     */
+    public function registerMinimizedScript($minHandle, $relativeResDistPath, $handles){
+        $relativeResPath = $this->getResDistDir() . $relativeResDistPath;
+        ResourceHelper::registerMinimizedScript($minHandle, $this->getUrlRes($relativeResPath), $handles);
     }
 
     /**
@@ -781,6 +872,7 @@ abstract class Plugin{
     /**
      * Add Console Page. Much like add_menu_page,
      * but instead of callback you provide some controller uri (e.g. 'admin/some-action')
+     * see https://developer.wordpress.org/resource/dashicons/#wordpress for icons
      *
      * @param string $title
      * @param string $capability
@@ -794,9 +886,13 @@ abstract class Plugin{
 
         $this->consolePageUris[$menuSlug] = $renderUri;
 
+        if($relativeResIconUrl && !preg_match('%^dashicons-%', $relativeResIconUrl)){
+            $relativeResIconUrl = $this->getUrlRes($relativeResIconUrl);
+        }
+
         add_menu_page($title, $title, $capability, $menuSlug,
             $this->getCallbackMethod('renderConsolePage'), 
-            $relativeResIconUrl?$this->getUrlRes($relativeResIconUrl):'', $position);
+            $relativeResIconUrl, $position);
     }
 
     /**

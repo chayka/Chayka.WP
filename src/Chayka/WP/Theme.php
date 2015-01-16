@@ -5,6 +5,7 @@ namespace Chayka\WP;
 use Chayka\MVC\Application;
 use Chayka\MVC\ApplicationDispatcher;
 use Chayka\WP\Helpers\OptionHelper;
+use Chayka\WP\Helpers\ResourceHelper;
 
 abstract class Theme extends Plugin{
     
@@ -23,20 +24,23 @@ abstract class Theme extends Plugin{
         $this->baseUrl = self::dirUrl($__file__);
 
         $namespace = $this->getNamespace();
-        $this->appId = $namespace ? str_replace('\\', '_', $namespace) : $this->getClassName();
+        $this->appId = $namespace ? $namespace : $this->getClassName();
+//        $this->appId = $namespace ? str_replace('\\', '_', $namespace) : $this->getClassName();
         $this->application = new Application($this->basePath.'app', $this->appId);
 
-        $APP_ID = strtoupper($this->appId);
         ApplicationDispatcher::registerApplication($this->appId, $this->application, $routes);
 
-        defined($APP_ID.'_PATH')
-            || define($APP_ID.'_PATH', $this->basePath);
-        defined($APP_ID.'_URL')
-            || define($APP_ID.'_URL',  $this->baseUrl);
-        defined($APP_ID.'_APP_PATH')
-            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
+//        $APP_ID = strtoupper($this->appId);
+//        defined($APP_ID.'_PATH')
+//            || define($APP_ID.'_PATH', $this->basePath);
+//        defined($APP_ID.'_URL')
+//            || define($APP_ID.'_URL',  $this->baseUrl);
+//        defined($APP_ID.'_APP_PATH')
+//            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
 
         $minimize = OptionHelper::getOption('minimizeMedia');
+        ResourceHelper::setMediaMinimized($minimize);
+        $this->setMediaMinimized($minimize);
         $this->registerResources($minimize);
         $this->addRoute('default');
         $this->registerRoutes();

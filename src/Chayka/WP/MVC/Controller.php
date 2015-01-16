@@ -8,10 +8,26 @@
 
 namespace Chayka\WP\MVC;
 
+use Chayka\Helpers\HttpHeaderHelper;
 use Chayka\MVC;
 use Chayka\WP;
+use Chayka\WP\Helpers\ResourceHelper;
+use Chayka\WP\Models\PostModel;
+use Chayka\WP\Query;
 
 class Controller extends MVC\Controller{
+
+    protected $appUrl;
+
+    /**
+     * Controller constructor
+     *
+     * @param $appPath
+     */
+    public function __construct($appPath){
+        parent::__construct($appPath);
+        $this->appUrl = preg_replace('%^.*wp-content%', '/wp-content', $appPath);
+    }
 
     /**
      * This function should be used to set post data,
@@ -54,5 +70,82 @@ class Controller extends MVC\Controller{
      */
     public function setKeywords($keywords){
         WP\Helpers\HtmlHelper::setMetaKeywords($keywords);
+    }
+
+    /**
+     * Enqueue script. Utilizes wp_enqueue_script().
+     * However if detects registered minimized and concatenated version enqueue it instead.
+     *
+     * @param $handle
+     * @param string|bool $resRelativeSrc
+     * @param array $dependencies
+     * @param string|bool $ver
+     * @param bool $in_footer
+     */
+    public function enqueueScript($handle, $resRelativeSrc = false, $dependencies = array(), $ver = false, $in_footer = false){
+        $src = $this->appUrl.'res/'.$resRelativeSrc;
+        ResourceHelper::enqueueScript($handle, $src, $dependencies, $ver, $in_footer);
+    }
+
+    /**
+     * Enqueue style. Utilizes wp_enqueue_style().
+     * However if detects registered minimized and concatenated version enqueue it instead.
+     *
+     * @param $handle
+     * @param string|bool $resRelativeSrc
+     * @param array $dependencies
+     * @param string|bool $ver
+     * @param bool $in_footer
+     */
+    public function enqueueStyle($handle, $resRelativeSrc = false, $dependencies = array(), $ver = false, $in_footer = false) {
+        $src = $this->appUrl.'res/'.$resRelativeSrc;
+        ResourceHelper::enqueueStyle($handle, $src, $dependencies, $ver, $in_footer);
+    }
+
+    /**
+     * Enqueue both script and style with the same $handle.
+     * Uses minimized versions if detects.
+     *
+     * @param string $handle
+     */
+    public function enqueueScriptStyle($handle) {
+        ResourceHelper::enqueueScriptStyle($handle);
+    }
+
+    /**
+     * This helper load post for the action.
+     * It checks if $id and $slug are valid, redirects to valid url otherwise.
+     * If $id or $slug is omitted then loads by what is given and no consistency check is performed.
+     * Assigns post for major $wp_query as current (for all those headers to work right).
+     * And optionally increases post reviews count.
+     *
+     * @param $id
+     * @param $slug
+     * @param bool $incReviews
+     * @return PostModel|null
+     */
+    public function loadActionPost($id = null, $slug = null, $incReviews = true){
+        $post = $id?PostModel::selectById($id):null;
+        if($post && $post->getId()){
+            if($slug && urldecode($post->getSlug()) != $slug){
+                HttpHeaderHelper::redirect($post->getHref(), 301);
+            }
+        }else if($slug){
+            $post = PostModel::selectBySlug($slug);
+            if($post && $post->getId() && $id && $post->getId() != $id){
+                HttpHeaderHelper::redirect($post->getHref(), 301);
+            }
+        }
+
+        if($post){
+            if($incReviews){
+                $post->incReviewsCount();
+            }
+            $this->setPost($post);
+        }else{
+            Query::setIs404(true);
+        }
+
+        return $post;
     }
 }

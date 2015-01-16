@@ -77,7 +77,7 @@ abstract class ReadyModel implements DbReady, JsonReady{
     }
 
     /**
-     * Select instance from db by some unique key.
+     * Select instance from db by some key.
      * Mind to ensure index on $key field.
      *
      * @param $key

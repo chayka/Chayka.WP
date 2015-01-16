@@ -52,7 +52,7 @@ class Query extends WP_Query {
                 die();
             }
             add_filter('single_template', array('Chayka\\WP\\Query', 'renderResponse'), 1, 1);
-
+            remove_action( 'template_redirect', 'wp_old_slug_redirect');
             remove_filter ('the_content','wpautop');
             $q = new Query();
             $q->copyFrom($wp_the_query);
