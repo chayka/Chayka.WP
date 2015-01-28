@@ -159,7 +159,7 @@ class ResourceHelper {
      * @param bool $in_footer
      */
     public static function enqueueStyle($handle, $src = false, $dependencies = array(), $ver = false, $in_footer = false){
-        if(self::$isMediaMinimized && self::$minimizedStyles[$handle]){
+        if(self::$isMediaMinimized && !empty(self::$minimizedStyles[$handle])){
             wp_enqueue_style(self::$minimizedStyles[$handle]);
         }else{
             wp_enqueue_style($handle, $src, $dependencies, $ver, $in_footer);

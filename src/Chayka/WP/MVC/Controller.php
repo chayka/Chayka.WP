@@ -13,7 +13,6 @@ use Chayka\MVC;
 use Chayka\WP;
 use Chayka\WP\Helpers\ResourceHelper;
 use Chayka\WP\Models\PostModel;
-use Chayka\WP\Query;
 
 class Controller extends MVC\Controller{
 
@@ -143,9 +142,34 @@ class Controller extends MVC\Controller{
             }
             $this->setPost($post);
         }else{
-            Query::setIs404(true);
+            WP\Query::setIs404(true);
         }
 
         return $post;
     }
+
+    /**
+     * Setup pagination by WP_Query
+     *
+     * @param \WP_Query $wpQuery
+     * @return $this
+     */
+    public function setupPaginationByWpQuery($wpQuery = null){
+        if(!$wpQuery){
+            $wpQuery = PostModel::getWpQuery();
+        }
+        return $this->getPagination()
+            ->setCurrentPage($wpQuery->get('paged'))
+            ->setTotalPages($wpQuery->max_num_pages);
+    }
+
+    /**
+     * Set WP page template
+     *
+     * @param $template
+     */
+    public function setWpTemplate($template){
+        WP\Query::setTemplate($template);
+    }
+
 }

@@ -250,15 +250,18 @@ class PostModel implements DbReady, JsonReady, InputReady{
 
     /**
      * Get post excerpt that was set or generated one
-     * 
-     * @param boolean $generate set to true if you need excerpt autogeneration
+     *
+     * @param bool $generate set to true if you need excerpt autogeneration
+     * @param bool $stripShortcodes set to true will strip shortcodes while generating excerpt
      * @return string
      */
-    public function getExcerpt($generate = true) {
+    public function getExcerpt($generate = true, $stripShortcodes = true) {
         if($generate && !$this->excerpt && $this->content){
             $text = $this->getContent();
 
-            $text = strip_shortcodes( $text );
+            if($stripShortcodes){
+                $text = strip_shortcodes( $text );
+            }
 
             $text = apply_filters('the_content', $text);
             $text = str_replace(']]>', ']]&gt;', $text);
@@ -983,7 +986,7 @@ class PostModel implements DbReady, JsonReady, InputReady{
      * @return integer
      */
     public static function postsFound(){
-        return (int)max(self::$wpQuery->found_posts, self::$postsFound);
+        return (int)max(self::$wpQuery?self::$wpQuery->found_posts:0, self::$postsFound);
     }
 
     /**

@@ -16,6 +16,8 @@ class Query extends WP_Query {
 
     protected static $_post = null;
 
+    protected static $template = null;
+
     //
     /**
      * This function is called on parse_request hook.
@@ -102,6 +104,19 @@ class Query extends WP_Query {
         return self::$_post;
     }
 
+    /**
+     * @return null|string
+     */
+    public static function getTemplate() {
+        return self::$template;
+    }
+
+    /**
+     * @param null|string $template
+     */
+    public static function setTemplate($template) {
+        self::$template = $template;
+    }
 
     public static function getProperty($key, $default = ''){
         global $wp_the_query;
@@ -176,7 +191,7 @@ class Query extends WP_Query {
 
 
     public static function renderResponse($template){
-        return __DIR__.'/index.php';
+        return self::$template?self::$template:__DIR__.'/index.php';
     }
 
 }
