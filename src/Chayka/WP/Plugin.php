@@ -920,6 +920,7 @@ abstract class Plugin{
      */
     public function addSupport_Metaboxes(){
         $this->addAction('add_meta_boxes', 'addMetaBoxes');
+        $this->addAction('do_meta_boxes', 'unregisterMetaBoxes');
         $this->addAction('save_post', 'updateMetaBoxes', 50, 2);
         $this->registerMetaBoxes();
     }
@@ -1009,7 +1010,6 @@ abstract class Plugin{
     /**
      * Callback method for 'add_meta_boxes' hook,
      * adding metaboxes when rendering post editor page
-     *
      */
     public function addMetaBoxes(){
         foreach($this->metaBoxUris as $id => $params){
@@ -1027,6 +1027,33 @@ abstract class Plugin{
         }
         //  TODO: revise style naming
         wp_enqueue_style('brx-wp-admin');
+    }
+
+    /**
+     * Remove registered metabox.
+     * Handy for blocking metaboxes from parent themes.
+     *
+     * more info http://codex.wordpress.org/Function_Reference/remove_meta_box
+     *
+     * @param string $id
+     * @param string|array $pages
+     * @param string $context 'normal', 'advanced', or 'side'.
+     */
+    public function removeMetaBox($id, $pages, $context = 'advanced'){
+        if(is_string($pages)){
+            $pages = preg_split('%\s+%', $pages);
+        }
+        foreach($pages as $page){
+            remove_meta_box($id, $page, $context);
+        }
+    }
+
+    /**
+     * Callback method for 'add_meta_boxes' hook,
+     * adding metaboxes when rendering post editor page
+     */
+    public function unregisterMetaBoxes(){
+
     }
 
     /**
