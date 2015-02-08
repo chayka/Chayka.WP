@@ -744,7 +744,7 @@ abstract class Plugin{
     }
 
     /**
-     * Go through vendor folder if it exests.
+     * Go through vendor folder if it exists.
      * Find composer.json
      * Call "wp-init" callback.
      *
@@ -776,7 +776,7 @@ abstract class Plugin{
     }
 
     /**
-     * Register composer plugin
+     * Register composer Chayka plugin
      *
      * @param string $name
      * @param string $path
@@ -789,13 +789,24 @@ abstract class Plugin{
         }
 
         if($path) {
-            $composerFile = $path . '/composer.json';
-            if (file_exists($composerFile)) {
-                $json = FsHelper::readFile($composerFile);
-                $composerData = json_decode($json);
-                $plugin = Util::getItem($composerData, 'chayka-wp-plugin');
-                if($plugin){
-                    call_user_func(array($plugin, 'init'));
+            $chaykaFile = $path . '/chayka.json';
+            if (file_exists($chaykaFile)) {
+                $json = FsHelper::readFile($chaykaFile);
+                $chaykaData = json_decode($json);
+                $phpNamespace =Util::getItem($chaykaData, 'phpNamespace');
+                if($phpNamespace){
+                    call_user_func(array($phpNamespace.'\\Plugin', 'init'));
+                }
+            }else{
+                $composerFile = $path . '/composer.json';
+                if (file_exists($composerFile)) {
+                    $json = FsHelper::readFile($composerFile);
+                    $composerData = json_decode($json);
+                    $plugin = Util::getItem($composerData, 'chayka-wp-plugin');
+                    if($plugin){
+                        call_user_func(array($plugin, 'init'));
+                    }
+
                 }
             }
         }
