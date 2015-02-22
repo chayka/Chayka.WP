@@ -594,7 +594,6 @@ class UserModel implements DbReady, JsonReady, InputReady{
         $obj->setJabber(Util::getItem($wpRecord, 'jabber'));
         $obj->setAim(Util::getItem($wpRecord, 'aim'));
         $obj->setYim(Util::getItem($wpRecord, 'yim'));
-        
         $obj->setWpUser($wpRecord);
         
         self::$userCacheById[$obj->getId()] = $obj;
