@@ -502,53 +502,71 @@ abstract class Plugin{
 
     }
 
-    /**
-     * Alias to wp_register_style, but the path is relative to '/res'
-     *
-     * @param $handle
-     * @param $relativeResPath
-     * @param array $dependencies
-     */
-    public function registerStyle($handle, $relativeResPath, $dependencies = array()){
+	/**
+	 * Set script rendering location (head|footer)
+	 *
+	 * @param $handle
+	 * @param bool $inFooter
+	 */
+	public function setScriptLocation($handle, $inFooter = false){
+		ResourceHelper::setScriptLocation($handle, $inFooter);
+	}
+
+	/**
+	 * Alias to wp_register_style, but the path is relative to '/res'
+	 *
+	 * @param string $handle
+	 * @param string $relativeResPath
+	 * @param array $dependencies
+	 * @param bool $version
+	 * @param string $media
+	 */
+    public function registerStyle($handle, $relativeResPath, $dependencies = array(), $version = false, $media = 'all'){
         $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
-        ResourceHelper::registerStyle($handle, $this->getUrlRes($relativeResPath), $dependencies);
+        ResourceHelper::registerStyle($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $media);
     }
 
 
-    /**
-     * Register minimized style file that contains all the min-cat styles defined by $handles.
-     *
-     * @param string $minHandle
-     * @param string $relativeResDistPath
-     * @param array $handles
-     */
-    public function registerMinimizedStyle($minHandle, $relativeResDistPath, $handles){
+	/**
+	 * Register minimized style file that contains all the min-cat styles defined by $handles.
+	 *
+	 * @param string $minHandle
+	 * @param string $relativeResDistPath
+	 * @param array $handles
+	 * @param bool $version
+	 * @param string $media
+	 */
+    public function registerMinimizedStyle($minHandle, $relativeResDistPath, $handles, $version = false, $media = 'all'){
         $relativeResPath = $this->getResDistDir() . $relativeResDistPath;
-        ResourceHelper::registerMinimizedStyle($minHandle, $this->getUrlRes($relativeResPath), $handles);
+        ResourceHelper::registerMinimizedStyle($minHandle, $this->getUrlRes($relativeResPath), $handles, $version, $media);
     }
 
-    /**
-     * Alias to wp_register_script, but the path is relative to '/res'
-     *
-     * @param $handle
-     * @param $relativeResPath
-     * @param array $dependencies
-     */
-    public function registerScript($handle, $relativeResPath, $dependencies = array()){
+	/**
+	 * Alias to wp_register_script, but the path is relative to '/res'
+	 *
+	 * @param string $handle
+	 * @param string $relativeResPath
+	 * @param array $dependencies
+	 * @param bool $version
+	 * @param bool $inFooter
+	 */
+    public function registerScript($handle, $relativeResPath, $dependencies = array(), $version = false, $inFooter = true){
         $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
-        ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies);
+        ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $inFooter);
     }
 
-    /**
-     * Register minimized script file that contains all the min-cat scripts defined by $handles.
-     *
-     * @param string $minHandle
-     * @param string $relativeResDistPath
-     * @param array $handles
-     */
-    public function registerMinimizedScript($minHandle, $relativeResDistPath, $handles){
+	/**
+	 * Register minimized script file that contains all the min-cat scripts defined by $handles.
+	 *
+	 * @param string $minHandle
+	 * @param string $relativeResDistPath
+	 * @param array $handles
+	 * @param bool $version
+	 * @param bool $inFooter
+	 */
+    public function registerMinimizedScript($minHandle, $relativeResDistPath, $handles, $version = false, $inFooter = true){
         $relativeResPath = $this->getResDistDir() . $relativeResDistPath;
-        ResourceHelper::registerMinimizedScript($minHandle, $this->getUrlRes($relativeResPath), $handles);
+        ResourceHelper::registerMinimizedScript($minHandle, $this->getUrlRes($relativeResPath), $handles, $inFooter);
     }
 
     /**
@@ -687,7 +705,7 @@ abstract class Plugin{
                                     if ($needOverrideCss) {
                                         wp_deregister_script($name);
                                     }
-                                    wp_register_style($name, $this->getUrl($relPath));
+                                    wp_register_style($name, $this->getUrl($relPath), [], $bowerVer, false);
                                     break;
                                 case 'js':
                                     foreach ($dependencies as $dep) {
@@ -697,7 +715,7 @@ abstract class Plugin{
                                     if ($needOverrideJs) {
                                         wp_deregister_script($name);
                                     }
-                                    wp_register_script($name, $this->getUrl($relPath), $dependencies, $bowerVer);
+                                    wp_register_script($name, $this->getUrl($relPath), $dependencies, $bowerVer, false);
                                     break;
                             }
                         }

@@ -32,14 +32,16 @@ class ResourceHelper {
         self::$isMediaMinimized = $isMediaMinimized;
     }
 
-    /**
-     * Alias to wp_register_script but checks if dependencies can be found inside minimized files
-     *
-     * @param $handle
-     * @param $src
-     * @param array $dependencies
-     */
-    public static function registerScript($handle, $src, $dependencies = array()){
+	/**
+	 * Alias to wp_register_script but checks if dependencies can be found inside minimized files
+	 *
+	 * @param string $handle
+	 * @param string $src
+	 * @param array $dependencies
+	 * @param bool $version
+	 * @param bool $inFooter
+	 */
+    public static function registerScript($handle, $src, $dependencies = array(), $version = false, $inFooter = true){
         if(self::$isMediaMinimized){
             foreach($dependencies as $i => $d){
                 if(self::$minimizedScripts[$d]){
@@ -48,17 +50,19 @@ class ResourceHelper {
             }
             $dependencies = array_unique($dependencies);
         }
-        wp_register_script($handle, $src, $dependencies);
+        wp_register_script($handle, $src, $dependencies, $version, $inFooter);
     }
 
-    /**
-     * Register script that contains minimized and concatenated scripts
-     *
-     * @param string $minHandle
-     * @param string $src
-     * @param array $handles
-     */
-    public static function registerMinimizedScript($minHandle, $src, $handles){
+	/**
+	 * Register script that contains minimized and concatenated scripts
+	 *
+	 * @param string $minHandle
+	 * @param string $src
+	 * @param array $handles
+	 * @param bool $version
+	 * @param bool $inFooter
+	 */
+    public static function registerMinimizedScript($minHandle, $src, $handles, $version = false, $inFooter = true){
         global $wp_scripts;
         $dependencies = array();
         foreach($handles as $handle){
@@ -78,8 +82,20 @@ class ResourceHelper {
             $dependencies = array_merge($dependencies, $itemDependencies);
         }
         $dependencies = array_unique($dependencies);
-        wp_register_script($minHandle, $src, $dependencies);
+        wp_register_script($minHandle, $src, $dependencies, $version, $inFooter);
     }
+
+	/**
+	 * This function can change default script rendering location: head or footer
+	 * @param $handle
+	 * @param bool $inFooter
+	 */
+	public static function setScriptLocation($handle, $inFooter = false){
+		global $wp_scripts;
+		if($wp_scripts->registered[$handle]){
+			$wp_scripts->set_group($handle, false, $inFooter?1:0);
+		}
+	}
 
     /**
      * Enqueue script. Utilizes wp_enqueue_script().
@@ -89,24 +105,26 @@ class ResourceHelper {
      * @param string|bool $src
      * @param array $dependencies
      * @param string|bool $ver
-     * @param bool $in_footer
+     * @param bool $inFooter
      */
-    public static function enqueueScript($handle, $src = false, $dependencies = array(), $ver = false, $in_footer = false){
+    public static function enqueueScript($handle, $src = false, $dependencies = array(), $ver = false, $inFooter = true){
         if(self::$isMediaMinimized && !empty(self::$minimizedScripts[$handle])){
             wp_enqueue_script(self::$minimizedScripts[$handle]);
         }else{
-            wp_enqueue_script($handle, $src, $dependencies, $ver, $in_footer);
+            wp_enqueue_script($handle, $src, $dependencies, $ver, $inFooter);
         }
     }
 
-    /**
-     * Alias to wp_register_style but checks if dependencies can be found inside minimized files
-     *
-     * @param $handle
-     * @param $src
-     * @param array $dependencies
-     */
-    public static function registerStyle($handle, $src, $dependencies = array()){
+	/**
+	 * Alias to wp_register_style but checks if dependencies can be found inside minimized files
+	 *
+	 * @param string $handle
+	 * @param string $src
+	 * @param array $dependencies
+	 * @param bool $version
+	 * @param string $media
+	 */
+    public static function registerStyle($handle, $src, $dependencies = array(), $version = false, $media = 'all'){
         if(self::$isMediaMinimized) {
             foreach ($dependencies as $i => $d) {
                 if (self::$minimizedStyles[$d]) {
@@ -115,17 +133,19 @@ class ResourceHelper {
             }
             $dependencies = array_unique($dependencies);
         }
-        wp_register_style($handle, $src, $dependencies);
+        wp_register_style($handle, $src, $dependencies, $version, $media);
     }
 
-    /**
-     * Register script that contains minimized and concatenated styles
-     *
-     * @param string $minHandle
-     * @param $src
-     * @param array $handles
-     */
-    public static function registerMinimizedStyle($minHandle, $src, $handles){
+	/**
+	 * Register script that contains minimized and concatenated styles
+	 *
+	 * @param string $minHandle
+	 * @param string $src
+	 * @param array $handles
+	 * @param bool $version
+	 * @param string $media
+	 */
+    public static function registerMinimizedStyle($minHandle, $src, $handles, $version = false, $media = 'all'){
         global $wp_styles;
         $dependencies = array();
         foreach($handles as $handle){
@@ -145,7 +165,7 @@ class ResourceHelper {
             $dependencies = array_merge($dependencies, $itemDependencies);
         }
         $dependencies = array_unique($dependencies);
-        wp_register_style($minHandle, $src, $dependencies);
+        wp_register_style($minHandle, $src, $dependencies, $version, $media);
     }
 
     /**
@@ -156,13 +176,13 @@ class ResourceHelper {
      * @param string|bool $src
      * @param array $dependencies
      * @param string|bool $ver
-     * @param bool $in_footer
+     * @param string $media
      */
-    public static function enqueueStyle($handle, $src = false, $dependencies = array(), $ver = false, $in_footer = false){
+    public static function enqueueStyle($handle, $src = false, $dependencies = array(), $ver = false, $media = 'all'){
         if(self::$isMediaMinimized && !empty(self::$minimizedStyles[$handle])){
             wp_enqueue_style(self::$minimizedStyles[$handle]);
         }else{
-            wp_enqueue_style($handle, $src, $dependencies, $ver, $in_footer);
+            wp_enqueue_style($handle, $src, $dependencies, $ver, $media);
         }
     }
 
@@ -172,7 +192,8 @@ class ResourceHelper {
      *
      * @param string $handle
      */
-    public static function enqueueScriptStyle($handle){
+    public static function enqueueScriptStyle($handle, $scriptInFooter = true){
+	    self::setScriptLocation($handle, $scriptInFooter);
         self::enqueueScript($handle);
         self::enqueueStyle($handle);
     }
