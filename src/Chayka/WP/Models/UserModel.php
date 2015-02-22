@@ -579,21 +579,21 @@ class UserModel implements DbReady, JsonReady, InputReady{
         
         $obj = new self();
 
-        $obj->setId($wpRecord->ID);
-        $obj->setLogin($wpRecord->user_login);
-        $obj->setEmail($wpRecord->user_email);
-        $obj->setNicename($wpRecord->user_nicename);
-        $obj->setUrl($wpRecord->user_url);
-        $obj->setDisplayName($wpRecord->display_name);
-        $obj->setFirstName($wpRecord->first_name);
-        $obj->setLastName($wpRecord->last_name);
-        $obj->setDescription($wpRecord->description);
-        $obj->setRichEditing($wpRecord->rich_editing);        
-        $obj->setRegistered(DateHelper::dbStrToDatetime($wpRecord->user_registered));
-        $obj->setRole($wpRecord->role);
-        $obj->setJabber($wpRecord->jabber);
-        $obj->setAim($wpRecord->aim);
-        $obj->setYim($wpRecord->yim);
+        $obj->setId(Util::getItem($wpRecord, 'ID'));
+        $obj->setLogin(Util::getItem($wpRecord, 'user_login'));
+        $obj->setEmail(Util::getItem($wpRecord, 'user_email'));
+        $obj->setNicename(Util::getItem($wpRecord, 'user_nicename'));
+        $obj->setUrl(Util::getItem($wpRecord, 'user_url'));
+        $obj->setDisplayName(Util::getItem($wpRecord, 'display_name'));
+        $obj->setFirstName(Util::getItem($wpRecord, 'first_name'));
+        $obj->setLastName(Util::getItem($wpRecord, 'last_name'));
+        $obj->setDescription(Util::getItem($wpRecord, 'description'));
+        $obj->setRichEditing(Util::getItem($wpRecord, 'rich_editing'));
+        $obj->setRegistered(DateHelper::dbStrToDatetime(Util::getItem($wpRecord, 'user_registered')));
+        $obj->setRole(Util::getItem($wpRecord, 'role'));
+        $obj->setJabber(Util::getItem($wpRecord, 'jabber'));
+        $obj->setAim(Util::getItem($wpRecord, 'aim'));
+        $obj->setYim(Util::getItem($wpRecord, 'yim'));
         
         $obj->setWpUser($wpRecord);
         

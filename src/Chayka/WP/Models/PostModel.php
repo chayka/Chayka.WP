@@ -713,28 +713,28 @@ class PostModel implements DbReady, JsonReady, InputReady{
      */
     public static function unpackDbRecord( $wpRecord){
         $obj = new self();
-
-        $obj->setId($wpRecord->ID);
-        $obj->setUserId($wpRecord->post_author);
-        $obj->setParentId($wpRecord->post_parent);
-        $obj->setGuid($wpRecord->guid);
-        $obj->setType($wpRecord->post_type);
-        $obj->setSlug($wpRecord->post_name);
-        $obj->setTitle($wpRecord->post_title);
-        $obj->setContent($wpRecord->post_content);
-        $obj->setContentFiltered($wpRecord->post_content_filtered);
-        $obj->setExcerpt($wpRecord->post_excerpt);
-        $obj->setStatus($wpRecord->post_status);        
-        $obj->setPingStatus($wpRecord->ping_status);
-        $obj->setPinged($wpRecord->pinged);
-        $obj->setToPing($wpRecord->to_ping);
-        $obj->setPassword($wpRecord->post_password);
-        $obj->setDtCreated(DateHelper::dbStrToDatetime($wpRecord->post_date));
-        $obj->setDtModified(DateHelper::dbStrToDatetime($wpRecord->post_modified));
-        $obj->setMenuOrder($wpRecord->menu_order);
-        $obj->setMimeType($wpRecord->post_mime_type);
-        $obj->setCommentStatus($wpRecord->comment_status);
-        $obj->setCommentCount($wpRecord->comment_count);
+//		Util::print_r($wpRecord);
+        $obj->setId(Util::getItem($wpRecord, 'ID'));
+        $obj->setUserId(Util::getItem($wpRecord, 'post_author'));
+        $obj->setParentId(Util::getItem($wpRecord, 'post_parent'));
+        $obj->setGuid(Util::getItem($wpRecord, 'guid'));
+        $obj->setType(Util::getItem($wpRecord, 'post_type'));
+        $obj->setSlug(Util::getItem($wpRecord, 'post_name'));
+        $obj->setTitle(Util::getItem($wpRecord, 'post_title'));
+        $obj->setContent(Util::getItem($wpRecord, 'post_content'));
+        $obj->setContentFiltered(Util::getItem($wpRecord, 'post_content_filtered'));
+        $obj->setExcerpt(Util::getItem($wpRecord, 'post_excerpt'));
+        $obj->setStatus(Util::getItem($wpRecord, 'post_status'));
+        $obj->setPingStatus(Util::getItem($wpRecord, 'ping_status'));
+        $obj->setPinged(Util::getItem($wpRecord, 'pinged'));
+        $obj->setToPing(Util::getItem($wpRecord, 'to_ping'));
+        $obj->setPassword(Util::getItem($wpRecord, 'post_password'));
+        $obj->setDtCreated(DateHelper::dbStrToDatetime(Util::getItem($wpRecord, 'post_date')));
+        $obj->setDtModified(DateHelper::dbStrToDatetime(Util::getItem($wpRecord, 'post_modified')));
+        $obj->setMenuOrder(Util::getItem($wpRecord, 'menu_order'));
+        $obj->setMimeType(Util::getItem($wpRecord, 'post_mime_type'));
+        $obj->setCommentStatus(Util::getItem($wpRecord, 'comment_status'));
+        $obj->setCommentCount(Util::getItem($wpRecord, 'comment_count'));
         
         $obj->setWpPost($wpRecord);
         
@@ -1496,6 +1496,9 @@ class PostModel implements DbReady, JsonReady, InputReady{
         setup_postdata($post);
         $comments = $this->getComments()?$this->getComments():array();
         foreach($comments as $comment){
+	        /**
+	         * @var CommentModel $comment
+	         */
             $wp_the_query->comments[] = $comment->getWpComment();
         }
         $wp_the_query->comment_count = $this->getCommentCount();

@@ -692,20 +692,20 @@ class CommentModel implements DbReady, JsonReady, InputReady{
         
         $obj = new self();
 
-        $obj->setId($wpRecord->comment_ID);
-        $obj->setPostId($wpRecord->comment_post_ID);
-        $obj->setUserId($wpRecord->user_id);
-        $obj->setParentId($wpRecord->comment_parent);
-        $obj->setAuthor($wpRecord->comment_author);
-        $obj->setEmail($wpRecord->comment_author_email);
-        $obj->setUrl($wpRecord->comment_author_url);
-        $obj->setIp($wpRecord->comment_author_IP);
-        $obj->setContent($wpRecord->comment_content);
-        $obj->setKarma($wpRecord->comment_karma);
-        $obj->setIsApproved($wpRecord->comment_approved);
-        $obj->setDtCreated(DateHelper::dbStrToDatetime($wpRecord->comment_date));
-        $obj->setAgent($wpRecord->comment_agent);
-        $obj->setType($wpRecord->comment_type);
+        $obj->setId(Util::getItem($wpRecord, 'comment_ID'));
+        $obj->setPostId(Util::getItem($wpRecord, 'comment_post_ID'));
+        $obj->setUserId(Util::getItem($wpRecord, 'user_id'));
+        $obj->setParentId(Util::getItem($wpRecord, 'comment_parent'));
+        $obj->setAuthor(Util::getItem($wpRecord, 'comment_author'));
+        $obj->setEmail(Util::getItem($wpRecord, 'comment_author_email'));
+        $obj->setUrl(Util::getItem($wpRecord, 'comment_author_url'));
+        $obj->setIp(Util::getItem($wpRecord, 'comment_author_IP'));
+        $obj->setContent(Util::getItem($wpRecord, 'comment_content'));
+        $obj->setKarma(Util::getItem($wpRecord, 'comment_karma'));
+        $obj->setIsApproved(Util::getItem($wpRecord, 'comment_approved'));
+        $obj->setDtCreated(DateHelper::dbStrToDatetime(Util::getItem($wpRecord, 'comment_date')));
+        $obj->setAgent(Util::getItem($wpRecord, 'comment_agent'));
+        $obj->setType(Util::getItem($wpRecord, 'comment_type'));
         
         $obj->setWpComment($wpRecord);
         
