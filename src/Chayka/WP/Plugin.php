@@ -74,7 +74,8 @@ abstract class Plugin{
 //        defined($APP_ID.'_APP_PATH')
 //            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
 
-        $minimize = OptionHelper::getOption('MinimizeMedia');
+	    $minimize = OptionHelper::getOption('MinimizeMedia');
+	    $cacheControl = OptionHelper::getOption('CacheControl');
         ResourceHelper::setMediaMinimized($minimize);
         $this->setMediaMinimized($minimize);
         $this->getBower($minimize);
@@ -513,6 +514,22 @@ abstract class Plugin{
 	}
 
 	/**
+	 * Alias to wp_enqueue_style, but the path is relative to '/res'
+	 *
+	 * @param string $handle
+	 * @param string|bool $relativeResPath
+	 * @param array $dependencies
+	 * @param bool $version
+	 * @param string $media
+	 */
+    public function enqueueStyle($handle, $relativeResPath = false, $dependencies = array(), $version = false, $media = 'all'){
+	    if($relativeResPath){
+		    $relativeResPath = $this->getUrlRes(($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath);
+	    }
+        ResourceHelper::enqueueStyle($handle, $relativeResPath, $dependencies, $version, $media);
+    }
+
+	/**
 	 * Alias to wp_register_style, but the path is relative to '/res'
 	 *
 	 * @param string $handle
@@ -521,11 +538,10 @@ abstract class Plugin{
 	 * @param bool $version
 	 * @param string $media
 	 */
-    public function registerStyle($handle, $relativeResPath, $dependencies = array(), $version = false, $media = 'all'){
-        $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
-        ResourceHelper::registerStyle($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $media);
-    }
-
+	public function registerStyle($handle, $relativeResPath, $dependencies = array(), $version = false, $media = 'all'){
+		$relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+		ResourceHelper::registerStyle($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $media);
+	}
 
 	/**
 	 * Register minimized style file that contains all the min-cat styles defined by $handles.
@@ -542,6 +558,31 @@ abstract class Plugin{
     }
 
 	/**
+	 * Alias to wp_deregister_style
+	 *
+	 * @param $handle
+	 */
+	public function unregisterStyle($handle){
+		wp_deregister_style($handle);
+	}
+
+	/**
+	 * Alias to wp_register_script, but the path is relative to '/res'
+	 *
+	 * @param string $handle
+	 * @param string|bool $relativeResPath
+	 * @param array $dependencies
+	 * @param bool $version
+	 * @param bool $inFooter
+	 */
+	public function enqueueScript($handle, $relativeResPath = false, $dependencies = array(), $version = false, $inFooter = true){
+		if($relativeResPath){
+			$relativeResPath = $this->getUrlRes(($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath);
+		}
+		ResourceHelper::enqueueScript($handle, $relativeResPath, $dependencies, $version, $inFooter);
+	}
+
+	/**
 	 * Alias to wp_register_script, but the path is relative to '/res'
 	 *
 	 * @param string $handle
@@ -550,10 +591,10 @@ abstract class Plugin{
 	 * @param bool $version
 	 * @param bool $inFooter
 	 */
-    public function registerScript($handle, $relativeResPath, $dependencies = array(), $version = false, $inFooter = true){
-        $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
-        ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $inFooter);
-    }
+	public function registerScript($handle, $relativeResPath, $dependencies = array(), $version = false, $inFooter = true){
+		$relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+		ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $inFooter);
+	}
 
 	/**
 	 * Register minimized script file that contains all the min-cat scripts defined by $handles.
@@ -569,6 +610,15 @@ abstract class Plugin{
         ResourceHelper::registerMinimizedScript($minHandle, $this->getUrlRes($relativeResPath), $handles, $inFooter);
     }
 
+	/**
+	 * Alias to wp_deregister_script
+	 *
+	 * @param string $handle
+	 */
+	public function unregisterScript($handle){
+		wp_deregister_script($handle);
+	}
+
     /**
      * Not implemented yet and to be revised
      *
@@ -580,6 +630,14 @@ abstract class Plugin{
 //        TODO: Zend independent NslHelper
 //        NlsHelper::registerScriptNls($handle, $relativeResJsPath, $dependencies, null, null, $this->basePath);
     }
+
+	/**
+	 * @param string $handle
+	 * @param bool $scriptInFooter
+	 */
+	public function enqueueScriptStyle($handle, $scriptInFooter = true){
+		ResourceHelper::enqueueScriptStyle($handle, $scriptInFooter);
+	}
 
     /**
      * Read and parse bower config
@@ -655,10 +713,15 @@ abstract class Plugin{
         }
 
         if($path) {
-            $bowerFile = $this->basePath . '/' . $path . '/bower.json';
+	        $bowerFile = $this->basePath . '/' . $path . '/bower.json';
+	        $dotBowerFile = $this->basePath . '/' . $path . '/.bower.json';
             if (file_exists($bowerFile)) {
                 $json = FsHelper::readFile($bowerFile);
-                $bowerData = json_decode($json);
+                $bowerData = json_decode($json, true);
+	            if(file_exists($dotBowerFile)){
+		            $json = FsHelper::readFile($dotBowerFile);
+		            $bowerData = array_merge($bowerData, json_decode($json, true));
+	            }
                 $bowerVer = Util::getItem($bowerData, 'version', '0.0.0');
                 $needOverrideJs = false;
                 if ($overrideWithNew) {
@@ -687,7 +750,7 @@ abstract class Plugin{
                     $dependencies = array();
                     $bowerDependencies = Util::getItem($bowerData, 'dependencies');
                     if ($bowerDependencies) {
-                        $dependencies = array_keys(get_object_vars($bowerDependencies));
+                        $dependencies = array_keys($bowerDependencies);
                     }
 
                     foreach ($mainFiles as $file) {
@@ -696,16 +759,21 @@ abstract class Plugin{
                         $minimize = Util::getItem($bower, 'minimize');
                         if($minimize){
                             $filePathMin = FsHelper::setExtensionPrefix($filePath, 'min');
-                            $filePath = file_exists($filePathMin)?$filePathMin:$filePath;
+	                        if(file_exists($filePathMin)){
+		                        $filePath = $filePathMin;
+	                        }
                         }
-                        if (basename($file, '.' . $ext) == $name) {
+	                    $bn = strtolower(basename($file, '.' . $ext));
+                        if (preg_match("%(jquery[\\.\\-_])?$name([\\.\\-_]\\d+)*([\\.\\-_]min)?%iu", $bn)) {
                             $relPath = str_replace($this->basePath, '', $filePath);
                             switch ($ext) {
                                 case 'css':
                                     if ($needOverrideCss) {
                                         wp_deregister_script($name);
+//	                                    $this->unregisterScript($name);
                                     }
                                     wp_register_style($name, $this->getUrl($relPath), [], $bowerVer, false);
+//									$this->registerStyle($name, $this->getUrl($relPath), [], $bowerVer, false);
                                     break;
                                 case 'js':
                                     foreach ($dependencies as $dep) {
@@ -714,8 +782,10 @@ abstract class Plugin{
                                     }
                                     if ($needOverrideJs) {
                                         wp_deregister_script($name);
+//	                                    $this->unregisterScript($name);
                                     }
-                                    wp_register_script($name, $this->getUrl($relPath), $dependencies, $bowerVer, false);
+                                    wp_register_script($name, $this->getUrl($relPath), $dependencies, $bowerVer, true);
+//	                                $this->registerScript($name, $this->getUrl($relPath), [], $bowerVer, true);
                                     break;
                             }
                         }
@@ -852,6 +922,22 @@ abstract class Plugin{
         return add_action($action, is_string($method) ? $this->getCallbackMethod($method) : $method, $priority, $numberOfArguments);
     }
 
+	/**
+	 * Alias to remove_action, but if the $method is a string and method exists then
+	 * $this->getCallbackMethod($callback) is used instead.
+	 * @param $tag
+	 * @param $callback
+	 * @param int $priority
+	 *
+	 * @return bool
+	 */
+	public function removeAction($tag, $callback, $priority = 10){
+		if(is_string($callback) && method_exists($this, $callback)){
+			$callback = $this->getCallbackMethod($callback);
+		}
+		return remove_action($tag, $callback, $priority);
+	}
+
     /**
      * Register your action hooks here using $this->addFilter();
      */
@@ -873,7 +959,23 @@ abstract class Plugin{
         return add_filter($filter, is_string($method) ? $this->getCallbackMethod($method) : $method, $priority, $numberOfArguments);
     }
 
-    /**
+	/**
+	 * Alias to remove_filter, but if the $method is a string and method exists then
+	 * $this->getCallbackMethod($callback) is used instead.
+	 * @param $tag
+	 * @param $callback
+	 * @param int $priority
+	 *
+	 * @return bool
+	 */
+	public function removeFilter($tag, $callback, $priority = 10){
+		if(is_string($callback) && method_exists($this, $callback)){
+			$callback = $this->getCallbackMethod($callback);
+		}
+		return remove_filter($tag, $callback, $priority);
+	}
+
+	/**
      * Enables support for console pages that will be typically rendered by AdminController.
      * You should implement registerConsolePages();
      */

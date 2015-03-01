@@ -65,8 +65,10 @@ class ResourceHelper {
     public static function registerMinimizedScript($minHandle, $src, $handles, $version = false, $inFooter = true){
         global $wp_scripts;
         $dependencies = array();
+	    foreach($handles as $handle) {
+		    self::$minimizedScripts[ $handle ] = $minHandle;
+	    }
         foreach($handles as $handle){
-            self::$minimizedScripts[$handle] = $minHandle;
             $item = Util::getItem($wp_scripts->registered, $handle);
             $itemDependencies = Util::getItem($item, 'deps', array());
             foreach ($itemDependencies as $i => $d) {
@@ -148,8 +150,10 @@ class ResourceHelper {
     public static function registerMinimizedStyle($minHandle, $src, $handles, $version = false, $media = 'all'){
         global $wp_styles;
         $dependencies = array();
+	    foreach($handles as $handle) {
+		    self::$minimizedStyles[ $handle ] = $minHandle;
+	    }
         foreach($handles as $handle){
-            self::$minimizedStyles[$handle] = $minHandle;
             $item = Util::getItem($wp_styles->registered, $handle);
             $itemDependencies = Util::getItem($item, 'deps', array());
             foreach ($itemDependencies as $i => $d) {
