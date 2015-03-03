@@ -11,6 +11,7 @@ namespace Chayka\WP\MVC;
 use Chayka\Helpers\HttpHeaderHelper;
 use Chayka\MVC;
 use Chayka\WP;
+use Chayka\WP\Helpers\AngularHelper;
 use Chayka\WP\Helpers\ResourceHelper;
 use Chayka\WP\Models\PostModel;
 
@@ -82,9 +83,27 @@ class Controller extends MVC\Controller{
      * @param bool $in_footer
      */
     public function enqueueScript($handle, $resRelativeSrc = false, $dependencies = array(), $ver = false, $in_footer = false){
-        $src = $this->appUrl.'res/'.$resRelativeSrc;
+	    $src = false;
+	    if($resRelativeSrc) {
+		    $src = $this->appUrl . 'res/' . $resRelativeSrc;
+	    }
         ResourceHelper::enqueueScript($handle, $src, $dependencies, $ver, $in_footer);
     }
+
+	/**
+	 * @param $handle
+	 * @param bool $resRelativeSrc
+	 * @param array $dependencies
+	 * @param bool $ver
+	 * @param bool $in_footer
+	 */
+	public function enqueueNgScript($handle, $resRelativeSrc = false, $dependencies = array(), $ver = false, $in_footer = false){
+		$src = false;
+		if($resRelativeSrc) {
+			$src = $this->appUrl . 'res/' . $resRelativeSrc;
+		}
+		AngularHelper::enqueueScript($handle, $src, $dependencies, $ver, $in_footer);
+	}
 
     /**
      * Enqueue style. Utilizes wp_enqueue_style().
@@ -97,7 +116,10 @@ class Controller extends MVC\Controller{
      * @param bool $in_footer
      */
     public function enqueueStyle($handle, $resRelativeSrc = false, $dependencies = array(), $ver = false, $in_footer = false) {
-        $src = $this->appUrl.'res/'.$resRelativeSrc;
+	    $src = false;
+	    if($resRelativeSrc) {
+		    $src = $this->appUrl . 'res/' . $resRelativeSrc;
+	    }
         ResourceHelper::enqueueStyle($handle, $src, $dependencies, $ver, $in_footer);
     }
 
@@ -110,6 +132,13 @@ class Controller extends MVC\Controller{
     public function enqueueScriptStyle($handle) {
         ResourceHelper::enqueueScriptStyle($handle);
     }
+
+	/**
+	 * @param $handle
+	 */
+	public function enqueueNgScriptStyle($handle) {
+		AngularHelper::enqueueScriptStyle($handle);
+	}
 
     /**
      * This helper load post for the action.

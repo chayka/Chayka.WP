@@ -190,15 +190,16 @@ class ResourceHelper {
         }
     }
 
-    /**
-     * Enqueue both script and style with the same $handle.
-     * Uses minimized versions if detects.
-     *
-     * @param string $handle
-     */
+	/**
+	 * Enqueue both script and style with the same $handle.
+	 * Uses minimized versions if detects.
+	 *
+	 * @param string $handle
+	 * @param bool $scriptInFooter
+	 */
     public static function enqueueScriptStyle($handle, $scriptInFooter = true){
 	    self::setScriptLocation($handle, $scriptInFooter);
-        self::enqueueScript($handle);
-        self::enqueueStyle($handle);
+        static::enqueueScript($handle);
+	    static::enqueueStyle($handle);
     }
 }

@@ -8,6 +8,7 @@ use Chayka\Helpers\FsHelper;
 use Chayka\MVC\ApplicationDispatcher;
 use Chayka\MVC\Application;
 use Chayka\MVC\View;
+use Chayka\WP\Helpers\AngularHelper;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\OptionHelper;
 use Chayka\WP\Helpers\ResourceHelper;
@@ -594,6 +595,19 @@ abstract class Plugin{
 	public function registerScript($handle, $relativeResPath, $dependencies = array(), $version = false, $inFooter = true){
 		$relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
 		ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $inFooter);
+	}
+
+	/**
+	 * @param $handle
+	 * @param $relativeResPath
+	 * @param array $dependencies
+	 * @param null $enqueueCallback
+	 * @param bool $version
+	 * @param bool $inFooter
+	 */
+	public function registerNgScript($handle, $relativeResPath, $dependencies = array(), $enqueueCallback = null, $version = false, $inFooter = true){
+		$relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+		AngularHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $enqueueCallback, $version, $inFooter);
 	}
 
 	/**
