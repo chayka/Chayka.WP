@@ -52,7 +52,7 @@ class AngularHelper extends ResourceHelper {
 	 * @param $handle
 	 * @param bool|string $src
 	 * @param array $dependencies
-	 * @param null $enqueueCallback
+	 * @param callable|null $enqueueCallback
 	 * @param bool $version
 	 * @param bool $inFooter
 	 */
@@ -61,12 +61,12 @@ class AngularHelper extends ResourceHelper {
 			self::registerScript( $handle, $src, $dependencies, $enqueueCallback, $version, $inFooter );
 		}
 		if(!in_array($handle, self::$queue) && in_array($handle, self::$registered)){
-			if(self::$dependencies[$handle]){
+			if(isset(self::$dependencies[$handle])){
 				foreach(self::$dependencies[$handle] as $dep){
 					self::enqueueScript($dep);
 				}
 			}
-			if(self::$callbacks[$handle]){
+			if(isset(self::$callbacks[$handle])){
 				$cb = self::$callbacks[$handle];
 				$cb();
 			}

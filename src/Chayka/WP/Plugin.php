@@ -601,7 +601,7 @@ abstract class Plugin{
 	 * @param $handle
 	 * @param $relativeResPath
 	 * @param array $dependencies
-	 * @param null $enqueueCallback
+	 * @param callable|null $enqueueCallback
 	 * @param bool $version
 	 * @param bool $inFooter
 	 */
