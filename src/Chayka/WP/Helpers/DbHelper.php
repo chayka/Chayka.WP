@@ -195,6 +195,48 @@ class DbHelper {
         return $dbRecords;
     }
 
+	/**
+	 * Limited sql select.
+	 * Adds LIMIT $limit OFFSET $offset to $sql.
+	 * Ensures SELECT SQL_CALC_FOUND_ROWS
+	 *
+	 * http://habrahabr.ru/post/217521/ -> join optimization
+	 *
+	 * @param string $sql
+	 * @param int $limit
+	 * @param int $offset
+	 * @param null|string $className
+	 *
+	 * @return array
+	 */
+	public static function selectSqlLimitOffset($sql, $limit = 0, $offset = 0, $className = null){
+		if(!preg_match('%^\s*SELECT\s+SQL_CALC_FOUND_ROWS\s%im', $sql)){
+			$sql = preg_replace('%\s*SELECT%im', 'SELECT SQL_CALC_FOUND_ROWS', $sql);
+		}
+		$sql.=sprintf(' LIMIT %d OFFSET %d', $limit, $offset);
+		return self::selectSql($sql, $className);
+	}
+
+	/**
+	 * Limited sql select.
+	 * Adds LIMIT $perPage OFFSET ($page - 1) * $perPage to $sql.
+	 * Ensures SELECT SQL_CALC_FOUND_ROWS
+	 *
+	 * @param $sql
+	 * @param int $page
+	 * @param int $perPage
+	 * @param null|string $className
+	 *
+	 * @return array
+	 */
+	public static function selectSqlPage($sql, $page = 1, $perPage = 10, $className = null){
+		if($page < 1){
+			$page = 1;
+		}
+		$offset = ($page - 1) * $perPage;
+		return self::selectSqlLimitOffset($sql, $perPage, $offset, $className);
+	}
+
     /**
      * Get the number of rows found during last sql query.
      * 'SELECT FOUND_ROWS()' is utiliezed.

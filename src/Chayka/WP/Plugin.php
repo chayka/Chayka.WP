@@ -76,7 +76,6 @@ abstract class Plugin{
 //            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
 
 	    $minimize = OptionHelper::getOption('MinimizeMedia');
-	    $cacheControl = OptionHelper::getOption('CacheControl');
         ResourceHelper::setMediaMinimized($minimize);
         $this->setMediaMinimized($minimize);
         $this->getBower($minimize);
@@ -898,6 +897,11 @@ abstract class Plugin{
                 $phpNamespace =Util::getItem($chaykaData, 'phpNamespace');
                 if($phpNamespace){
                     call_user_func(array($phpNamespace.'\\Plugin', 'init'));
+	                $sidebarFn = $chaykaFile = $path . '/Sidebar.php';
+	                if(file_exists($sidebarFn)){
+		                require_once $sidebarFn;
+	                }
+
                 }
             }else{
                 $composerFile = $path . '/composer.json';
