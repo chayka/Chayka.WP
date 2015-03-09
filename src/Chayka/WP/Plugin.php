@@ -785,7 +785,7 @@ abstract class Plugin{
                                         wp_deregister_script($name);
 //	                                    $this->unregisterScript($name);
                                     }
-                                    wp_register_style($name, $this->getUrl($relPath), [], $bowerVer, false);
+                                    ResourceHelper::registerStyle($name, $this->getUrl($relPath), [], $bowerVer, false);
 //									$this->registerStyle($name, $this->getUrl($relPath), [], $bowerVer, false);
                                     break;
                                 case 'js':
@@ -797,7 +797,7 @@ abstract class Plugin{
                                         wp_deregister_script($name);
 //	                                    $this->unregisterScript($name);
                                     }
-                                    wp_register_script($name, $this->getUrl($relPath), $dependencies, $bowerVer, true);
+                                    ResourceHelper::registerScript($name, $this->getUrl($relPath), $dependencies, $bowerVer, true);
 //	                                $this->registerScript($name, $this->getUrl($relPath), [], $bowerVer, true);
                                     break;
                             }
