@@ -307,14 +307,14 @@ class UserQuery{
      * @return UserQuery
      */
     public function metaQuery($key, $value, $compare = '=', $type = 'CHAR'){
-        $taxQuery = array(
+        $metaQuery = array(
             'key' => $key,
             'value' => $value,
             'compare' => $compare,
             'type' => $type,
         );
         
-        $this->vars['meta_query'][]=$taxQuery;
+        $this->vars['meta_query'][]=$metaQuery;
         
         return $this;
     }
