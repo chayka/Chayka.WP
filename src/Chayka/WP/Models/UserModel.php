@@ -526,7 +526,24 @@ class UserModel implements DbReady, JsonReady, InputReady{
     public static function updateUserMeta($userId, $key, $value, $oldValue = ''){
         return update_user_meta($userId, $key, $value, $oldValue);
     }
-    
+
+	/**
+	 * Remove metadata matching criteria from a user.
+	 *
+	 * You can match based on the key, or key and value. Removing based on key and
+	 * value, will keep from removing duplicate metadata with the same key. It also
+	 * allows removing all metadata matching key, if needed.
+	 *
+	 * @param integer $userId
+	 * @param string $key
+	 * @param string $oldValue
+	 *
+	 * @return bool
+	 */
+	public static function deleteUserMeta($userId, $key, $oldValue = ''){
+		return delete_user_meta($userId, $key, $oldValue);
+	}
+
     /**
      * Get user meta single key-value pair or all key-values
      * 
@@ -549,6 +566,14 @@ class UserModel implements DbReady, JsonReady, InputReady{
     public function updateMeta($key, $value, $oldValue = '') {
         self::updateUserMeta($this->getId(), $key, $value, $oldValue);
     }
+
+	/**
+	 * @param $key
+	 * @param string $oldValue
+	 */
+	public function deleteMeta($key, $oldValue = ''){
+		self::deleteUserMeta($this->getId(), $key, $oldValue);
+	}
 
     /**
      * DbReady method, returns corresponding DB Table ID column name
