@@ -493,6 +493,16 @@ class UserModel implements DbReady, JsonReady, InputReady{
         return $this;
     }
 
+	/**
+	 * Magic getter that allows to use UserModel where wpUser should be used
+	 *
+	 * @param $name
+	 * @return mixed
+	 */
+	public function __get($name) {
+		return Util::getItem($this->wpUser, $name);
+	}
+
     /**
      * Get user meta single key-value pair or all key-values
      * 

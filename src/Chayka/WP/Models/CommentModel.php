@@ -527,6 +527,15 @@ class CommentModel implements DbReady, JsonReady, InputReady{
         return $this;
     }
 
+	/**
+	 * Magic getter that allows to use CommentModel where wpComment should be used
+	 *
+	 * @param $name
+	 * @return mixed
+	 */
+	public function __get($name) {
+		return Util::getItem($this->wpComment, $name);
+	}
     /**
      * DbReady method, returns corresponding DB Table ID column name
      * 

@@ -627,7 +627,16 @@ class PostModel implements DbReady, JsonReady, InputReady{
         $this->wpPost = $wpPost;
         return $this;
     }
-    
+
+	/**
+	 * Magic getter that allows to use PostModel where wpPost should be used
+	 *
+	 * @param $name
+	 * @return mixed
+	 */
+	public function __get($name) {
+		return Util::getItem($this->wpPost, $name);
+	}
     /**
      * Get post href. Utilizes get_permalink().
      * 
@@ -935,7 +944,6 @@ class PostModel implements DbReady, JsonReady, InputReady{
         }else{
             self::$wpQuery = new WP_Query($wpPostsQueryArgs);
         }
-        
         $posts = array();
         self::$postsFound=self::$wpQuery->found_posts;
         while(self::$wpQuery->have_posts()){

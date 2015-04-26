@@ -65,15 +65,7 @@ abstract class Plugin{
         $this->appId = $namespace ? $namespace : $this->getClassName();
         $this->application = new Application($this->basePath.'app', $this->appId);
         set_include_path($this->basePath.PATH_SEPARATOR.get_include_path());
-        ApplicationDispatcher::registerApplication($this->appId, $this->application, $routes);
-
-//        $APP_ID = strtoupper(str_replace('\\', '_', $this->appId));
-//        defined($APP_ID.'_PATH')
-//            || define($APP_ID.'_PATH', $this->basePath);
-//        defined($APP_ID.'_URL')
-//            || define($APP_ID.'_URL',  $this->baseUrl);
-//        defined($APP_ID.'_APP_PATH')
-//            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
+        ApplicationDispatcher::registerApplication($this->application, $routes);
 
 	    $minimize = OptionHelper::getOption('MinimizeMedia');
         ResourceHelper::setMediaMinimized($minimize);

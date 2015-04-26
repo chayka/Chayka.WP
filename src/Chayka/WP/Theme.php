@@ -25,18 +25,9 @@ abstract class Theme extends Plugin{
 
         $namespace = $this->getNamespace();
         $this->appId = $namespace ? $namespace : $this->getClassName();
-//        $this->appId = $namespace ? str_replace('\\', '_', $namespace) : $this->getClassName();
         $this->application = new Application($this->basePath.'app', $this->appId);
 
-        ApplicationDispatcher::registerApplication($this->appId, $this->application, $routes);
-
-//        $APP_ID = strtoupper($this->appId);
-//        defined($APP_ID.'_PATH')
-//            || define($APP_ID.'_PATH', $this->basePath);
-//        defined($APP_ID.'_URL')
-//            || define($APP_ID.'_URL',  $this->baseUrl);
-//        defined($APP_ID.'_APP_PATH')
-//            || define($APP_ID.'_APP_PATH', $this->basePath.'app');
+        ApplicationDispatcher::registerApplication($this->application, $routes);
 
         $minimize = OptionHelper::getOption('minimizeMedia');
         ResourceHelper::setMediaMinimized($minimize);
@@ -124,6 +115,22 @@ abstract class Theme extends Plugin{
     public function excerptMore(){
         return $this->excerptMore;
     }
+
+	/**
+	 * Add custom editor css styles
+	 *
+	 * @param string|array $relativeResPath
+	 */
+	public function registerEditorStyle($relativeResPath){
+		if(is_array($relativeResPath)){
+			foreach($relativeResPath as $i=>$path){
+				$relativeResPath[$i] = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $path;
+			}
+		}else{
+			$relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+		}
+		add_editor_style($relativeResPath);
+	}
     
 //    public function showAdminBar($show = true){
 //        $this->adminBar = $show;

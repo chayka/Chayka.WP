@@ -22,11 +22,11 @@ class Controller extends MVC\Controller{
     /**
      * Controller constructor
      *
-     * @param $appPath
+     * @param MVC\Application $application
      */
-    public function __construct($appPath){
-        parent::__construct($appPath);
-        $this->appUrl = preg_replace('%^.*wp-content%', '/wp-content', $appPath);
+    public function __construct($application){
+        parent::__construct($application);
+        $this->appUrl = preg_replace('%^.*wp-content%', '/wp-content', $this->appPath);
     }
 
     /**
@@ -40,6 +40,19 @@ class Controller extends MVC\Controller{
         WP\Helpers\HtmlHelper::setPost($post);
         WP\Query::setPost($post);
     }
+
+	/**
+	 * A helper to start 'not found' scenario.
+	 * Just return it from controller action at the point when post is not found.
+	 *
+	 * @param bool $notFound
+	 *
+	 * @return bool
+	 */
+	public function setNotFound404($notFound = true){
+		WP\Query::setIs404($notFound);
+		return $notFound;
+	}
 
     /**
      * Set html title.
