@@ -32,8 +32,9 @@ class UserModel implements DbReady, JsonReady, InputReady{
     protected static $jsonMetaFields = array();
 
     protected static $currentUser;
-    
-    protected $id;
+	protected static $validationErrors;
+
+	protected $id;
 
     protected $login;
     
@@ -957,9 +958,18 @@ class UserModel implements DbReady, JsonReady, InputReady{
      *
      * @return array[field]='Error Text'
      */
-    public function getValidationErrors() {
-        return array();
+    public static function getValidationErrors() {
+        return self::$validationErrors;
     }
+
+	/**
+	 * Add validation errors after unpacking from request input
+	 *
+	 * @param array[field]='Error Text' $errors
+	 */
+	public static function addValidationErrors($errors) {
+		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+	}
 
     /**
      * Unpacks request input.
@@ -968,82 +978,94 @@ class UserModel implements DbReady, JsonReady, InputReady{
      * @param array $input
      * @return PostModel
      */
-    public function unpackInput($input = array()) {
+    public static function unpackJsonItem($input = array()) {
         if(empty($input)){
             $input = InputHelper::getParams();
         }
-        $input = array_merge($this->packJsonItem(), $input);
+	    $id = Util::getItem($input, 'id', 0);
 
-        $this->setId(Util::getItem($input, 'id', 0));
-        $this->setLogin(Util::getItem($input, 'user_login'));
-        $this->setEmail(Util::getItem($input, 'user_email'));
-        $this->setNicename(Util::getItem($input, 'user_nicename'));
-        $this->setUrl(Util::getItem($input, 'user_url'));
-        $this->setDisplayName(Util::getItem($input, 'display_name'));
-//        $this->setNickname(Util::getItem($input, 'nickname'));
-        $this->setFirstName(Util::getItem($input, 'first_name'));
-        $this->setLastName(Util::getItem($input, 'last_name'));
-        $this->setDescription(Util::getItem($input, 'description'));
-        $this->setRichEditing(Util::getItem($input, 'rich_editing'));        
-        $this->setRegistered(DateHelper::jsonStrToDatetime(Util::getItem($input, 'user_registered')));
-        $this->setRole(Util::getItem($input, 'role'));
-        $this->setJabber(Util::getItem($input, 'jabber'));
-        $this->setAim(Util::getItem($input, 'aim'));
-        $this->setYim(Util::getItem($input, 'yim'));
-        
-        $adminMeta = array(
-            'rich_editing',
-            'comment_shortcuts',
-            'admin_color',
-            'use_ssl',
-            'wp_capabilities',
-            'wp_user_level',
-            'default_password_nag',
-            'show_admin_bar_front',
-        );
-        $reservedMeta = array(
-            'first_name', 
-            'last_name', 
-            'description',
-            'rich_editing', 
-            'jabber',
-            'aim',
-            'yim',
-        );
-        
-        $meta = InputHelper::getParam('meta');
-        if(!AclHelper::isAdmin() && $meta && is_array($meta)){
-            foreach($adminMeta as $key){
-                if(isset($meta[$key])){
-                    unset($meta[$key]);
-                }
-            }
-        }
-        foreach($reservedMeta as $key){
-            if(isset($meta[$key])){
-                unset($meta[$key]);
-            }
-        }
-        if(isset($meta) && is_array($meta)){
-            foreach($meta as $key=>$value){
-                if(strpos($key, 'wp_')===0){
-                    unset($meta[$key]);
-                }
-            }
-        }
-        InputHelper::setParam('meta', $meta);
-        
+	    $obj = $id? static::selectById($id): new static();
+
+	    $valid = static::validateInput($input, $id? $obj:null);
+
+	    if($valid) {
+		    $input = array_merge( $obj->packJsonItem(), $input );
+
+		    $obj->setId( Util::getItem( $input, 'id', 0 ) );
+		    $obj->setLogin( Util::getItem( $input, 'user_login' ) );
+		    $obj->setEmail( Util::getItem( $input, 'user_email' ) );
+		    $obj->setNicename( Util::getItem( $input, 'user_nicename' ) );
+		    $obj->setUrl( Util::getItem( $input, 'user_url' ) );
+		    $obj->setDisplayName( Util::getItem( $input, 'display_name' ) );
+//        $obj->setNickname(Util::getItem($input, 'nickname'));
+		    $obj->setFirstName( Util::getItem( $input, 'first_name' ) );
+		    $obj->setLastName( Util::getItem( $input, 'last_name' ) );
+		    $obj->setDescription( Util::getItem( $input, 'description' ) );
+		    $obj->setRichEditing( Util::getItem( $input, 'rich_editing' ) );
+		    $obj->setRegistered( DateHelper::jsonStrToDatetime( Util::getItem( $input, 'user_registered' ) ) );
+		    $obj->setRole( Util::getItem( $input, 'role' ) );
+		    $obj->setJabber( Util::getItem( $input, 'jabber' ) );
+		    $obj->setAim( Util::getItem( $input, 'aim' ) );
+		    $obj->setYim( Util::getItem( $input, 'yim' ) );
+
+		    $adminMeta    = array(
+			    'rich_editing',
+			    'comment_shortcuts',
+			    'admin_color',
+			    'use_ssl',
+			    'wp_capabilities',
+			    'wp_user_level',
+			    'default_password_nag',
+			    'show_admin_bar_front',
+		    );
+		    $reservedMeta = array(
+			    'first_name',
+			    'last_name',
+			    'description',
+			    'rich_editing',
+			    'jabber',
+			    'aim',
+			    'yim',
+		    );
+
+		    $meta = InputHelper::getParam( 'meta' );
+		    if ( ! AclHelper::isAdmin() && $meta && is_array( $meta ) ) {
+			    foreach ( $adminMeta as $key ) {
+				    if ( isset( $meta[ $key ] ) ) {
+					    unset( $meta[ $key ] );
+				    }
+			    }
+		    }
+		    foreach ( $reservedMeta as $key ) {
+			    if ( isset( $meta[ $key ] ) ) {
+				    unset( $meta[ $key ] );
+			    }
+		    }
+		    if ( isset( $meta ) && is_array( $meta ) ) {
+			    foreach ( $meta as $key => $value ) {
+				    if ( strpos( $key, 'wp_' ) === 0 ) {
+					    unset( $meta[ $key ] );
+				    }
+			    }
+		    }
+		    InputHelper::setParam( 'meta', $meta );
+		    return $obj;
+	    }
+
+	    return null;
     }
 
-    /**
-     * Validates input and sets $validationErrors
-     *
-     * @param array $input
-     * @param string $action (create|update)
-     * @return boolean is input valid
-     */
-    public function validateInput($input = array(), $action = 'create') {
-        $valid = apply_filters('UserModel.validateInput', true, $this, $input, $action);
+	/**
+	 * Validates input and sets $validationErrors
+	 *
+	 * @param array $input
+	 * @param UserModel $oldState
+	 *
+	 * @return bool is input valid
+	 */
+    public static function validateInput($input = array(), $oldState = null) {
+	    self::$validationErrors = array();
+        $valid = apply_filters('UserModel.validateInput', true, $input, $oldState);
         return $valid;
     }
     

@@ -15,7 +15,8 @@ use WP_Error;
 
 class TermModel implements DbReady, JsonReady, InputReady{
 
-    protected $wpTerm;
+	protected static $validationErrors;
+	protected $wpTerm;
 
     public function __construct() {
         $this->wpTerm = new \stdClass();
@@ -496,10 +497,18 @@ class TermModel implements DbReady, JsonReady, InputReady{
      *
      * @return array[field]='Error Text'
      */
-    public function getValidationErrors() {
-        return array();
+    public static function getValidationErrors() {
+        return self::$validationErrors;
     }
 
+	/**
+	 * Add validation errors after unpacking from request input
+	 *
+	 * @param array[field]='Error Text' $errors
+	 */
+	public static function addValidationErrors($errors) {
+		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+	}
     /**
      * Unpacks request input.
      * Used by REST Controllers.
@@ -507,33 +516,45 @@ class TermModel implements DbReady, JsonReady, InputReady{
      * @param array $input
      * @return TermModel
      */
-    public function unpackInput($input = array()) {
+    public static function unpackJsonItem($input = array()) {
         if(empty($input)){
             $input = InputHelper::getParams();
         }
-        $input = array_merge($this->packJsonItem(), $input);
+	    $id = Util::getItem($input, 'id', 0);
 
-        $this->setId(Util::getItem($input, 'id', 0));
-        $this->setTermId(Util::getItem($input, 'term_id'));
-        $this->setName(Util::getItem($input, 'name'));
-        $this->setSlug(Util::getItem($input, 'slug'));
-        $this->setGroup(Util::getItem($input, 'term_group', 0));
-        $this->setTaxonomy(Util::getItem($input, 'taxonomy'));
-        $this->setDescription(Util::getItem($input, 'daescription'));
-        $this->setParentId(Util::getItem($input, 'parent', 0));
-//        $this->setCountPerTaxonomy(Util::getItem($input, 'count', 0));
-        return $this;
+	    $obj = $id? static::selectById($id): new static();
+
+	    $valid = static::validateInput($input, $id? $obj:null);
+
+	    if($valid){
+            $input = array_merge($obj->packJsonItem(), $input);
+
+//        $this->setId(Util::getItem($input, 'id', 0));
+		    $obj->setTermId(Util::getItem($input, 'term_id'));
+		    $obj->setName(Util::getItem($input, 'name'));
+		    $obj->setSlug(Util::getItem($input, 'slug'));
+		    $obj->setGroup(Util::getItem($input, 'term_group', 0));
+		    $obj->setTaxonomy(Util::getItem($input, 'taxonomy'));
+		    $obj->setDescription(Util::getItem($input, 'daescription'));
+		    $obj->setParentId(Util::getItem($input, 'parent', 0));
+//        $obj->setCountPerTaxonomy(Util::getItem($input, 'count', 0));
+            return $obj;
+	    }
+
+	    return null;
     }
 
-    /**
-     * Validates input and sets $validationErrors
-     *
-     * @param array $input
-     * @param string $action (create|update)
-     * @return boolean is input valid
-     */
-    public function validateInput($input = array(), $action = 'create') {
-        $valid = apply_filters('TermtModel.validateInput', true, $this, $input, $action);
+	/**
+	 * Validates input and sets $validationErrors
+	 *
+	 * @param array $input
+	 * @param TermModel $oldState
+	 *
+	 * @return bool is input valid
+	 */
+    public static function validateInput($input = array(), $oldState = null) {
+	    static::$validationErrors = array();
+        $valid = apply_filters('TermModel.validateInput', true, $input, $oldState);
         return $valid;
     }
 

@@ -9,13 +9,18 @@
 namespace Chayka\WP\Models;
 
 
+use Chayka\Helpers\InputReady;
 use Chayka\Helpers\JsonReady;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\DbReady;
 
-abstract class ReadyModel implements DbReady, JsonReady{
+abstract class ReadyModel implements DbReady, JsonReady, InputReady{
+
+	protected static $validationErrors = array();
 
     protected $id;
+
+
     /**
      * Insert current instance to db and return object id
      *
@@ -108,9 +113,47 @@ abstract class ReadyModel implements DbReady, JsonReady{
         return DbHelper::selectSql($sql, new static());
     }
 
-    public static function selectAll(){
+	/**
+	 * Select all entities
+	 *
+	 * @return array
+	 */
+	public static function selectAll(){
         return static::selectSql('SELECT SQL_CALC_FOUND_ROWS * FROM {table}');
     }
+
+	/**
+	 * Limited sql select.
+	 * Adds LIMIT $limit OFFSET $offset to $sql.
+	 *
+	 * http://habrahabr.ru/post/217521/ -> join optimization
+	 *
+	 * @param int $limit
+	 * @param int $offset
+	 *
+	 * @return array
+	 */
+	public static function selectLimitOffset($limit = 0, $offset = 0){
+		$sql=sprintf('SELECT SQL_CALC_FOUND_ROWS * FROM {table} LIMIT %d OFFSET %d', $limit, $offset);
+		return self::selectSql($sql);
+	}
+
+	/**
+	 * Limited sql select.
+	 * Adds LIMIT $perPage OFFSET ($page - 1) * $perPage to $sql.
+	 *
+	 * @param int $page
+	 * @param int $perPage
+	 *
+	 * @return array
+	 */
+	public static function selectPage($page = 1, $perPage = 10){
+		if($page < 1){
+			$page = 1;
+		}
+		$offset = ($page - 1) * $perPage;
+		return self::selectLimitOffset($perPage, $offset);
+	}
 
     /**
      * Get id column name in db table
@@ -138,5 +181,38 @@ abstract class ReadyModel implements DbReady, JsonReady{
         $this->id = $id;
         return $this;
     }
+
+	/**
+	 * Validates input and sets $validationErrors
+	 *
+	 * @param array $input
+	 * @param mixed $oldState
+	 *
+	 * @return bool is input valid
+	 */
+	public static function validateInput($input = array(), $oldState = null) {
+		static::$validationErrors = array();
+		$valid = apply_filters(self::getDbTable().'.validateInput', true, $input, $oldState);
+		return $valid;
+	}
+
+	/**
+	 * Get validation errors after unpacking from request input
+	 * Should be set by validateInput
+	 *
+	 * @return array[field]='Error Text'
+	 */
+	public static function getValidationErrors() {
+		return static::$validationErrors;
+	}
+
+	/**
+	 * Add validation errors after unpacking from request input
+	 *
+	 * @param array[field]='Error Text' $errors
+	 */
+	public static function addValidationErrors($errors) {
+		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+	}
 
 }

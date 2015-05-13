@@ -45,7 +45,7 @@ class CommentModel implements DbReady, JsonReady, InputReady{
 
     protected $wpComment;
 
-    protected $validationErrors = array();
+    protected static $validationErrors = array();
 
     protected static $commentsCacheById = array();
     protected static $commentsCacheByPostId = array();
@@ -562,64 +562,88 @@ class CommentModel implements DbReady, JsonReady, InputReady{
      * 
      * @return array[field]='Error Text'
      */
-    public function getValidationErrors() {
-        return $this->validationErrors;
+    public static function getValidationErrors() {
+        return static::$validationErrors;
     }
 
-    /**
-     * Unpacks request input.
-     * Used by REST Controllers.
-     * 
-     * @param array $input
-     */
-    public function unpackInput($input = array()) {
+	/**
+	 * Add validation errors after unpacking from request input
+	 *
+	 * @param array[field]='Error Text' $errors
+	 */
+	public static function addValidationErrors($errors) {
+		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+	}
+
+	/**
+	 * Unpacks request input.
+	 * Used by REST Controllers.
+	 *
+	 * @param array $input
+	 *
+	 * @return JsonReady|void
+	 */
+    public static function unpackJsonItem($input = array()) {
         if(empty($input)){
             $input = InputHelper::getParams();
         }
-        $input = array_merge($this->packJsonItem(), $input);
+	    $id = Util::getItem($input, 'id', 0);
 
-        $this->setContent(Util::getItem($input, 'comment_content'));
+	    $obj = $id? static::selectById($id): new static();
 
-        if(!$this->getId()){
-            $this->setPostId(Util::getItem($input, 'comment_post_ID'));
-            
-            $parentId = Util::getItem($input, 'comment_parent', 0);
-            $parentStatus = ( 0 < $parentId ) ? wp_get_comment_status($parentId) : '';
-            $this->setParentId(( 'approved' == $parentStatus || 'unapproved' == $parentStatus ) ? $parentId : 0);
+	    $valid = static::validateInput($input, $id? $obj:null);
 
-            $user = UserModel::currentUser();
-            if($user && $user->getId()){
-                $this->setUserId($user->getId());
-                $this->setAuthor($user->getDisplayName()?$user->getDisplayName():$user->getLogin());
-                $this->setEmail($user->getEmail());
-                $this->setUrl($user->getUrl());
-            }else{
-                $this->setUserId(0);
-                $this->setAuthor(Util::getItem($input, 'comment_author'));
-                $this->setEmail(Util::getItem($input, 'comment_author_email'));
-                $this->setUrl(Util::getItem($input, 'comment_author_url'));
-            }
-            $this->setType(Util::getItem($input, 'comment_type', ''));
-            $dbRec = $this->packDbRecord(false);
-            unset($dbRec['comment_approved']);
-            $this->setIsApproved(wp_allow_comment($dbRec));
-        }
-        
+	    if($valid) {
+		    $input = array_merge( $obj->packJsonItem(), $input );
+
+		    $obj->setContent( Util::getItem( $input, 'comment_content' ) );
+
+		    if ( ! $obj->getId() ) {
+			    $obj->setPostId( Util::getItem( $input, 'comment_post_ID' ) );
+
+			    $parentId     = Util::getItem( $input, 'comment_parent', 0 );
+			    $parentStatus = ( 0 < $parentId ) ? wp_get_comment_status( $parentId ) : '';
+			    $obj->setParentId( ( 'approved' == $parentStatus || 'unapproved' == $parentStatus ) ? $parentId : 0 );
+
+			    $user = UserModel::currentUser();
+			    if ( $user && $user->getId() ) {
+				    $obj->setUserId( $user->getId() );
+				    $obj->setAuthor( $user->getDisplayName() ? $user->getDisplayName() : $user->getLogin() );
+				    $obj->setEmail( $user->getEmail() );
+				    $obj->setUrl( $user->getUrl() );
+			    } else {
+				    $obj->setUserId( 0 );
+				    $obj->setAuthor( Util::getItem( $input, 'comment_author' ) );
+				    $obj->setEmail( Util::getItem( $input, 'comment_author_email' ) );
+				    $obj->setUrl( Util::getItem( $input, 'comment_author_url' ) );
+			    }
+			    $obj->setType( Util::getItem( $input, 'comment_type', '' ) );
+			    $dbRec = $obj->packDbRecord( false );
+			    unset( $dbRec['comment_approved'] );
+			    $obj->setIsApproved( wp_allow_comment( $dbRec ) );
+		    }
+
+		    return $obj;
+	    }
+
+	    return null;
     }
 
-    /**
-     * Validates input and sets $validationErrors
-     * 
-     * @param array $input
-     * @param string $action (create|update)
-     * @return boolean is input valid
-     */
-    public function validateInput($input = array(), $action = 'create') {
-        if('create' == $action){
+	/**
+	 * Validates input and sets $validationErrors
+	 *
+	 * @param array $input
+	 * @param CommentModel $oldState
+	 *
+	 * @return bool is input valid
+	 */
+    public static function validateInput($input = array(), $oldState = null) {
+	    static::$validationErrors = array();
+	    $valid = apply_filters('CommentModel.validateInput', true, $input, $oldState);
+        if(!$oldState){ // creating new comment
             $postId = Util::getItem($input, 'comment_post_ID', 0);
             $post = PostModel::selectById($postId);
 
-            $valid = apply_filters('CommentModel.validateInput', true, $this, $input, $action);
             if(!$valid){
                 return false; 
             }
@@ -635,16 +659,16 @@ class CommentModel implements DbReady, JsonReady, InputReady{
             $status_obj = get_post_status_object($status);
             $msgCommentsClosed = NlsHelper::_('Sorry, comments are closed for this item.');
             if (!comments_open($postId)) {
-                $this->validationErrors['comment_closed'] = $msgCommentsClosed;
+                self::$validationErrors['comment_closed'] = $msgCommentsClosed;
                 return false;
             } elseif ('trash' == $status) {
-                $this->validationErrors['comment_on_trash'] = $msgCommentsClosed;
+	            self::$validationErrors['comment_on_trash'] = $msgCommentsClosed;
                 return false;
             } elseif (!$status_obj->public && !$status_obj->private) {
-                $this->validationErrors['comment_on_draft'] = $msgCommentsClosed;
+	            self::$validationErrors['comment_on_draft'] = $msgCommentsClosed;
                 return false;
             } elseif (post_password_required($postId)) {
-                $this->validationErrors['comment_on_password_protected'] = $msgCommentsClosed;
+	            self::$validationErrors['comment_on_password_protected'] = $msgCommentsClosed;
                 return false;
             } 
 
@@ -664,26 +688,26 @@ class CommentModel implements DbReady, JsonReady, InputReady{
                     return false;
                 }else{
                     if (!Util::getItem($input, 'comment_author')) {
-                        $this->validationErrors['comment_author'] = 'Необходимо заполнить';
+	                    self::$validationErrors['comment_author'] = 'Необходимо заполнить';
                     }
                     if (!Util::getItem($input, 'comment_author_email')) {
-                        $this->validationErrors['comment_author_email'] = 'Необходимо заполнить';
+	                    self::$validationErrors['comment_author_email'] = 'Необходимо заполнить';
                     }
                 }
             }
 
             if (!Util::getItem($input, 'comment_content')) {
-                $this->validationErrors['comment_content'] = 'Введите комментарий';
+	            self::$validationErrors['comment_content'] = 'Введите комментарий';
             }
             
-            if(!empty($this->validationErrors)){
+            if(!empty(self::$validationErrors)){
                 return false;
             }
             
-        }elseif('update' == $action){
-            AclHelper::apiOwnershipRequired($this);
+        }else{ // updating comment
+            AclHelper::apiOwnershipRequired($oldState);
             if (!Util::getItem($input, 'comment_content')) {
-                $this->validationErrors['comment_content'] = 'Введите комментарий';
+	            self::$validationErrors['comment_content'] = 'Введите комментарий';
                 return false;
             }
         }

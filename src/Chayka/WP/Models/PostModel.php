@@ -23,8 +23,9 @@ class PostModel implements DbReady, JsonReady, InputReady{
     
     static $wpQuery;
     static $postsFound;
+	protected static $validationErrors = array();
 
-    protected $id;
+	protected $id;
     protected $userId;
     protected $parentId;
     protected $guid;
@@ -1608,9 +1609,18 @@ class PostModel implements DbReady, JsonReady, InputReady{
      * 
      * @return array[field]='Error Text'
      */
-    public function getValidationErrors() {
-        return array();
+    public static function getValidationErrors() {
+        return static::$validationErrors;
     }
+
+	/**
+	 * Add validation errors after unpacking from request input
+	 *
+	 * @param array[field]='Error Text' $errors
+	 */
+	public static function addValidationErrors($errors) {
+		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+	}
 
     /**
      * Unpacks request input.
@@ -1619,43 +1629,54 @@ class PostModel implements DbReady, JsonReady, InputReady{
      * @param array $input
      * @return PostModel
      */
-    public function unpackInput($input = array()) {
+    public static function unpackJsonItem($input = array()) {
         if(empty($input)){
             $input = InputHelper::getParams();
         }
-        $input = array_merge($this->packJsonItem(), $input);
 
-        $this->setId(Util::getItem($input, 'id', 0));
-        $this->setUserId(Util::getItem($input, 'post_author'));
-        $this->setParentId(Util::getItem($input, 'post_parent'));
-        $this->setGuid(Util::getItem($input, 'guid'));
-        $this->setType(Util::getItem($input, 'post_type'));
-        $this->setSlug(Util::getItem($input, 'post_name'));
-        $this->setTitle(Util::getItem($input, 'post_title'));
-        $this->setContent(Util::getItem($input, 'post_content'));
-        $this->setExcerpt(Util::getItem($input, 'post_excerpt'));
-        $this->setStatus(Util::getItem($input, 'post_status'));        
-        $this->setPingStatus(Util::getItem($input, 'ping_status'));
-        $this->setPinged(Util::getItem($input, 'pinged'));
-        $this->setToPing(Util::getItem($input, 'to_ping'));
-        $this->setPassword(Util::getItem($input, 'post_password'));
-//        $this->setDtCreated(DateHelper::jsonStrToDatetime(Util::getItem($input, 'post_date')));
-        $this->setDtModified(DateHelper::jsonStrToDatetime(Util::getItem($input, 'post_modified')));
-        $this->setMenuOrder(Util::getItem($input, 'menu_order'));
-//        $this->setMimeType(Util::getItem($input, 'post_mime_type'));
-        $this->setCommentStatus(Util::getItem($input, 'comment_status'));
-        return $this;
+	    $id = Util::getItem($input, 'id', 0);
+
+	    $obj = $id? static::selectById($id): new static();
+
+	    $valid = static::validateInput($input, $id? $obj:null);
+
+	    if($valid){
+	        $input = array_merge($obj->packJsonItem(), $input);
+
+		    $obj->setUserId(Util::getItem($input, 'post_author'));
+		    $obj->setParentId(Util::getItem($input, 'post_parent'));
+		    $obj->setGuid(Util::getItem($input, 'guid'));
+		    $obj->setType(Util::getItem($input, 'post_type'));
+		    $obj->setSlug(Util::getItem($input, 'post_name'));
+		    $obj->setTitle(Util::getItem($input, 'post_title'));
+		    $obj->setContent(Util::getItem($input, 'post_content'));
+		    $obj->setExcerpt(Util::getItem($input, 'post_excerpt'));
+		    $obj->setStatus(Util::getItem($input, 'post_status'));
+		    $obj->setPingStatus(Util::getItem($input, 'ping_status'));
+		    $obj->setPinged(Util::getItem($input, 'pinged'));
+		    $obj->setToPing(Util::getItem($input, 'to_ping'));
+		    $obj->setPassword(Util::getItem($input, 'post_password'));
+		    $obj->setDtModified(DateHelper::jsonStrToDatetime(Util::getItem($input, 'post_modified')));
+		    $obj->setMenuOrder(Util::getItem($input, 'menu_order'));
+	//        $obj->setMimeType(Util::getItem($input, 'post_mime_type'));
+		    $obj->setCommentStatus(Util::getItem($input, 'comment_status'));
+	        return $obj;
+	    }
+
+	    return null;
     }
 
-    /**
-     * Validates input and sets $validationErrors
-     * 
-     * @param array $input
-     * @param string $action (create|update)
-     * @return boolean is input valid
-     */
-    public function validateInput($input = array(), $action = 'create') {
-        $valid = apply_filters('PostModel.validateInput', true, $this, $input, $action);
+	/**
+	 * Validates input and sets $validationErrors
+	 *
+	 * @param array $input
+	 * @param PostModel $oldState
+	 *
+	 * @return bool is input valid
+	 */
+    public static function validateInput($input = array(), $oldState = null) {
+	    static::$validationErrors = array();
+        $valid = apply_filters('PostModel.validateInput', true, $input, $oldState);
         return $valid;
     }
 
