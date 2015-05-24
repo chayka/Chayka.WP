@@ -31,8 +31,22 @@ class PostQuery{
     public function getVars(){
         return $this->vars;
     }
-    
-    /**
+
+	/**
+	 * Add vars to the set
+	 *
+	 * @param array $vars
+	 *
+	 * @return $this
+	 */
+	public function setVars($vars){
+		foreach($vars as $key=>$value){
+			$this->vars[$key] = $value;
+		}
+		return $this;
+	}
+
+	/**
      * Set query filter var
      *
      * @param string $key

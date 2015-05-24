@@ -17,33 +17,51 @@ class RestController extends MVC\RestController{
 
 	protected $modelClassName;
 
+	/**
+	 * Get model classname for this RestController
+	 *
+	 * @return string
+	 */
 	public function getModelClassName() {
 		return $this->modelClassName;
 	}
 
+	/**
+	 * Set model classname fot this RestController
+	 *
+	 * @param string $modelClassName
+	 */
 	public function setModelClassName($modelClassName) {
 		$this->modelClassName = $modelClassName;
 	}
 
+	/**
+	 * Init
+	 */
 	public function init(){
 		InputHelper::captureInput();
+		InputHelper::preserveSlashes('model');
 		$model = InputHelper::getParam('model');
 		if($model){
 			$this->setModelClassName($model);
 		}
 	}
 
+	/**
+	 * Action called on POST to controller, creates a model.
+	 * @param bool $respond
+	 *
+	 * @return \Chayka\WP\Models\ReadyModel
+	 */
 	public function createAction($respond = true){
 		InputHelper::setParam('action', 'create');
 		$class = $this->getModelClassName();
-//		$model = new $class();
-//		$model = InputHelper::getModelFromInput($model);
 		/**
 		 * @var \Chayka\WP\Models\ReadyModel $model
 		 */
-		$model = call_user_func(array($this->getModelClassName(), 'unpackJsonItem'));
+		$model = call_user_func(array($class, 'unpackJsonItem'));
 		$meta = InputHelper::getParam('meta', array());
-		$errors = call_user_func(array($this->getModelClassName(), 'getValidationErrors'));
+		$errors = call_user_func(array($class, 'getValidationErrors'));
 		if(!empty($errors)){
 			JsonHelper::respondErrors($errors);
 		}else{
@@ -56,7 +74,7 @@ class RestController extends MVC\RestController{
 						}
 					}
 				}
-				$model = call_user_func(array($this->getModelClassName(), 'selectById'), $id, false);
+				$model = call_user_func(array($class, 'selectById'), $id, false);
 				apply_filters($class . '.created', $model);
 				if ($respond) {
 					JsonHelper::respond($model);
@@ -69,6 +87,12 @@ class RestController extends MVC\RestController{
 		return $model;
 	}
 
+	/**
+	 * Action called on PUT to controller, updates a model.
+	 * @param bool $respond
+	 *
+	 * @return \Chayka\WP\Models\ReadyModel
+	 */
 	public function updateAction($respond = true){
 		InputHelper::setParam('action', 'update');
 		$id = InputHelper::getParam('id');
@@ -76,9 +100,9 @@ class RestController extends MVC\RestController{
 		/**
 		 * @var \Chayka\WP\Models\ReadyModel
 		 */
-		$model = call_user_func(array($this->getModelClassName(), 'unpackJsonItem'));
+		$model = call_user_func(array($class, 'unpackJsonItem'));
 		$meta = InputHelper::getParam('meta', array());
-		$errors = call_user_func(array($this->getModelClassName(), 'getValidationErrors'));
+		$errors = call_user_func(array($class, 'getValidationErrors'));
 		if(!empty($errors)){
 			JsonHelper::respondErrors($errors);
 		}else{
@@ -108,6 +132,12 @@ class RestController extends MVC\RestController{
 
 	}
 
+	/**
+	 * Action called on DELETE to controller, deletes a model.
+	 * @param bool $respond
+	 *
+	 * @return \Chayka\WP\Models\ReadyModel
+	 */
 	public function deleteAction($respond = true){
 		$id = InputHelper::getParam('id');
 		$class = $this->getModelClassName();
@@ -116,7 +146,7 @@ class RestController extends MVC\RestController{
 			$errors = $model->getValidationErrors();
 			JsonHelper::respondErrors($errors);
 		}
-		$result = $model->delete();//WpDbHelper::delete($table, $key, $id);
+		$result = $model->delete();
 		if($result){
 			apply_filters($class.'.deleted', $model);
 		}
@@ -126,6 +156,12 @@ class RestController extends MVC\RestController{
 		return $result;
 	}
 
+	/**
+	 * Action called on GET to controller, reads a model.
+	 * @param bool $respond
+	 *
+	 * @return \Chayka\WP\Models\ReadyModel
+	 */
 	public function readAction($respond = true){
 		$id = InputHelper::getParam('id');
 		$model = call_user_func(array($this->getModelClassName(), 'selectById'), $id);
@@ -135,22 +171,36 @@ class RestController extends MVC\RestController{
 		return $model;
 	}
 
+	/**
+	 * Action should be mapped like an ordinary controller-action route.
+	 * This one is simple but functional stub can be overridden for more
+	 * sophisticated cases (like sorting and filtering)
+	 *
+	 * @param bool $respond
+	 *
+	 * @return \Chayka\WP\Models\ReadyModel
+	 */
 	public function listAction($respond = true){
 		$limit = InputHelper::getParam('limit', 10);
 		$offset = InputHelper::getParam('offset', 0);
 		$page = InputHelper::getParam('page', 0);
+		$payload = array();
+
 		if(!$limit){
 			$models = call_user_func(array($this->getModelClassName(), 'selectAll'));
 		}elseif($page){
 			$models = call_user_func(array($this->getModelClassName(), 'selectPage'), $page, $limit);
+			$payload['page'] = $page;
+			$payload['limit'] = $limit;
 		}else{
 			$models = call_user_func(array($this->getModelClassName(), 'selectLimitOffset'), $limit, $offset);
+			$payload['offset'] = $offset;
+			$payload['limit'] = $limit;
 		}
 		$total = DbHelper::rowsFound();
-		JsonHelper::respond(array(
-			'items' => $models,
-			'total' => $total
-		));
+		$payload['items']=$models;
+		$payload['total']=$total;
+		JsonHelper::respond($payload);
 	}
 
 }

@@ -967,13 +967,6 @@ class PostModel implements DbReady, JsonReady, InputReady{
      * @return array(PostModel)
      */
     public static function selectSql($sql){
-//        global $wpdb;
-//        $posts = array();
-//        $dbRecords = $wpdb->get_results($sql);
-//        foreach ($dbRecords as $dbRecord) {
-//            $posts[] = self::unpackDbRecord($dbRecord);
-//        }
-//        self::$postsFound = count($dbRecords)?$wpdb->get_var('SELECT FOUND_ROWS()'):0;
         $posts = DbHelper::selectSql($sql, __CLASS__);
         self::$postsFound = DbHelper::rowsFound();
 

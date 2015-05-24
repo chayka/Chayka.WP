@@ -278,6 +278,35 @@ abstract class Plugin{
         $this->application->getRouter()->addRoute($label, $urlPattern, $defaults, $paramPatterns);
     }
 
+	/**
+	 * Add set of route to rest controller
+	 *
+	 * @param string $modelSlug e.g. 'post-model'
+	 * @param string $restUrlPattern e.g '/?id'
+	 * @param array $restParamPatterns e.g. ['id'=>'/^\d+$/']
+	 * @param string $modelClassName e.g. '\\Chayka\\WP\\Models\\PostModel'
+	 * @param string $controller e.g. 'post-model'
+	 * @param array $defaults
+	 */
+	public function addRestRoute($modelSlug, $restUrlPattern = '/?id', $restParamPatterns = array(), $modelClassName = '', $controller = 'rest', $defaults = array()){
+		$this->application->getRouter()->addRestRoute($modelSlug, $restUrlPattern, $restParamPatterns, $modelClassName, $controller, $defaults);
+	}
+
+	/**
+	 * Add set of routes to rest controller
+	 *
+	 * @param string $modelSlug e.g. 'post-model'
+	 * @param string $modelsSlug e.g. 'post-models'
+	 * @param string $restUrlPattern e.g '/?id'
+	 * @param array $restParamPatterns e.g. ['id'=>'/^\d+$/']
+	 * @param string $modelClassName e.g. '\\Chayka\\WP\\Models\\PostModel'
+	 * @param string $controller e.g. 'post-model'
+	 * @param string $listAction
+	 * @param array $defaults
+	 */
+	public function addRestRoutes($modelSlug, $modelsSlug='', $restUrlPattern = '/:id', $restParamPatterns = array(), $modelClassName = '', $controller = 'rest', $listAction='list', $defaults = array()) {
+		$this->application->getRouter()->addRestRoutes($modelSlug, $modelsSlug, $restUrlPattern, $restParamPatterns, $modelClassName, $controller, $listAction, $defaults);
+	}
     /**
      * Processes request uri and returns response
      *
