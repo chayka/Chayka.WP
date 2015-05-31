@@ -886,7 +886,7 @@ class UserModel implements DbReady, JsonReady, InputReady{
      */
     public function packJsonItem() {
         $jsonItem = array();
-        $jsonItem['id'] = $this->getId();
+        $jsonItem['id'] = (int)$this->getId();
         $jsonItem['user_login'] = $this->getLogin();
         $jsonItem['user_nicename'] = $this->getNicename();
         $jsonItem['user_url'] = $this->getUrl();

@@ -430,20 +430,20 @@ class CommentModel implements DbReady, JsonReady, InputReady{
     /**
      * Is comment approved
      * 
-     * @return boolean
+     * @return int|string 0|1|'spam'
      */
     public function getIsApproved() {
-        return $this->isApproved;
+        return $this->isApproved==='spam'?$this->isApproved:(int)$this->isApproved;
     }
 
     /**
      * Set approved flag
      * 
-     * @param boolean $isApproved
+     * @param int|string $isApproved 0|1|'spam'
      * @return CommentModel
      */
     public function setIsApproved($isApproved) {
-        $this->isApproved = $isApproved;
+        $this->isApproved = $isApproved==='spam'?$isApproved:(int)$isApproved;
         return $this;
     }
 
@@ -676,7 +676,7 @@ class CommentModel implements DbReady, JsonReady, InputReady{
             $user = wp_get_current_user();
             if ($user->exists()) {
                 if (current_user_can('unfiltered_html')) {
-                    if (wp_create_nonce('unfiltered-html-comment_' . $postId) != $_POST['_wp_unfiltered_html_comment']) {
+                    if (wp_create_nonce('unfiltered-html-comment_' . $postId) != Util::getItem($_POST, '_wp_unfiltered_html_comment')) {
                         kses_remove_filters(); // start with a clean slate
                         kses_init_filters(); // set up the filters
                         InputHelper::permitHtml('comment_content');
@@ -704,6 +704,8 @@ class CommentModel implements DbReady, JsonReady, InputReady{
                 return false;
             }
             
+        }else if(empty($input)){// deleting
+	        AclHelper::apiOwnershipRequired($oldState);
         }else{ // updating comment
             AclHelper::apiOwnershipRequired($oldState);
             if (!Util::getItem($input, 'comment_content')) {
@@ -767,7 +769,7 @@ class CommentModel implements DbReady, JsonReady, InputReady{
         $dbRecord['user_id'] = $this->getUserId();
         $dbRecord['comment_content'] = $this->getContent();
         $dbRecord['comment_karma'] = $this->getKarma();
-        $dbRecord['comment_approved'] = (int)$this->getIsApproved();
+        $dbRecord['comment_approved'] = $this->getIsApproved();
         $dbRecord['comment_agent'] = $this->getAgent();
         $dbRecord['comment_parent'] = $this->getParentId();
         $dbRecord['comment_type'] = $this->getType();
@@ -862,8 +864,7 @@ class CommentModel implements DbReady, JsonReady, InputReady{
         $comments = array();
         $dbRecords = get_comments($wpCommentsQueryArgs);
         foreach ($dbRecords as $dbRecord) {
-            $comment = self::unpackDbRecord($dbRecord);
-            $comments[$comment->getId()] = $comment;
+            $comments[] = self::unpackDbRecord($dbRecord);
         }
         
         return $comments;
@@ -992,7 +993,7 @@ class CommentModel implements DbReady, JsonReady, InputReady{
      */
     public function packJsonItem() {
         $jsonItem = array();
-        $jsonItem['id'] = $this->getId();
+        $jsonItem['id'] = (int)$this->getId();
         $jsonItem['comment_post_ID'] = $this->getPostId();
         $jsonItem['comment_author'] = $this->getAuthor();
         $jsonItem['comment_author_email'] = $this->getEmail();
@@ -1003,7 +1004,7 @@ class CommentModel implements DbReady, JsonReady, InputReady{
         $jsonItem['comment_karma_delta'] = $this->getKarmaDelta();
         $jsonItem['comment_approved'] = $this->getIsApproved();
         $jsonItem['comment_agent'] = $this->getAgent();
-        $jsonItem['comment_parent'] = $this->getParentId();
+        $jsonItem['comment_parent'] = (int)$this->getParentId();
         $jsonItem['comment_type'] = $this->getType();
         $jsonItem['comment_date'] = DateHelper::datetimeToJsonStr($this->getDtCreated());
         $jsonItem['comment_date_gmt'] = DateHelper::datetimeToJsonStr($this->getDtCreatedGMT());

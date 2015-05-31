@@ -191,7 +191,59 @@ class CommentQuery{
         $this->post = $post;
         return $this->postId($post->getId());
     }
-    
+
+	/**
+	 * Select comments for specified post ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function postIdIn($ids){
+		return $this->setVar('post__in', $ids);
+	}
+
+	/**
+	 * Exclude comments for specified post ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function postIdNotIn($ids){
+		return $this->setVar('post__not_in', $ids);
+	}
+
+	/**
+	 * Select comment by is.
+	 *
+	 * @param int $commentId
+	 *
+	 * @return CommentQuery
+	 */
+	public function commentId($commentId){
+		return $this->setVar('ID', $commentId);
+	}
+
+	/**
+	 * Select comments for specified ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function commentIdIn($ids){
+		return $this->setVar('comment__in', $ids);
+	}
+
+	/**
+	 * Exclude comments for specified ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function commentIdNotIn($ids){
+		return $this->setVar('comment__not_in', $ids);
+	}
+
+
     /**
      * Only return comments for a particular user.
      * 
@@ -201,7 +253,102 @@ class CommentQuery{
     public function userId($userId){
         return $this->setVar('user_id', $userId);
     }
-    
+
+	/**
+	 * Select comments for specified user ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function userIdIn($ids){
+		return $this->setVar('author__in', $ids);
+	}
+
+	/**
+	 * Exclude comments for specified user ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function userIdNotIn($ids){
+		return $this->setVar('author__not_in', $ids);
+	}
+
+	/**
+	 * Search by author email
+	 *
+	 * @param string $email
+	 *
+	 * @return CommentQuery
+	 */
+	public function authorEmail($email){
+		return $this->setVar('author_email', $email);
+	}
+
+	/**
+	 * Only return comments for a particular post author.
+	 *
+	 * @param int $userId
+	 * @return CommentQuery
+	 */
+	public function postUserId($userId){
+		return $this->setVar('post_author', $userId);
+	}
+
+	/**
+	 * Select comments for specified post author ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function postUserIdIn($ids){
+		return $this->setVar('post_author__in', $ids);
+	}
+
+	/**
+	 * Exclude comments for specified post author ids
+	 * @param array|string $ids
+	 *
+	 * @return CommentQuery
+	 */
+	public function postUserIdNotIn($ids){
+		return $this->setVar('post_author__not_in', $ids);
+	}
+
+	/**
+	 * Array of IDs or email addresses of users whose unapproved comments
+	 * will be returned by the query regardless of `$status`. Default empty.
+	 * @param array|string $include
+	 *
+	 * @return CommentQuery
+	 */
+    public function includeUnapproved($include = 'self'){
+	    if($include === 'self'){
+		    $include = array(get_current_user_id());
+	    }
+	    return $this->setVar('include_unapproved', $include);
+    }
+
+	/**
+	 * Set return values.
+	 *
+	 * @param string|array(string) $fields
+	 * @return PostQuery
+	 */
+	public function fields($fields){
+		return $this->setVar('fields', $fields);
+	}
+
+	public function fields_All(){
+		return $this->fields('*');
+	}
+
+	public function fields_Ids(){
+		return $this->fields('ids');
+	}
+
+
+
     /**
      * Only return the total count of comments.
      * 

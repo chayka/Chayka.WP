@@ -1547,7 +1547,7 @@ class PostModel implements DbReady, JsonReady, InputReady{
      */
     public function packJsonItem() {
         $jsonItem = array();
-        $jsonItem['id'] = $this->getId();
+        $jsonItem['id'] = (int)$this->getId();
         $jsonItem['post_author'] = $this->getUserId();
         $jsonItem['post_parent'] = $this->getParentId();
         $jsonItem['post_type'] = $this->getType();

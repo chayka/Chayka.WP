@@ -142,7 +142,7 @@ class RestController extends MVC\RestController{
 		$id = InputHelper::getParam('id');
 		$class = $this->getModelClassName();
 		$model = call_user_func(array($class, 'selectById'), $id);
-		if(!$model->validateInput(array(), 'delete')){
+		if(!$model->validateInput(array(), $model)){
 			$errors = $model->getValidationErrors();
 			JsonHelper::respondErrors($errors);
 		}

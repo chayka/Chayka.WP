@@ -566,8 +566,8 @@ class TermModel implements DbReady, JsonReady, InputReady{
      */
     public function packJsonItem() {
         return array(
-            'id' => $this->getRelationId(),
-            'term_id'=>$this->getTermId(),
+            'id' => (int)$this->getRelationId(),
+            'term_id'=>(int)$this->getTermId(),
             'name'=>$this->getName(),
             'slug'=>$this->getSlug(),
             'term_group'=>$this->getGroup(),
