@@ -7,6 +7,7 @@ use Chayka\Helpers\JsonReady;
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\InputHelper;
 use Chayka\Helpers\DateHelper;
+use Chayka\WP\Helpers\AclReady;
 use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Queries\PostQuery;
@@ -18,7 +19,7 @@ use WP_Query;
 use WP_Post;
 use WP_Error;
 
-class PostModel implements DbReady, JsonReady, InputReady{
+class PostModel implements DbReady, JsonReady, InputReady, AclReady{
 
     
     static $wpQuery;
@@ -1719,4 +1720,94 @@ class PostModel implements DbReady, JsonReady, InputReady{
         
         return $ret;
     }
- }
+
+	/**
+	 * @param string $privilege
+	 * @param \Chayka\WP\Models\UserModel|null $user
+	 *
+	 * @return boolean
+	 */
+	public function userCan( $privilege, $user = null ) {
+		if(!$user){
+			$user = UserModel::currentUser();
+		}
+		$userCan = true;
+		$errors = array();
+
+		$isOwner = $this->getUserId() == $user->getId();
+		$isPage = $this->getType() == 'page';
+		$publish = $this->getStatus() == 'publish' || $this->getType() == 'attachment' && $this->getStatus() == 'inherit';
+		$isPrivate = $this->getStatus() == 'private';
+		$isProtected = $this->getId() && post_password_required($this->getId());
+
+		$permissions = array();
+
+		switch($privilege){
+			case 'create':
+				$permissions[]='edit_posts';
+				if($publish){
+					$permissions[]='publish_posts';
+				}
+				if(!$isOwner){
+					$permissions[]='edit_others_posts';
+					if($isPrivate){
+						$permissions[]='edit_private_posts';
+					}
+				}
+				break;
+			case 'read':
+				if(!$publish || $isProtected){
+					if(!$isOwner){
+						$permissions[]='edit_others_posts';
+						if($isPrivate){
+							$permissions[]='read_private_posts';
+						}
+					}
+				}
+				break;
+			case 'update':
+				$permissions[]='edit_posts';
+				if($publish){
+					$permissions[]='edit_published_posts';
+				}
+				if(!$isOwner){
+					$permissions[]='edit_others_posts';
+					if($isPrivate){
+						$permissions[]='edit_private_posts';
+					}
+				}
+				break;
+			case 'delete':
+				$permissions[]='delete_posts';
+				if($publish){
+					$permissions[]='delete_published_posts';
+				}
+				if(!$isOwner){
+					$permissions[]='delete_others_posts';
+					if($isPrivate){
+						$permissions[]='delete_private_posts';
+					}
+				}
+				break;
+			default:
+
+		}
+
+		foreach($permissions as $perm){
+			if($isPage){
+				$perm = str_replace('post', 'page', $perm);
+			}
+			$userCan &= user_can($user->getWpUser(), $perm);
+			if(!$userCan){
+				$errors['permission_required']= 'Permission '.$perm.' required to '.$privilege.' post';
+				break;
+			}
+		}
+
+		$userCan = apply_filters('PostModel.'.$privilege, $userCan, $this, $user);
+		if(!$userCan){
+			static::addValidationErrors($errors);
+		}
+		return $userCan;
+	}
+}

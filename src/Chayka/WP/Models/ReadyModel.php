@@ -11,10 +11,11 @@ namespace Chayka\WP\Models;
 
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\JsonReady;
+use Chayka\WP\Helpers\AclReady;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\DbReady;
 
-abstract class ReadyModel implements DbReady, JsonReady, InputReady{
+abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
 
 	protected static $validationErrors = array();
 
@@ -213,6 +214,33 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady{
 	 */
 	public static function addValidationErrors($errors) {
 		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+	}
+
+	/**
+	 * Checks user permission for privilege on current model.
+	 * This function should be overriden to accept 'create', 'read', 'update', 'delete'.
+	 * It should use parent::userCan() for convinience.
+	 * It should apply_filters('<ModelName>.<privilege>', $model, $user);
+	 *
+	 * @param string $privilege
+	 * @param null $user
+	 *
+	 * @return bool
+	 */
+	public function userCan( $privilege, $user = null ) {
+		if(!$user){
+			$user = UserModel::currentUser();
+		}
+		$userCan = true;
+		$errors = array();
+
+		$table = preg_replace('%^'.DbHelper::wpdb()->prefix.'%', '', static::getDbTable());
+
+		$userCan = apply_filters($table.'.'.$privilege, $userCan, $this, $user);
+		if(!$userCan){
+			static::addValidationErrors($errors);
+		}
+		return $userCan;
 	}
 
 }

@@ -7,6 +7,7 @@ use Chayka\Helpers\JsonReady;
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\InputHelper;
 use Chayka\Helpers\DateHelper;
+use Chayka\WP\Helpers\AclReady;
 use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Helpers\AclHelper;
 use Chayka\WP\Queries\UserQuery;
@@ -22,7 +23,7 @@ use WP_Error;
  * Used for authentification, registration, update, delete and userpics management 
  *
  */
-class UserModel implements DbReady, JsonReady, InputReady{
+class UserModel implements DbReady, JsonReady, InputReady, AclReady{
     const SESSION_KEY = '_user';
     
     protected static $userCacheById = array();
@@ -1152,4 +1153,51 @@ class UserModel implements DbReady, JsonReady, InputReady{
         return $ret;
     }
 
+	/**
+	 * @param string $privilege
+	 * @param \Chayka\WP\Models\UserModel|null $user
+	 *
+	 * @return boolean
+	 */
+	public function userCan( $privilege, $user = null ) {
+		if(!$user){
+			$user = UserModel::currentUser();
+		}
+		$isCurrent = $user->getId() == $this->getId();
+		$userCan = true;
+		$errors = array();
+		$permissions = array();
+
+		switch($privilege){
+			case 'create':
+				$permissions[]='create_users';
+				break;
+			case 'read':
+				break;
+			case 'update':
+				if(!$isCurrent) {
+					$permissions[] = 'edit_users';
+				}
+				break;
+			case 'delete':
+				$permissions[]='delete_users';
+				break;
+			default:
+
+		}
+
+		foreach($permissions as $perm){
+			$userCan &= user_can($user->getWpUser(), $perm);
+			if(!$userCan){
+				$errors['permission_required']= 'Permission '.$perm.' required to '.$privilege.' user';
+				break;
+			}
+		}
+
+		$userCan = apply_filters('UserModel.'.$privilege, $userCan, $this, $user);
+		if(!$userCan){
+			static::addValidationErrors($errors);
+		}
+		return $userCan;
+	}
 }

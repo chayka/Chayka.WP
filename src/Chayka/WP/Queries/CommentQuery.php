@@ -94,6 +94,28 @@ class CommentQuery{
         $comments = $this->select();
         return count($comments)?reset($comments):null;
     }
+
+	/**
+	 * Select total amount of comments under this query instead of comments
+	 *
+	 * @param bool $omitLimitOffset
+	 *
+	 * @return int
+	 */
+	public function selectCount($omitLimitOffset = true){
+		$params = $this->getVars();
+		if($omitLimitOffset) {
+			if ( isset( $params['number'] ) ) {
+				unset( $params['number'] );
+			}
+			if ( isset( $params['offset'] ) ) {
+				unset( $params['offset'] );
+			}
+		}
+		$params['count'] = true;
+
+		return get_comments($params);
+	}
     
     /**
      * Only return comments with this status.
@@ -272,6 +294,16 @@ class CommentQuery{
 	 */
 	public function userIdNotIn($ids){
 		return $this->setVar('author__not_in', $ids);
+	}
+
+	/**
+	 * Select replies for specified id
+	 * @param $commentId
+	 *
+	 * @return CommentQuery
+	 */
+	public function parent($commentId){
+		return $this->setVar('parent', $commentId);
 	}
 
 	/**

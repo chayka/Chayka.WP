@@ -134,15 +134,19 @@ class AclHelper {
         }
         
     }
-    
-    /**
-     * Check if user is the owner of specified object
-     *
-     * @param PostModel|CommentModel $obj
-     * @return bool
-     */
-    public static function isOwner($obj){
-        $user = UserModel::currentUser();
+
+	/**
+	 * Check if user is the owner of specified object
+	 *
+	 * @param PostModel|CommentModel $obj
+	 * @param UserModel|null $user
+	 *
+	 * @return bool
+	 */
+    public static function isOwner($obj, $user = null){
+	    if(!$user) {
+		    $user = UserModel::currentUser();
+	    }
         $isOwner = false;
         if($user->getId()){
             if($obj instanceof UserModel){
@@ -170,14 +174,18 @@ class AclHelper {
         }
     }
 
-    /**
-     * Check if user is not the owner of specified object
-     *
-     * @param PostModel|CommentModel $obj
-     * @return bool
-     */
-    public static function isNotOwner(/*PostModel*/ $obj){
-        $user = UserModel::currentUser();
+	/**
+	 * Check if user is not the owner of specified object
+	 *
+	 * @param PostModel|CommentModel $obj
+	 * @param UserModel|null $user
+	 *
+	 * @return bool
+	 */
+    public static function isNotOwner($obj, $user = null){
+	    if(!$user) {
+		    $user = UserModel::currentUser();
+	    }
         if($obj instanceof UserModel){
             $isOwner = $obj->getId() == $user->getId();
         }else{

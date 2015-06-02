@@ -7,6 +7,7 @@ use Chayka\Helpers\JsonReady;
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\InputHelper;
 use Chayka\Helpers\DateHelper;
+use Chayka\WP\Helpers\AclReady;
 use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\AclHelper;
@@ -24,7 +25,7 @@ use DateTime;
  *
  * @author borismossounov
  */
-class CommentModel implements DbReady, JsonReady, InputReady{
+class CommentModel implements DbReady, JsonReady, InputReady, AclReady{
 
     protected $id;
     protected $postId;
@@ -1072,4 +1073,78 @@ class CommentModel implements DbReady, JsonReady, InputReady{
         return $ret;
     }
 
+	/**
+	 * @param string $privilege
+	 * @param \Chayka\WP\Models\UserModel|null $user
+	 *
+	 * @return mixed
+	 */
+	public function userCan( $privilege, $user = null ) {
+		if(!$user){
+			$user = UserModel::currentUser();
+		}
+		$post = PostModel::selectById($this->getPostId());
+		$userCan = true;
+		$errors = array();
+		$canModerate = user_can($user->getWpUser(), 'moderate_comments');
+		$commentsAllowed = comments_open($this->getPostId()) && post_type_supports($post->getType(), 'comments' );
+		$isCommentOwner = AclHelper::isOwner($this, $user);
+		if(!$canModerate){
+			switch($privilege){
+				case 'create':
+					/**
+					 * User can create comment if:
+					 * - comments are not blocked for post
+					 * - post is readable
+					 */
+					if(!$commentsAllowed || !$post->userCan('read', $user)){
+						$userCan = false;
+						$errors['comments_closed']=NlsHelper::_('Comments are not allowed for this post');
+					}
+					break;
+				case 'read':
+					/**
+					 * User can read comment if:
+					 * - comments are not blocked for post
+					 * - post is readable
+					 */
+					if(!$commentsAllowed || !$post->userCan('read', $user)){
+						$userCan = false;
+						$errors['comments_closed']=NlsHelper::_('Comments are not allowed for this post');
+					}
+					break;
+				case 'update':
+					/**
+					 * User can update comment if:
+					 * - user owns it
+					 */
+					if(!$isCommentOwner){
+						$userCan = false;
+						$errors['permission_required']=NlsHelper::_('User should own this comment');
+					}
+					break;
+				case 'delete':
+					/**
+					 * User can delete comment if:
+					 * - user owns it
+					 * - user can edit post
+					 */
+					if(!$isCommentOwner && !$post->userCan('update', $user)){
+						$userCan = false;
+						$errors['permission_required']=NlsHelper::_('User should own this comment');
+					}
+					break;
+				default:
+					$userCan = false;
+			}
+		}
+
+		$userCan = apply_filters('CommentModel.'.$privilege, $userCan, $this, $user);
+
+		if(!$userCan){
+			static::addValidationErrors($errors);
+		}
+
+		return $userCan;
+	}
 }

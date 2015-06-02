@@ -61,8 +61,9 @@ class RestController extends MVC\RestController{
 		 */
 		$model = call_user_func(array($class, 'unpackJsonItem'));
 		$meta = InputHelper::getParam('meta', array());
+		$userCan = $model->userCan('create');
 		$errors = call_user_func(array($class, 'getValidationErrors'));
-		if(!empty($errors)){
+		if(!$userCan || !empty($errors)){
 			JsonHelper::respondErrors($errors);
 		}else{
 			$id = $model->insert();
@@ -102,8 +103,9 @@ class RestController extends MVC\RestController{
 		 */
 		$model = call_user_func(array($class, 'unpackJsonItem'));
 		$meta = InputHelper::getParam('meta', array());
+		$userCan = $model->userCan('update');
 		$errors = call_user_func(array($class, 'getValidationErrors'));
-		if(!empty($errors)){
+		if(!$userCan || !empty($errors)){
 			JsonHelper::respondErrors($errors);
 		}else{
 			try{
@@ -142,6 +144,10 @@ class RestController extends MVC\RestController{
 		$id = InputHelper::getParam('id');
 		$class = $this->getModelClassName();
 		$model = call_user_func(array($class, 'selectById'), $id);
+		if(!$model->userCan('delete')){
+			$errors = call_user_func(array($class, 'getValidationErrors'));
+			JsonHelper::respondErrors($errors);
+		}
 		if(!$model->validateInput(array(), $model)){
 			$errors = $model->getValidationErrors();
 			JsonHelper::respondErrors($errors);
@@ -164,7 +170,12 @@ class RestController extends MVC\RestController{
 	 */
 	public function readAction($respond = true){
 		$id = InputHelper::getParam('id');
-		$model = call_user_func(array($this->getModelClassName(), 'selectById'), $id);
+		$class = $this->getModelClassName();
+		$model = call_user_func(array($class, 'selectById'), $id);
+		if(!$model->userCan('read')){
+			$errors = call_user_func(array($class, 'getValidationErrors'));
+			JsonHelper::respondErrors($errors);
+		}
 		if($respond){
 			JsonHelper::respond($model, $model?0:1);
 		}

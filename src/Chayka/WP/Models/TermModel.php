@@ -6,6 +6,7 @@ use Chayka\Helpers\Util;
 use Chayka\Helpers\JsonReady;
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\InputHelper;
+use Chayka\WP\Helpers\AclReady;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Queries\TermQuery;
@@ -13,7 +14,7 @@ use Chayka\WP\Queries\PostTermQuery;
 use Exception;
 use WP_Error;
 
-class TermModel implements DbReady, JsonReady, InputReady{
+class TermModel implements DbReady, JsonReady, InputReady, AclReady{
 
 	protected static $validationErrors;
 	protected $wpTerm;
@@ -577,6 +578,26 @@ class TermModel implements DbReady, JsonReady, InputReady{
             'count'=>$this->getCountPerTaxonomy(),
         );
     }
+
+	/**
+	 * @param string $privilege
+	 * @param \Chayka\WP\Models\UserModel|null $user
+	 *
+	 * @return boolean
+	 */
+	public function userCan( $privilege, $user = null ) {
+		if(!$user){
+			$user = UserModel::currentUser();
+		}
+		$userCan = true;
+		$errors = array();
+
+		$userCan = apply_filters('TermModel.'.$privilege, $userCan, $this, $user);
+		if(!$userCan){
+			static::addValidationErrors($errors);
+		}
+		return $userCan;
+	}
 
 }
 
