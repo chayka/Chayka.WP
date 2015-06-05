@@ -687,18 +687,18 @@ class CommentModel implements DbReady, JsonReady, InputReady, AclReady{
                 if (get_option('comment_registration') || 'private' == $status){
                     AclHelper::apiAuthRequired('Sorry, you must be logged in to post a comment.');
                     return false;
-                }else{
+                }else if(get_option('require_name_email')){
                     if (!Util::getItem($input, 'comment_author')) {
-	                    self::$validationErrors['comment_author'] = 'Необходимо заполнить';
+	                    self::$validationErrors['comment_author'] = 'Required field';
                     }
                     if (!Util::getItem($input, 'comment_author_email')) {
-	                    self::$validationErrors['comment_author_email'] = 'Необходимо заполнить';
+	                    self::$validationErrors['comment_author_email'] = 'Required field';
                     }
                 }
             }
 
             if (!Util::getItem($input, 'comment_content')) {
-	            self::$validationErrors['comment_content'] = 'Введите комментарий';
+	            self::$validationErrors['comment_content'] = 'Required field';
             }
             
             if(!empty(self::$validationErrors)){
@@ -710,7 +710,7 @@ class CommentModel implements DbReady, JsonReady, InputReady, AclReady{
         }else{ // updating comment
             AclHelper::apiOwnershipRequired($oldState);
             if (!Util::getItem($input, 'comment_content')) {
-	            self::$validationErrors['comment_content'] = 'Введите комментарий';
+	            self::$validationErrors['comment_content'] = 'Required field';
                 return false;
             }
         }
