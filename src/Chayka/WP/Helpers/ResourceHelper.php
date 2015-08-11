@@ -32,6 +32,39 @@ class ResourceHelper {
         self::$isMediaMinimized = $isMediaMinimized;
     }
 
+    /**
+     * Add callback to enqueue or register script at an appropriate moment.
+     *
+     * Scripts and styles should not be registered or enqueued until the
+     * <code>wp_enqueue_scripts</code>, <code>admin_enqueue_scripts</code>, or
+     * <code>login_enqueue_scripts</code> hooks.
+     *
+     * @param \Closure $callback
+     */
+    protected static function addEnqueueScriptsCallback($callback){
+        if( did_action('wp_enqueue_scripts') ||
+            did_action('admin_enqueue_scripts') ||
+            did_action('login_enqueue_scripts') ){
+            call_user_func($callback);
+        }else{
+            add_action('wp_enqueue_scripts', $callback);
+            add_action('admin_enqueue_scripts', $callback);
+            add_action('login_enqueue_scripts', $callback);
+        }
+    }
+
+    /**
+     * Alias to wp_deregister_script
+     *
+     * @param $handle
+     */
+    public static function unregisterScript($handle){
+        $callback = function() use ($handle){
+            wp_deregister_script($handle);
+        };
+        self::addEnqueueScriptsCallback($callback);
+    }
+
 	/**
 	 * Alias to wp_register_script but checks if dependencies can be found inside minimized files
 	 *
@@ -42,15 +75,20 @@ class ResourceHelper {
 	 * @param bool $inFooter
 	 */
     public static function registerScript($handle, $src, $dependencies = array(), $version = false, $inFooter = true){
-        if(self::$isMediaMinimized){
-            foreach($dependencies as $i => $d){
-                if(self::$minimizedScripts[$d]){
-                    $dependencies[$i] = self::$minimizedScripts[$d];
+
+        $callback = function() use ($handle, $src, $dependencies, $version, $inFooter){
+            if(self::$isMediaMinimized){
+                foreach($dependencies as $i => $d){
+                    if(self::$minimizedScripts[$d]){
+                        $dependencies[$i] = self::$minimizedScripts[$d];
+                    }
                 }
+                $dependencies = array_unique($dependencies);
             }
-            $dependencies = array_unique($dependencies);
-        }
-        wp_register_script($handle, $src, $dependencies, $version, $inFooter);
+            wp_register_script($handle, $src, $dependencies, $version, $inFooter);
+        };
+
+        self::addEnqueueScriptsCallback($callback);
     }
 
 	/**
@@ -63,28 +101,32 @@ class ResourceHelper {
 	 * @param bool $inFooter
 	 */
     public static function registerMinimizedScript($minHandle, $src, $handles, $version = false, $inFooter = true){
-        global $wp_scripts;
-        $dependencies = array();
-	    foreach($handles as $handle) {
-		    self::$minimizedScripts[ $handle ] = $minHandle;
-	    }
-        foreach($handles as $handle){
-            $item = Util::getItem($wp_scripts->registered, $handle);
-            $itemDependencies = Util::getItem($item, 'deps', array());
-            foreach ($itemDependencies as $i => $d) {
-                if (self::$minimizedScripts[$d]) {
-                    if(self::$minimizedScripts[$d] === $minHandle){
-                        unset($itemDependencies[$i]);
-                    }else{
-                        $itemDependencies[$i] = self::$minimizedScripts[$d];
+        $callback = function() use ($minHandle, $src, $handles, $version, $inFooter){
+            global $wp_scripts;
+            $dependencies = array();
+            foreach($handles as $handle) {
+                self::$minimizedScripts[ $handle ] = $minHandle;
+            }
+            foreach($handles as $handle){
+                $item = Util::getItem($wp_scripts->registered, $handle);
+                $itemDependencies = Util::getItem($item, 'deps', array());
+                foreach ($itemDependencies as $i => $d) {
+                    if (isset(self::$minimizedScripts[$d])) {
+                        if(self::$minimizedScripts[$d] === $minHandle){
+                            unset($itemDependencies[$i]);
+                        }else{
+                            $itemDependencies[$i] = self::$minimizedScripts[$d];
+                        }
                     }
                 }
+                $itemDependencies = array_unique($itemDependencies);
+                $dependencies = array_merge($dependencies, $itemDependencies);
             }
-            $itemDependencies = array_unique($itemDependencies);
-            $dependencies = array_merge($dependencies, $itemDependencies);
-        }
-        $dependencies = array_unique($dependencies);
-        wp_register_script($minHandle, $src, $dependencies, $version, $inFooter);
+            $dependencies = array_unique($dependencies);
+            wp_register_script($minHandle, $src, $dependencies, $version, $inFooter);
+        };
+
+        self::addEnqueueScriptsCallback($callback);
     }
 
 	/**
@@ -93,10 +135,15 @@ class ResourceHelper {
 	 * @param bool $inFooter
 	 */
 	public static function setScriptLocation($handle, $inFooter = false){
-		global $wp_scripts;
-		if($wp_scripts->registered[$handle]){
-			$wp_scripts->set_group($handle, false, $inFooter?1:0);
-		}
+
+        $callback = function() use ($handle, $inFooter){
+            global $wp_scripts;
+            if($wp_scripts->registered[$handle]){
+                $wp_scripts->set_group($handle, false, $inFooter?1:0);
+            }
+        };
+
+        self::addEnqueueScriptsCallback($callback);
 	}
 
     /**
@@ -110,14 +157,51 @@ class ResourceHelper {
      * @param bool $inFooter
      */
     public static function enqueueScript($handle, $src = false, $dependencies = array(), $ver = false, $inFooter = true){
-        if(self::$isMediaMinimized && !empty(self::$minimizedScripts[$handle])){
-            wp_enqueue_script(self::$minimizedScripts[$handle]);
+        $callback = function() use ($handle, $src, $dependencies, $ver, $inFooter) {
+            if ( self::$isMediaMinimized && ! empty( self::$minimizedScripts[ $handle ] ) ) {
+                wp_enqueue_script( self::$minimizedScripts[ $handle ] );
+            } else {
+                wp_enqueue_script( $handle, $src, $dependencies, $ver, $inFooter );
+            }
+        };
+        self::addEnqueueScriptsCallback($callback, $handle);
+    }
+
+    /**
+     * Add callback to enqueue or register style at an appropriate moment.
+     *
+     * Scripts and styles should not be registered or enqueued until the
+     * <code>wp_enqueue_styles</code>, <code>admin_enqueue_styles</code>, or
+     * <code>login_enqueue_styles</code> hooks.
+     *
+     * @param \Closure $callback
+     */
+    protected static function addEnqueueStylesCallback($callback){
+        if( did_action('wp_enqueue_styles') ||
+            did_action('admin_enqueue_styles') ||
+            did_action('login_enqueue_styles') ){
+//            $callback();
+            call_user_func($callback);
         }else{
-            wp_enqueue_script($handle, $src, $dependencies, $ver, $inFooter);
+            add_action('wp_enqueue_styles', $callback);
+            add_action('admin_enqueue_styles', $callback);
+            add_action('login_enqueue_styles', $callback);
         }
     }
 
-	/**
+    /**
+     * Alias to wp_deregister_style
+     *
+     * @param $handle
+     */
+    public static function unregisterStyle($handle){
+        $callback = function() use ($handle){
+            wp_deregister_style($handle);
+        };
+        self::addEnqueueScriptsCallback($callback);
+    }
+
+    /**
 	 * Alias to wp_register_style but checks if dependencies can be found inside minimized files
 	 *
 	 * @param string $handle
@@ -127,15 +211,18 @@ class ResourceHelper {
 	 * @param string $media
 	 */
     public static function registerStyle($handle, $src, $dependencies = array(), $version = false, $media = 'all'){
-        if(self::$isMediaMinimized) {
-            foreach ($dependencies as $i => $d) {
-                if (self::$minimizedStyles[$d]) {
-                    $dependencies[$i] = self::$minimizedStyles[$d];
+        $callback = function() use ($handle, $src, $dependencies, $version, $media){
+            if(self::$isMediaMinimized) {
+                foreach ($dependencies as $i => $d) {
+                    if (self::$minimizedStyles[$d]) {
+                        $dependencies[$i] = self::$minimizedStyles[$d];
+                    }
                 }
+                $dependencies = array_unique($dependencies);
             }
-            $dependencies = array_unique($dependencies);
-        }
-        wp_register_style($handle, $src, $dependencies, $version, $media);
+            wp_register_style($handle, $src, $dependencies, $version, $media);
+        };
+        self::addEnqueueScriptsCallback($callback);
     }
 
 	/**
@@ -148,28 +235,31 @@ class ResourceHelper {
 	 * @param string $media
 	 */
     public static function registerMinimizedStyle($minHandle, $src, $handles, $version = false, $media = 'all'){
-        global $wp_styles;
-        $dependencies = array();
-	    foreach($handles as $handle) {
-		    self::$minimizedStyles[ $handle ] = $minHandle;
-	    }
-        foreach($handles as $handle){
-            $item = Util::getItem($wp_styles->registered, $handle);
-            $itemDependencies = Util::getItem($item, 'deps', array());
-            foreach ($itemDependencies as $i => $d) {
-                if (self::$minimizedStyles[$d]) {
-                    if(self::$minimizedStyles[$d] === $minHandle){
-                        unset($itemDependencies[$i]);
-                    }else{
-                        $itemDependencies[$i] = self::$minimizedStyles[$d];
+        $callback = function() use ($minHandle, $src, $handles, $version, $media){
+            global $wp_styles;
+            $dependencies = array();
+            foreach($handles as $handle) {
+                self::$minimizedStyles[ $handle ] = $minHandle;
+            }
+            foreach($handles as $handle){
+                $item = Util::getItem($wp_styles->registered, $handle);
+                $itemDependencies = Util::getItem($item, 'deps', array());
+                foreach ($itemDependencies as $i => $d) {
+                    if (isset(self::$minimizedStyles[$d])) {
+                        if(self::$minimizedStyles[$d] === $minHandle){
+                            unset($itemDependencies[$i]);
+                        }else{
+                            $itemDependencies[$i] = self::$minimizedStyles[$d];
+                        }
                     }
                 }
+                $itemDependencies = array_unique($itemDependencies);
+                $dependencies = array_merge($dependencies, $itemDependencies);
             }
-            $itemDependencies = array_unique($itemDependencies);
-            $dependencies = array_merge($dependencies, $itemDependencies);
-        }
-        $dependencies = array_unique($dependencies);
-        wp_register_style($minHandle, $src, $dependencies, $version, $media);
+            $dependencies = array_unique($dependencies);
+            wp_register_style($minHandle, $src, $dependencies, $version, $media);
+        };
+        self::addEnqueueScriptsCallback($callback);
     }
 
     /**
@@ -183,11 +273,14 @@ class ResourceHelper {
      * @param string $media
      */
     public static function enqueueStyle($handle, $src = false, $dependencies = array(), $ver = false, $media = 'all'){
-        if(self::$isMediaMinimized && !empty(self::$minimizedStyles[$handle])){
-            wp_enqueue_style(self::$minimizedStyles[$handle]);
-        }else{
-            wp_enqueue_style($handle, $src, $dependencies, $ver, $media);
-        }
+        $callback = function() use ($handle, $src, $dependencies, $ver, $media){
+            if(self::$isMediaMinimized && !empty(self::$minimizedStyles[$handle])){
+                wp_enqueue_style(self::$minimizedStyles[$handle]);
+            }else{
+                wp_enqueue_style($handle, $src, $dependencies, $ver, $media);
+            }
+        };
+        self::addEnqueueScriptsCallback($callback);
     }
 
 	/**

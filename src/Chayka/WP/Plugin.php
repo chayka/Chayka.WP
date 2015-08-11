@@ -584,7 +584,7 @@ abstract class Plugin{
 	 * @param $handle
 	 */
 	public function unregisterStyle($handle){
-		wp_deregister_style($handle);
+		ResourceHelper::unregisterStyle($handle);
 	}
 
 	/**
@@ -650,7 +650,7 @@ abstract class Plugin{
 	 * @param string $handle
 	 */
 	public function unregisterScript($handle){
-		wp_deregister_script($handle);
+        ResourceHelper::unregisterScript($handle);
 	}
 
     /**

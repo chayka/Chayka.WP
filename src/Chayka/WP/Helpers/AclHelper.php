@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Helpers;
 
@@ -7,6 +12,12 @@ use Chayka\WP\Models\CommentModel;
 use Chayka\WP\Models\PostModel;
 use Chayka\WP\Models\UserModel;
 
+/**
+ * Class AclHelper allows to create Access Control List by allowing or denying access to specific resources.
+ * Utilizes WP capabilities.
+ *
+ * @package Chayka\WP\Helpers
+ */
 class AclHelper {
 
     const ROLE_GUEST = 'guest';
@@ -124,6 +135,8 @@ class AclHelper {
      * Respond with api error if user has no privilege for specified resource
      *
      * @param string $message
+     * @param string|null $privilege
+     * @param string|null $resource
      */
     public static function apiPermissionRequired($message = '', $privilege = null, $resource = null){
         if(!self::isAllowed($privilege, $resource)){

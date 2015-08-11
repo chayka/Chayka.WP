@@ -26,7 +26,7 @@ class Controller extends MVC\Controller{
      */
     public function __construct($application){
         parent::__construct($application);
-        $this->appUrl = preg_replace('%^.*wp-content%', '/wp-content', $this->appPath);
+        $this->appUrl = preg_replace('%^.*wp-content%', '/wp-content', $application->getPath());
     }
 
     /**
