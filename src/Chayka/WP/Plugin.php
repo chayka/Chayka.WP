@@ -564,7 +564,22 @@ abstract class Plugin{
 		ResourceHelper::registerStyle($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $media);
 	}
 
-	/**
+    /**
+     * Alias to wp_register_style, but the path is relative to '/res'.
+     * Ensures 'angular' as dependency.
+     *
+     * @param string $handle
+     * @param string $relativeResPath
+     * @param array $dependencies
+     * @param bool $version
+     * @param string $media
+     */
+    public function registerNgStyle($handle, $relativeResPath, $dependencies = array(), $version = false, $media = 'all'){
+        $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+        AngularHelper::registerStyle($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $media);
+    }
+
+    /**
 	 * Register minimized style file that contains all the min-cat styles defined by $handles.
 	 *
 	 * @param string $minHandle
@@ -617,14 +632,14 @@ abstract class Plugin{
 		ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $inFooter);
 	}
 
-	/**
-	 * @param $handle
-	 * @param $relativeResPath
-	 * @param array $dependencies
-	 * @param callable|null $enqueueCallback
-	 * @param bool $version
-	 * @param bool $inFooter
-	 */
+    /**
+     * @param $handle
+     * @param $relativeResPath
+     * @param array $dependencies
+     * @param callable|null $enqueueCallback
+     * @param bool $version
+     * @param bool $inFooter
+     */
 	public function registerNgScript($handle, $relativeResPath, $dependencies = array(), $enqueueCallback = null, $version = false, $inFooter = true){
 		$relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
 		AngularHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $enqueueCallback, $version, $inFooter);

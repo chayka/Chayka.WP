@@ -47,9 +47,9 @@ class ResourceHelper {
             did_action('login_enqueue_scripts') ){
             call_user_func($callback);
         }else{
-            add_action('wp_enqueue_scripts', $callback);
-            add_action('admin_enqueue_scripts', $callback);
-            add_action('login_enqueue_scripts', $callback);
+            add_action('wp_enqueue_scripts', $callback, 10);
+            add_action('admin_enqueue_scripts', $callback, 10);
+            add_action('login_enqueue_scripts', $callback, 10);
         }
     }
 
@@ -70,22 +70,22 @@ class ResourceHelper {
 	 *
 	 * @param string $handle
 	 * @param string $src
-	 * @param array $dependencies
+	 * @param array $ngDependencies
 	 * @param bool $version
 	 * @param bool $inFooter
 	 */
-    public static function registerScript($handle, $src, $dependencies = array(), $version = false, $inFooter = true){
+    public static function registerScript($handle, $src, $ngDependencies = array(), $version = false, $inFooter = true){
 
-        $callback = function() use ($handle, $src, $dependencies, $version, $inFooter){
+        $callback = function() use ($handle, $src, $ngDependencies, $version, $inFooter){
             if(self::$isMediaMinimized){
-                foreach($dependencies as $i => $d){
-                    if(self::$minimizedScripts[$d]){
-                        $dependencies[$i] = self::$minimizedScripts[$d];
+                foreach($ngDependencies as $i => $d){
+                    if(!empty(self::$minimizedScripts[$d])){
+                        $ngDependencies[$i] = self::$minimizedScripts[$d];
                     }
                 }
-                $dependencies = array_unique($dependencies);
+                $ngDependencies = array_unique($ngDependencies);
             }
-            wp_register_script($handle, $src, $dependencies, $version, $inFooter);
+            wp_register_script($handle, $src, $ngDependencies, $version, $inFooter);
         };
 
         self::addEnqueueScriptsCallback($callback);
@@ -164,7 +164,7 @@ class ResourceHelper {
                 wp_enqueue_script( $handle, $src, $dependencies, $ver, $inFooter );
             }
         };
-        self::addEnqueueScriptsCallback($callback, $handle);
+        self::addEnqueueScriptsCallback($callback);
     }
 
     /**
@@ -214,7 +214,7 @@ class ResourceHelper {
         $callback = function() use ($handle, $src, $dependencies, $version, $media){
             if(self::$isMediaMinimized) {
                 foreach ($dependencies as $i => $d) {
-                    if (self::$minimizedStyles[$d]) {
+                    if (!empty(self::$minimizedStyles[$d])) {
                         $dependencies[$i] = self::$minimizedStyles[$d];
                     }
                 }

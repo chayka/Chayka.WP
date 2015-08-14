@@ -1,9 +1,19 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Helpers;
 
 use wpdb;
 
+/**
+ * Class DbHelper contains set of handy database methods.
+ *
+ * @package Chayka\WP\Helpers
+ */
 class DbHelper {
 
     /**

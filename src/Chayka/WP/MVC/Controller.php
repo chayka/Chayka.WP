@@ -103,19 +103,20 @@ class Controller extends MVC\Controller{
         ResourceHelper::enqueueScript($handle, $src, $dependencies, $ver, $in_footer);
     }
 
-	/**
-	 * @param $handle
-	 * @param bool $resRelativeSrc
-	 * @param array $dependencies
-	 * @param bool $ver
-	 * @param bool $in_footer
-	 */
-	public function enqueueNgScript($handle, $resRelativeSrc = false, $dependencies = array(), $ver = false, $in_footer = false){
+    /**
+     * @param $handle
+     * @param bool $resRelativeSrc
+     * @param array $dependencies
+     * @param callable|null $enqueueCallback
+     * @param bool $ver
+     * @param bool $in_footer
+     */
+	public function enqueueNgScript($handle, $resRelativeSrc = false, $dependencies = array(), $enqueueCallback = null, $ver = false, $in_footer = false){
 		$src = false;
 		if($resRelativeSrc) {
 			$src = $this->appUrl . 'res/' . $resRelativeSrc;
 		}
-		AngularHelper::enqueueScript($handle, $src, $dependencies, $ver, $in_footer);
+		AngularHelper::enqueueScript($handle, $src, $dependencies, $enqueueCallback, $ver, $in_footer);
 	}
 
     /**
@@ -137,6 +138,25 @@ class Controller extends MVC\Controller{
     }
 
     /**
+     * Enqueue style. Utilizes wp_enqueue_style().
+     * However if detects registered minimized and concatenated version enqueue it instead.
+     * Ensures 'angular' as dependency
+     *
+     * @param $handle
+     * @param string|bool $resRelativeSrc
+     * @param array $dependencies
+     * @param string|bool $ver
+     * @param bool $in_footer
+     */
+    public function enqueueNgStyle($handle, $resRelativeSrc = false, $dependencies = array(), $ver = false, $in_footer = false) {
+        $src = false;
+        if($resRelativeSrc) {
+            $src = $this->appUrl . 'res/' . $resRelativeSrc;
+        }
+        AngularHelper::enqueueStyle($handle, $src, $dependencies, $ver, $in_footer);
+    }
+
+    /**
      * Enqueue both script and style with the same $handle.
      * Uses minimized versions if detects.
      *
@@ -147,6 +167,11 @@ class Controller extends MVC\Controller{
     }
 
 	/**
+     * Enqueue both script and style with the same $handle.
+     * Uses minimized versions if detects.
+     *
+     * Should be used to enqueue angular scripts to bootstrap them correctly
+     *
 	 * @param $handle
 	 */
 	public function enqueueNgScriptStyle($handle) {

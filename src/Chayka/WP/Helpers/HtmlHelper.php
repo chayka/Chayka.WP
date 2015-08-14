@@ -1,11 +1,24 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Helpers;
 
 use Chayka\Helpers;
 use Chayka\WP\Models\PostModel;
 
-
+/**
+ * Class HtmlHelper is a static container for HTML > HEAD > META values.
+ * Also contains a set of handy methods for outputting html attrs
+ * to hide|show|disable|enable|check|uncheck elements based on provided condition.
+ *
+ *
+ *
+ * @package Chayka\Helpers
+ */
 class HtmlHelper extends Helpers\HtmlHelper{
     
     /**
@@ -59,5 +72,3 @@ class HtmlHelper extends Helpers\HtmlHelper{
         return self::getMeta('sidebar-id');
     }
 }
-
-

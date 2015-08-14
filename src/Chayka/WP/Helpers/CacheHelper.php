@@ -1,9 +1,29 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Helpers;
 
 use \Closure;
 
+/**
+ * Class CacheHelper enables custom smart caching:
+
+ * $a = 'John'
+ *
+ * $value = CacheHelper::_('some cache', DAY_IN_SECONDS, function($key) use ($a){
+ *      return "Hello $a";
+ * });
+ *
+ * $value = CacheHelper::__('some multi-site cache', DAY_IN_SECONDS, function($key) use ($a){
+ *      return "Hello multi-site $a";
+ * });
+ *
+ * @package Chayka\WP\Helpers
+ */
 class CacheHelper {
 
     /**
