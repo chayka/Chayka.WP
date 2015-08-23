@@ -1,24 +1,74 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: borismossounov
- * Date: 11.01.15
- * Time: 19:00
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
  */
 
 namespace Chayka\WP\Helpers;
 
 use Chayka\Helpers\Util;
 
+/**
+ * Class ResourceHelper is a comprehensive solution to manage your styles and scripts.
+ * Basically it is a wrapper for all those
+ * - wp_register_script
+ * - wp_deregister_script
+ * - wp_enqueue_script
+ * - wp_register_style
+ * - wp_enqueue_style
+ * - wp_deregister_style
+ *
+ * However this helper loads them carefully at the appropriate hooks.
+ *
+ * One more thing - this helper enables usage of minimized & concatenated (by GruntJS) scripts & styles.
+ * Do it like that:
+ *      ResourceHelper::registerScript('jquery', 'js/jquery.js', ...);
+ *      ResourceHelper::registerScript('angular', 'js/angular.js',...);
+ *
+ *      ResourceHelper::registerMinimizedScript('jquery-angular', 'js/jquery-angular.min.js', ['jquery', 'angular']);
+ *
+ * then at some point call:
+ *
+ *      ResourceHelper::enqueueScript('jquery');
+ *
+ * it will load 'js/jquery-angular.min.js'
+ *
+ * the next call:
+ *
+ *      ResourceHelper::enqueueScript('angular');
+ *
+ * won't load a thing because it's already loaded. Amazing!
+ *
+ * @package Chayka\WP\Helpers
+ */
 class ResourceHelper {
 
+    /**
+     * This variable stores flag whether helper should look for minimized resources
+     * if available.
+     *
+     * @var bool
+     */
     protected static $isMediaMinimized = false;
 
+    /**
+     * Mapping of resource handles to the concatenated styles
+     *
+     * @var array
+     */
     protected static $minimizedStyles = array();
 
+    /**
+     * Mapping of resource handles to the concatenated scripts
+     *
+     * @var array
+     */
     protected static $minimizedScripts = array();
 
     /**
+     * Check if we are working in the minimized media mode
+     *
      * @return boolean
      */
     public static function isMediaMinimized() {
@@ -26,6 +76,8 @@ class ResourceHelper {
     }
 
     /**
+     * Set minimized media mode
+     *
      * @param boolean $isMediaMinimized
      */
     public static function setMediaMinimized($isMediaMinimized) {

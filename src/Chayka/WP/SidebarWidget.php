@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP;
 
@@ -7,6 +12,13 @@ use Chayka\Helpers\Util;
 use Chayka\MVC\View;
 use \WP_Widget;
 
+/**
+ * Class SidebarWidget implements our mechanism for creating sidebar widgets.
+ *
+ * Use yo chayka generator to generate sidebar widgets.
+ *
+ * @package Chayka\WP
+ */
 class SidebarWidget extends WP_Widget {
 
     /**

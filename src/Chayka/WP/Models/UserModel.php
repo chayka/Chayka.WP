@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Models;
 
@@ -20,55 +25,179 @@ use WP_Error;
 
 /**
  * Class implemented to handle user actions and manipulations
- * Used for authentification, registration, update, delete and userpics management 
- *
+ * Used for authentication, registration, update, delete and avatars management
  */
 class UserModel implements DbReady, JsonReady, InputReady, AclReady{
-    const SESSION_KEY = '_user';
-    
+
+//    const SESSION_KEY = '_user';
+
+    /**
+     * User models cached by user ids
+     *
+     * @var array
+     */
     protected static $userCacheById = array();
+
+    /**
+     * User models cached by emails
+     *
+     * @var array
+     */
     protected static $userCacheByEmail = array();
+
+    /**
+     * User models cached by logins
+     *
+     * @var array
+     */
     protected static $userCacheByLogin = array();
-    
+
+    /**
+     * An array that contains set of meta fields
+     * that should be published when model outputted as json
+     *
+     * @var array
+     */
     protected static $jsonMetaFields = array();
 
+    /**
+     * UserModel instance of current user
+     *
+     * @var UserModel
+     */
     protected static $currentUser;
+
+    /**
+     * Array of validation errors, part of InputReady interface implementation
+     *
+     * @var array
+     */
 	protected static $validationErrors;
 
-	protected $id;
+    /**
+     * User id
+     *
+     * @var int
+     */
+    protected $id;
 
+    /**
+     * User login
+     *
+     * @var string
+     */
     protected $login;
-    
+
+    /**
+     * User password
+     *
+     * @var string
+     */
     protected $password;
-    
+
+    /**
+     * User nice name - URL slug
+     *
+     * @var string
+     */
     protected $nicename;
-    
+
+    /**
+     * User website url
+     *
+     * @var string
+     */
     protected $url;
-    
+
+    /**
+     * User display name
+     *
+     * @var string
+     */
     protected $displayName;
-    
+
+    /**
+     * User first name
+     *
+     * @var string
+     */
     protected $firstName;
-    
+
+    /**
+     * User last name
+     *
+     * @var string
+     */
     protected $lastName;
-    
+
+    /**
+     * User description
+     *
+     * @var string
+     */
     protected $description;
-    
+
+    /**
+     * Flag that allows user to perform rich editing
+     *
+     * @var bool
+     */
     protected $richEditing;
-    
+
+    /**
+     * The highest of user roles
+     *
+     * @var string
+     */
     protected $role;
-    
+
+    /**
+     * Set of user capabilities
+     *
+     * @var array
+     */
     protected $capabilities;
-    
+
+    /**
+     * User email
+     *
+     * @var string
+     */
     protected $email;
 
+    /**
+     * The date time when user account was registered
+     *
+     * @var DateTime
+     */
     protected $registered;
 
+    /**
+     * Jabber account
+     *
+     * @var string
+     */
     protected $jabber;
-    
+
+    /**
+     * AIM account
+     *
+     * @var string
+     */
     protected $aim;
-    
+
+    /**
+     * YIM account
+     *
+     * @var string
+     */
     protected $yim;
-    
+
+    /**
+     * WP user object that is being wrapper by this model
+     *
+     * @var WP_User
+     */
     protected $wpUser;
 
     /**
@@ -580,6 +709,12 @@ class UserModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
 	/**
+     * Remove metadata matching criteria from a user.
+     *
+     * You can match based on the key, or key and value. Removing based on key and
+     * value, will keep from removing duplicate metadata with the same key. It also
+     * allows removing all metadata matching key, if needed.
+     *
 	 * @param $key
 	 * @param string $oldValue
 	 */
@@ -963,13 +1098,15 @@ class UserModel implements DbReady, JsonReady, InputReady, AclReady{
         return self::$validationErrors;
     }
 
-	/**
-	 * Add validation errors after unpacking from request input
-	 *
-	 * @param array[field]='Error Text' $errors
-	 */
+    /**
+     * Add validation errors after unpacking from request input
+     *
+     * @param array [field]='Error Text' $errors
+     *
+     * @return array|mixed
+     */
 	public static function addValidationErrors($errors) {
-		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+		return static::$validationErrors = array_merge(static::$validationErrors, $errors);
 	}
 
     /**
@@ -1154,6 +1291,8 @@ class UserModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
 	/**
+     * Checks if current $user has $privilege over current model
+     *
 	 * @param string $privilege
 	 * @param \Chayka\WP\Models\UserModel|null $user
 	 *

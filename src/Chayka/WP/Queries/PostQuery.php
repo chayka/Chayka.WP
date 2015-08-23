@@ -1,12 +1,29 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Queries;
 
 use Chayka\WP\Models\PostModel;
-//use Chayka\WP\Models\CommentModel;
 
+/**
+ * Class PostQuery is a helper that allows to build $arguments array
+ * for WP_Query
+ * For more details see https://codex.wordpress.org/Class_Reference/WP_Query
+ *
+ * @package Chayka\WP\Queries
+ */
 class PostQuery{
-    
+
+    /**
+     * Holds an array that is formed using helper methods and passed to WP_Query()
+     * to fetch posts form DB.
+     *
+     * @var array
+     */
     protected $vars = array();
 
     /**
@@ -229,7 +246,8 @@ class PostQuery{
     }
     
     /**
-     * 
+     * Setup taxonomy query
+     *
      * @param string $taxonomy
      * @param int|string|object|array(id|slug|object) $terms
      * @param string $field 'id' or 'slug'
@@ -294,11 +312,21 @@ class PostQuery{
         
         return $this;
     }
-    
+
+    /**
+     * Set taxonomy query relation to 'AND'
+     *
+     * @return PostQuery
+     */
     public function taxonomyQueryRelation_AND(){
         return $this->taxonomyQueryRelation('AND');
     }
-    
+
+    /**
+     * Set taxonomy query relation to 'OR'
+     *
+     * @return PostQuery
+     */
     public function taxonomyQueryRelation_OR(){
         return $this->taxonomyQueryRelation('OR');
     }
@@ -314,8 +342,9 @@ class PostQuery{
     }
     
     /**
-     * Display content based on post and page parameters
-     * 
+     * Display content based on post and page parameters.
+     * Use post id
+     *
      * @param int $postId
      * @return PostQuery
      */
@@ -324,8 +353,9 @@ class PostQuery{
     }
     
     /**
-     * Display content based on post and page parameters
-     * 
+     * Display content based on post and page parameters.
+     * Use post slug.
+     *
      * @param string $slug
      * @return PostQuery
      */
@@ -334,8 +364,9 @@ class PostQuery{
     }
     
     /**
-     * Display content based on post and page parameters
-     * 
+     * Display content based on post and page parameters.
+     * Use page id.
+     *
      * @param int $pageId
      * @return PostQuery
      */
@@ -344,7 +375,7 @@ class PostQuery{
     }
     
     /**
-     * Display content based on post and page parameters
+     * Display content based on post and page parameters.
      * Display child page using the slug of the parent and the child page, separated by a slash (e.g. 'parent_slug/child_slug')
      * 
      * @param string $slug
@@ -355,15 +386,22 @@ class PostQuery{
     }
     
     /**
-     * Display content based on post and page parameters
-     * 
+     * Display content based on post and page parameters.
+     * Use page id to return only child pages. Set to 0 to return only top-level entries.
+     *
      * @param int $postId
      * @return PostQuery
      */
     public function postParentId($postId){
         return $this->setVar('post_parent', $postId);
     }
-    
+
+    /**
+     * Display content based on post and page parameters.
+     * Select only top-level entries.
+     *
+     * @return PostQuery
+     */
     public function postParentId_TopLevel(){
         return $this->postParentId(0);
     }
@@ -401,7 +439,16 @@ class PostQuery{
     public function postIdIn($postIds){
         return $this->setVar('post__in', $postIds);
     }
-    
+
+    /**
+     * Select sticky posts
+     *
+     * @return PostQuery
+     */
+    public function postIdIn_StickyPosts(){
+        return $this->postIdIn(get_option( 'sticky_posts' ));
+    }
+
     /**
      * Display content based on post and page parameters.
      * Specify post NOT to retrieve.
@@ -412,11 +459,12 @@ class PostQuery{
     public function postIdNotIn($postIds){
         return $this->setVar('post__not_in', $postIds);
     }
-    
-    public function postIdIn_StickyPosts(){
-        return $this->postIdIn(get_option( 'sticky_posts' ));
-    }
 
+    /**
+     * Exclude sticky posts
+     *
+     * @return PostQuery
+     */
     public function postIdNotIn_StickyPosts(){
         return $this->postIdNotIn(get_option( 'sticky_posts' ));
     }
@@ -430,23 +478,48 @@ class PostQuery{
     public function postType($postType){
         return $this->setVar('post_type', $postType);
     }
-    
+
+    /**
+     * Show posts associated with type 'post'
+     *
+     * @return PostQuery
+     */
     public function postType_Post(){
         return $this->postType('post');
     }
-    
+
+    /**
+     * Show posts associated with type 'page'
+     *
+     * @return PostQuery
+     */
     public function postType_Page(){
         return $this->postType('page');
     }
-    
+
+    /**
+     * Show posts associated with type 'revision'
+     *
+     * @return PostQuery
+     */
     public function postType_Revision(){
         return $this->postType('revision');
     }
-    
+
+    /**
+     * Show posts associated with type 'attachment'
+     *
+     * @return PostQuery
+     */
     public function postType_Attachment(){
         return $this->postType('attachment');
     }
-    
+
+    /**
+     * Show posts associated with any type
+     *
+     * @return PostQuery
+     */
     public function postType_Any(){
         return $this->postType('any');
     }
@@ -460,39 +533,84 @@ class PostQuery{
     public function postStatus($status){
         return $this->setVar('post_status', $status);
     }
-    
+
+    /**
+     * Show posts associated with status 'publish'
+     *
+     * @return PostQuery
+     */
     public function postStatus_Publish(){
         return $this->postStatus('publish');
     }
-    
+
+    /**
+     * Show posts associated with status 'pending'
+     *
+     * @return PostQuery
+     */
     public function postStatus_Pending(){
         return $this->postStatus('pending');
     }
-    
+
+    /**
+     * Show posts associated with status 'draft'
+     *
+     * @return PostQuery
+     */
     public function postStatus_Draft(){
         return $this->postStatus('draft');
     }
-    
+
+    /**
+     * Show posts associated with status 'auto-draft'
+     *
+     * @return PostQuery
+     */
     public function postStatus_AutoDraft(){
         return $this->postStatus('auto-draft');
     }
-    
+
+    /**
+     * Show posts associated with status 'future'
+     *
+     * @return PostQuery
+     */
     public function postStatus_Future(){
         return $this->postStatus('future');
     }
-    
+
+    /**
+     * Show posts associated with status 'private'
+     *
+     * @return PostQuery
+     */
     public function postStatus_Private(){
         return $this->postStatus('private');
     }
-    
+
+    /**
+     * Show posts associated with status 'inherit'
+     *
+     * @return PostQuery
+     */
     public function postStatus_Inherit(){
         return $this->postStatus('inherit');
     }
-    
+
+    /**
+     * Show posts associated with status 'trash'
+     *
+     * @return PostQuery
+     */
     public function postStatus_Trash(){
         return $this->postStatus('trash');
     }
-    
+
+    /**
+     * Show posts associated with any status
+     *
+     * @return PostQuery
+     */
     public function postStatus_Any(){
         return $this->postStatus('any');
     }
@@ -521,7 +639,12 @@ class PostQuery{
     public function postsPerPage($perPage){
         return $this->setVar('posts_per_page', $perPage);
     }
-    
+
+    /**
+     * Select all entries, no pagination considered
+     *
+     * @return PostQuery
+     */
     public function postsPerPage_All(){
         return $this->postsPerPage(-1);
     }
@@ -576,17 +699,28 @@ class PostQuery{
     /**
      * Designates the ascending or descending order of the 'orderby' parameter. 
      * Defaults to 'DESC'
+     *
      * @param string $order
      * @return PostQuery
      */
     public function order($order){
         return $this->setVar('order', $order);
     }
-    
+
+    /**
+     * Sort entries in ascending order
+     *
+     * @return PostQuery
+     */
     public function order_ASC(){
         return $this->order('ASC');
     }
-   
+
+    /**
+     * Sort entries in descending order
+     *
+     * @return PostQuery
+     */
     public function order_DESC(){
         return $this->order('DESC');
     }
@@ -600,43 +734,93 @@ class PostQuery{
     public function orderBy($orderBy){
         return $this->setVar('orderby', $orderBy);
     }
-    
+
+    /**
+     * Do not sort entries. Entries will be returned in the order of creation.
+     *
+     * @return PostQuery
+     */
     public function orderBy_None(){
         return $this->orderBy('none');
     }
-   
+
+    /**
+     * Sort entries by id
+     *
+     * @return PostQuery
+     */
     public function orderBy_ID(){
         return $this->orderBy('ID');
     }
-   
+
+    /**
+     * Sort entries by author user id
+     *
+     * @return PostQuery
+     */
     public function orderBy_AuthorId(){
         return $this->orderBy('author');
     }
-   
+
+    /**
+     * Sort entries by title
+     *
+     * @return PostQuery
+     */
     public function orderBy_Title(){
         return $this->orderBy('title');
     }
-   
+
+    /**
+     * Sort entries by slug
+     *
+     * @return PostQuery
+     */
     public function orderBy_Slug(){
         return $this->orderBy('name');
     }
-   
+
+    /**
+     * Sort entries by creation date
+     *
+     * @return PostQuery
+     */
     public function orderBy_Date(){
         return $this->orderBy('date');
     }
-   
+
+    /**
+     * Sort entries by last modification date
+     *
+     * @return PostQuery
+     */
     public function orderBy_Modified(){
         return $this->orderBy('modified');
     }
-   
+
+    /**
+     * Sort entries by parent post id
+     *
+     * @return PostQuery
+     */
     public function orderBy_ParentId(){
         return $this->orderBy('parent');
     }
-   
+
+    /**
+     * Return entries in random order
+     *
+     * @return PostQuery
+     */
     public function orderBy_Rand(){
         return $this->orderBy('rand');
     }
-   
+
+    /**
+     * Sort entries by comment count
+     *
+     * @return PostQuery
+     */
     public function orderBy_CommentCount(){
         return $this->orderBy('comment_count');
     }
@@ -852,8 +1036,8 @@ class PostQuery{
     }
 
     /**
-     * Set relation for multiple meta_query handling
-     * Should come first before metaQuery() call
+     * Set relation for multiple meta_query handling.
+     * Should come first before metaQuery() call.
      *  
      * @param string $relation
      * @return PostQuery
@@ -863,11 +1047,23 @@ class PostQuery{
         
         return $this;
     }
-    
+
+    /**
+     * Set 'AND' relation for multiple meta_query handling.
+     * Should come first before metaQuery() call.
+     *
+     * @return PostQuery
+     */
     public function metaQueryRelation_AND(){
         return $this->metaQueryRelation('AND');
     }
-    
+
+    /**
+     * Set 'OR' relation for multiple meta_query handling.
+     * Should come first before metaQuery() call.
+     *
+     * @return PostQuery
+     */
     public function metaQueryRelation_OR(){
         return $this->metaQueryRelation('OR');
     }
@@ -921,15 +1117,30 @@ class PostQuery{
     public function fields($fields){
         return $this->setVar('fields', $fields);
     }
-    
+
+    /**
+     * Setup to return all fields
+     *
+     * @return PostQuery
+     */
     public function fields_All(){
         return $this->fields('all');
     }
-    
+
+    /**
+     * Setup to return all ids
+     *
+     * @return PostQuery
+     */
     public function fields_Ids(){
         return $this->fields('ids');
     }
-    
+
+    /**
+     * Setup to return array of id=>parent relations
+     *
+     * @return PostQuery
+     */
     public function fields_ID_ParentId(){
         return $this->fields('id=>parent');
     }
@@ -953,13 +1164,31 @@ class PostQuery{
     
 }
 
+/**
+ * Class PostDateQuery is a helper for building date queries inside WP_Query
+ *
+ * @package Chayka\WP\Queries
+ */
 class PostDateQuery{
     /**
+     * PostQuery that will be patched using this date query
+     *
      * @var PostQuery
      */
     protected $postQuery = null;
+
+    /**
+     * An array that holds the date query params
+     *
+     * @var array
+     */
     protected $vars = array();
-    
+
+    /**
+     * PostDateQuery constructor
+     *
+     * @param $postQuery
+     */
     public function __construct($postQuery) {
         $this->postQuery = $postQuery;
     }

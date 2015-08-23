@@ -1,13 +1,34 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Queries;
 
 use Chayka\WP\Models\UserModel;
 
+/**
+ * Class UserQuery is a helper that allows to build $arguments array
+ * for WP_User_Query
+ * For more details see https://codex.wordpress.org/Class_Reference/WP_User_Query
+ *
+ * @package Chayka\WP\Queries
+ */
 class UserQuery{
 
+    /**
+     * Holds an array that is formed using helper methods and passed to WP_User_Query()
+     * to fetch users form DB.
+     *
+     * @var array
+     */
     protected $vars = array();
-    
+
+    /**
+     * UserQuery constructor. Does nothing for now.
+     */
     public function __construct() {
         ;
     }
@@ -84,19 +105,39 @@ class UserQuery{
     public function role($role){
         return $this->setVar('role', $role);
     }
-    
+
+    /**
+     * Show users associated with 'administrator' role.
+     *
+     * @return UserQuery
+     */
     public function role_Administrator(){
         return $this->role('Administrator');
     }
-    
+
+    /**
+     * Show users associated with 'editor' role.
+     *
+     * @return UserQuery
+     */
     public function role_Editor(){
         return $this->role('Editor');
     }
-    
+
+    /**
+     * Show users associated with 'author' role.
+     *
+     * @return UserQuery
+     */
     public function role_Author(){
         return $this->role('Author');
     }
-    
+
+    /**
+     * Show users associated with 'subscriber' role.
+     *
+     * @return UserQuery
+     */
     public function role_Subscriber(){
         return $this->role('Subscriber');
     }
@@ -146,7 +187,7 @@ class UserQuery{
     }
     
     /**
-     * Set list of database table columns to matches the search string across multiple columns.
+     * Set list of database table columns to match the search string across multiple columns.
      *
      * @param array $columns
      * @return UserQuery
@@ -154,27 +195,52 @@ class UserQuery{
     public function searchColumns($columns){
         return $this->setVar('search_columns', $columns);
     }
-    
+
+    /**
+     * Add 'ID' to the list of database table columns to match the search string across multiple columns.
+     *
+     * @return UserQuery
+     */
     public function searchColumns_ID(){
         $this->vars['search_columns'][]='ID';
         return $this;
     }
-    
+
+    /**
+     * Add 'user_login' to the list of database table columns to match the search string across multiple columns.
+     *
+     * @return UserQuery
+     */
     public function searchColumns_Login(){
         $this->vars['search_columns'][]='user_login';
         return $this;
     }
-    
+
+    /**
+     * Add 'user_nicename' to the list of database table columns to match the search string across multiple columns.
+     *
+     * @return UserQuery
+     */
     public function searchColumns_Nicname(){
         $this->vars['search_columns'][]='user_nicename';
         return $this;
     }
-    
+
+    /**
+     * Add 'user_email' to the list of database table columns to match the search string across multiple columns.
+     *
+     * @return UserQuery
+     */
     public function searchColumns_Email(){
         $this->vars['search_columns'][]='user_email';
         return $this;
     }
-    
+
+    /**
+     * Add 'user_url' to the list of database table columns to match the search string across multiple columns.
+     *
+     * @return UserQuery
+     */
     public function searchColumns_Url(){
         $this->vars['search_columns'][]='user_url';
         return $this;
@@ -202,17 +268,28 @@ class UserQuery{
     /**
      * Designates the ascending or descending order of the 'orderby' parameter. 
      * Defaults to 'ASC'
+     *
      * @param string $order
      * @return UserQuery
      */
     public function order($order){
         return $this->setVar('order', $order);
     }
-    
+
+    /**
+     * Designates the ascending order of the 'orderby' parameter.
+     *
+     * @return UserQuery
+     */
     public function order_ASC(){
         return $this->order('ASC');
     }
-   
+
+    /**
+     * Designates the descending order of the 'orderby' parameter.
+     *
+     * @return UserQuery
+     */
     public function order_DESC(){
         return $this->order('DESC');
     }
@@ -226,39 +303,84 @@ class UserQuery{
     public function orderBy($orderBy){
         return $this->setVar('orderby', $orderBy);
     }
-    
+
+    /**
+     * Sort retrieved users by ID
+     *
+     * @return UserQuery
+     */
     public function orderBy_ID(){
         return $this->orderBy('ID');
     }
-    
+
+    /**
+     * Sort retrieved users by display_name
+     *
+     * @return UserQuery
+     */
     public function orderBy_DisplayName(){
         return $this->orderBy('display_name');
     }
-   
+
+    /**
+     * Sort retrieved users by user_name
+     *
+     * @return UserQuery
+     */
     public function orderBy_Name(){
         return $this->orderBy('user_name');
     }
-    
+
+    /**
+     * Sort retrieved users by user_login
+     *
+     * @return UserQuery
+     */
     public function orderBy_Login(){
         return $this->orderBy('user_login');
     }
-    
+
+    /**
+     * Sort retrieved users by user_nicename
+     *
+     * @return UserQuery
+     */
     public function orderBy_Nicename(){
         return $this->orderBy('user_nicename');
     }
-    
+
+    /**
+     * Sort retrieved users by user_email
+     *
+     * @return UserQuery
+     */
     public function orderBy_Email(){
         return $this->orderBy('user_email');
     }
-    
+
+    /**
+     * Sort retrieved users by user_url
+     *
+     * @return UserQuery
+     */
     public function orderBy_Url(){
         return $this->orderBy('user_url');
     }
-    
+
+    /**
+     * Sort retrieved users by user_registered
+     *
+     * @return UserQuery
+     */
     public function orderBy_DateRegistered(){
         return $this->orderBy('user_registered');
     }
-    
+
+    /**
+     * Sort retrieved users by post_count
+     *
+     * @return UserQuery
+     */
     public function orderBy_PostCount(){
         return $this->orderBy('post_count');
     }
@@ -345,17 +467,29 @@ class UserQuery{
         
         return $this;
     }
-    
+
+    /**
+     * Set 'AND' relation for multiple meta_query handling
+     * Should come first before metaQuery() call
+     *
+     * @return UserQuery
+     */
     public function metaQueryRelation_AND(){
         return $this->metaQueryRelation('AND');
     }
-    
+
+    /**
+     * Set 'OR' relation for multiple meta_query handling
+     * Should come first before metaQuery() call
+     *
+     * @return UserQuery
+     */
     public function metaQueryRelation_OR(){
         return $this->metaQueryRelation('OR');
     }
     
     /**
-     * Set return values.
+     * Set return values format.
      * 
      * @param string|array(string) $fields
      * @return UserQuery
@@ -363,11 +497,25 @@ class UserQuery{
     public function fields($fields){
         return $this->setVar('fields', $fields);
     }
-    
+
+    /**
+     * Set return values format to all fields.
+     *
+     * @return UserQuery
+     */
     public function fields_All(){
         return $this->fields('all');
     }
-    
+
+    /**
+     * Set return values format to all fields.
+     * Codex remark: 'all_with_meta' currently returns the same fields as 'all'
+     * which does not include user fields stored in wp_usermeta.
+     * You must create a second query to get the user meta fields by ID
+     * or use the __get PHP magic method to get the values of these fields.
+     *
+     * @return UserQuery
+     */
     public function fields_AllWithMeta(){
         return $this->fields('all_with_meta');
     }

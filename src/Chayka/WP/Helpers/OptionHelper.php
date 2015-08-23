@@ -1,10 +1,39 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Helpers;
 
+/**
+ * Class OptionHelper is a wrapper for:
+ * - get_option
+ * - update_option
+ * - get_site_option
+ * - update_site_option
+ *
+ * As a bonus it stores all options with suffix provided by getSuffix()
+ *
+ * You can create your own OptionHelper by extending this one.
+ * By default getSuffix() creates suffix based on class namespace.
+ * So you can just extend OptionHelper with different namespace
+ * and empty class, to get custom prefix.
+ *
+ * Another bonus is that all options are cached.
+ *
+ * @package Chayka\WP\Helpers
+ */
 class OptionHelper {
 
+    /**
+     * Options cache, not to load them twice.
+     *
+     * @var array
+     */
     protected static $cache = array();
+
     /**
      * You can ascend from this class.
      * You may want to override this class to set custom prefix.

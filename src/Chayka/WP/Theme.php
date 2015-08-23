@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP;
 
@@ -7,11 +12,32 @@ use Chayka\MVC\ApplicationDispatcher;
 use Chayka\WP\Helpers\OptionHelper;
 use Chayka\WP\Helpers\ResourceHelper;
 
+/**
+ * Class Theme extends Plugin and implements theme bootstrap file in Chayka.Framework.
+ *
+ * When you create a new theme you define a bootstrap object class
+ * that is a descendant of this class
+ *
+ * All the theme configuration and hooking must be done in such
+ * a bootstrap class implementation
+ *
+ * @package Chayka\WP
+ */
 abstract class Theme extends Plugin{
-    
+
+    /**
+     * The length of generated post excerpt
+     *
+     * @var int
+     */
     protected $excerptLength = 30;
+
+    /**
+     * The string that is appended to truncated post excerpt when generated automatically
+     *
+     * @var string
+     */
     protected $excerptMore = '...';
-//    protected $adminBar = true;
 
     /**
      * Theme Constructor

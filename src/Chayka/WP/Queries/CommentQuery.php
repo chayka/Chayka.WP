@@ -1,19 +1,42 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Queries;
 
 use Chayka\WP\Models\PostModel;
 use Chayka\WP\Models\CommentModel;
 
+/**
+ * Class CommentQuery is a helper that allows to build $arguments array
+ * for WP_Comments_Query
+ * For more details see https://codex.wordpress.org/Class_Reference/WP_Comment_Query
+ *
+ * @package Chayka\WP\Queries
+ */
 class CommentQuery{
-    
+
+    /**
+     * Holds an array that is formed using helper methods and passed to WP_Comments_Query()
+     * to fetch comments form DB.
+     *
+     * @var array
+     */
     protected $vars = array();
 
     /**
+     * Post to fetch comments for
+     *
      * @var PostModel
      */
     protected $post = null;
-    
+
+    /**
+     * Constructor method, does nothing for now.
+     */
     public function __construct() {
         ;
     }
@@ -126,19 +149,39 @@ class CommentQuery{
     public function status($status){
         return $this->setVar('status', $status);
     }
-    
+
+    /**
+     * Only return comments with status 'hold'.
+     *
+     * @return CommentQuery
+     */
     public function status_Hold(){
         return $this->status('hold');
     }
-    
+
+    /**
+     * Only return comments with status 'approve'.
+     *
+     * @return CommentQuery
+     */
     public function status_Approve(){
         return $this->status('approve');
     }
-    
+
+    /**
+     * Only return comments with status 'spam'.
+     *
+     * @return CommentQuery
+     */
     public function status_Spam(){
         return $this->status('spam');
     }
-    
+
+    /**
+     * Only return comments with status 'trash'.
+     *
+     * @return CommentQuery
+     */
     public function status_Trash(){
         return $this->status('trash');
     }
@@ -164,7 +207,8 @@ class CommentQuery{
     }
     
     /**
-     * How to sort $orderby. Valid values: ASC, DESC
+     * How to sort by the field specified using orderBy().
+     * Valid values: ASC, DESC
      * Default: DESC
      *
      * @param string $order
@@ -173,11 +217,21 @@ class CommentQuery{
     public function order($order){
         return $this->setVar('order', $order);
     }
-    
+
+    /**
+     * Sort in ascending order by the field specified using orderBy().
+     *
+     * @return CommentQuery
+     */
     public function order_ASC(){
         return $this->order('ASC');
     }
-   
+
+    /**
+     * Sort in descending order by the field specified using orderBy().
+     *
+     * @return CommentQuery
+     */
     public function order_DESC(){
         return $this->order('DESC');
     }
@@ -371,15 +425,23 @@ class CommentQuery{
 		return $this->setVar('fields', $fields);
 	}
 
+    /**
+     * Setup to return all fields
+     *
+     * @return PostQuery
+     */
 	public function fields_All(){
 		return $this->fields('*');
 	}
 
+    /**
+     * Setup to return ids only
+     *
+     * @return PostQuery
+     */
 	public function fields_Ids(){
 		return $this->fields('ids');
 	}
-
-
 
     /**
      * Only return the total count of comments.
@@ -473,11 +535,23 @@ class CommentQuery{
         
         return $this;
     }
-    
+
+    /**
+     * Set 'AND' relation for multiple meta_query handling
+     * Should come first before metaQuery() call
+     *
+     * @return CommentQuery
+     */
     public function metaQueryRelation_AND(){
         return $this->metaQueryRelation('AND');
     }
-    
+
+    /**
+     * Set 'OR' relation for multiple meta_query handling
+     * Should come first before metaQuery() call
+     *
+     * @return CommentQuery
+     */
     public function metaQueryRelation_OR(){
         return $this->metaQueryRelation('OR');
     }

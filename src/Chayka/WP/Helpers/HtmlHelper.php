@@ -15,7 +15,8 @@ use Chayka\WP\Models\PostModel;
  * Also contains a set of handy methods for outputting html attrs
  * to hide|show|disable|enable|check|uncheck elements based on provided condition.
  *
- *
+ * This class differs from the base one with the setPost($post) method mostly
+ * that allows to set all the meta at once.
  *
  * @package Chayka\Helpers
  */

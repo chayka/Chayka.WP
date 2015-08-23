@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Models;
 
@@ -14,11 +19,30 @@ use Chayka\WP\Queries\PostTermQuery;
 use Exception;
 use WP_Error;
 
+/**
+ * Class TermModel is a wrapper for WP term (tag, category or other)
+ *
+ * @package Chayka\WP\Models
+ */
 class TermModel implements DbReady, JsonReady, InputReady, AclReady{
 
-	protected static $validationErrors;
+    /**
+     * Array of validation errors, part of InputReady interface implementation
+     *
+     * @var array
+     */
+    protected static $validationErrors;
+
+    /**
+     * Original WP term object, that is being wrapped
+     *
+     * @var object
+     */
 	protected $wpTerm;
 
+    /**
+     * TermModel constructor
+     */
     public function __construct() {
         $this->wpTerm = new \stdClass();
         $this->wpRelation = new \stdClass();
@@ -474,7 +498,7 @@ class TermModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
-     * Get query helper instance
+     * Get TermQuery helper instance
      *
      * @param string|array(string) $taxonomies
      * @return TermQuery
@@ -484,6 +508,8 @@ class TermModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
+     * Get PostTermQuery helper instance
+     *
      * @param PostModel $post
      * @param string|array(string) $taxonomies
      * @return PostTermQuery
@@ -502,13 +528,15 @@ class TermModel implements DbReady, JsonReady, InputReady, AclReady{
         return self::$validationErrors;
     }
 
-	/**
-	 * Add validation errors after unpacking from request input
-	 *
-	 * @param array[field]='Error Text' $errors
-	 */
+    /**
+     * Add validation errors after unpacking from request input
+     *
+     * @param array[field]='Error Text' $errors
+     *
+     * @return array|mixed
+     */
 	public static function addValidationErrors($errors) {
-		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+		return static::$validationErrors = array_merge(static::$validationErrors, $errors);
 	}
     /**
      * Unpacks request input.
@@ -580,6 +608,9 @@ class TermModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
 	/**
+     * Checks whether $user has $privilege over current model,
+     * part of AclReady interface implementation
+     *
 	 * @param string $privilege
 	 * @param \Chayka\WP\Models\UserModel|null $user
 	 *

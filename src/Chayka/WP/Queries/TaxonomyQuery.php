@@ -1,11 +1,31 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Queries;
 
+/**
+ * Class TaxonomyQuery is a helper that allows to build $arguments array
+ * for get_taxonomies()
+ * For more details see https://codex.wordpress.org/Function_Reference/get_taxonomies
+ *
+ * @package Chayka\WP\Queries
+ */
 class TaxonomyQuery{
 
+    /**
+     * An array that holds query params that will be passed to get_taxonomies()
+     *
+     * @var array
+     */
     protected $vars = array();
-    
+
+    /**
+     * TaxonomyQuery constructor
+     */
     public function __construct() {
         ;
     }

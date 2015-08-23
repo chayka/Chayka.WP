@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: borismossounov
- * Date: 10.05.15
- * Time: 15:00
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
  */
 
 namespace Chayka\WP\MVC;
@@ -13,8 +12,24 @@ use Chayka\MVC;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\JsonHelper;
 
+/**
+ * Class RestController extends Chayka\MVC\RestController.
+ *
+ * When extending this class you can specify $modelClassName that is a classname of
+ * ReadyModel descendant and you can consider CRUD implemented,
+ * have to define only list action after that.
+ *
+ * @package Chayka\WP\MVC
+ */
 class RestController extends MVC\RestController{
 
+    /**
+     * When extending this class you can specify $modelClassName that is a classname of
+     * ReadyModel descendant and you can consider CRUD implemented,
+     * have to define only list action after that.
+     *
+     * @var string
+     */
 	protected $modelClassName;
 
 	/**

@@ -1,13 +1,11 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: borismossounov
- * Date: 08.11.14
- * Time: 12:19
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
  */
 
 namespace Chayka\WP\Models;
-
 
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\JsonReady;
@@ -15,10 +13,25 @@ use Chayka\WP\Helpers\AclReady;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\DbReady;
 
+/**
+ * ReadyModel is a base class for any custom model you would like to create
+ *
+ * @package Chayka\WP\Models
+ */
 abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
 
+    /**
+     * Array of validation errors, part of InputReady interface implementation
+     *
+     * @var array
+     */
 	protected static $validationErrors = array();
 
+    /**
+     * Model id
+     *
+     * @var int
+     */
     protected $id;
 
 

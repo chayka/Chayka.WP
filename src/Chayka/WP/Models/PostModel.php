@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Models;
 
@@ -19,49 +24,250 @@ use WP_Query;
 use WP_Post;
 use WP_Error;
 
+/**
+ * Class PostModel is a wrapper for WP_Post object
+ *
+ * @package Chayka\WP\Models
+ */
 class PostModel implements DbReady, JsonReady, InputReady, AclReady{
 
-    
+    /**
+     * The WP_Query object that was used last to fetch posts from DB
+     *
+     * @var WP_Query
+     */
     static $wpQuery;
+
+    /**
+     * The number of entries found using last query, that is used to render pagination
+     *
+     * @var int
+     */
     static $postsFound;
+
+    /**
+     * The hash map of validation errors, part of InputReady interface implementation
+     *
+     * @var array
+     */
 	protected static $validationErrors = array();
 
+    /**
+     * Post id
+     *
+     * @var int
+     */
 	protected $id;
+
+    /**
+     * Post author user id
+     *
+     * @var int
+     */
     protected $userId;
+
+    /**
+     * Parent post id
+     *
+     * @var int
+     */
     protected $parentId;
+
+    /**
+     * Post guid
+     *
+     * @var string
+     */
     protected $guid;
+
+    /**
+     * Post type
+     *
+     * @var string
+     */
     protected $type;
 
+    /**
+     * Post slug (name) that is used as a part of the post url
+     *
+     * @var string
+     */
     protected $slug;
+
+    /**
+     * Post title
+     *
+     * @var string
+     */
     protected $title;
+
+    /**
+     * Post content
+     *
+     * @var string
+     */
     protected $content;
+
+    /**
+     * Post content with applied filters
+     * @deprecated
+     * @var string
+     */
     protected $contentFiltered;
+
+    /**
+     * Post excerpt (description)
+     *
+     * @var string
+     */
     protected $excerpt;
+
+    /**
+     * Post status
+     *
+     * @var string
+     */
     protected $status;
+
+    /**
+     * Post ping status
+     *
+     * @var string
+     */
     protected $pingStatus;
+
+    /**
+     * Post password (for password protected posts)
+     *
+     * @var
+     */
     protected $password;
+
+    /**
+     * URLs that need to be pinged.
+     *
+     * @var string
+     */
     protected $toPing;
+
+    /**
+     * Get URLs pinged
+     *
+     * @var string
+     */
     protected $pinged;
+
+    /**
+     * Get menu order property (used for ordering)
+     *
+     * @var int
+     */
     protected $menuOrder;
+
+    /**
+     * Get mime type for 'attachment' post type
+     *
+     * @var string
+     */
     protected $mimeType;
+
+    /**
+     * Post commenting status
+     *
+     * @var string
+     */
     protected $commentStatus;
+
+    /**
+     * The number of post comments
+     *
+     * @var int
+     */
     protected $commentCount;
+
+    /**
+     * An array to store post comments
+     *
+     * @var array
+     */
     protected $comments;
+
+    /**
+     * Number of post reviews
+     *
+     * @var int
+     */
     protected $reviewsCount;
+
+    /**
+     * An array to cache loaded post terms (tags / categories / other taxonomies)
+     *
+     * @var array
+     */
     protected $terms;
+
+    /**
+     * An array to cache loaded meta values
+     *
+     * @var array
+     */
     protected $meta;
+
+    /**
+     * An array to cache loaded image data in case of 'attachment' post type
+     *
+     * @var array
+     */
     protected $imageData;
+
+    /**
+     * The id of thumbnail (post with 'attachment' type)
+     *
+     * @var int
+     */
     protected $thumbnailId;
 
+    /**
+     * The date when post was created
+     *
+     * @var DateTime
+     */
     protected $dtCreated;
-    protected $dtCreatedGMT;
-    protected $dtModified;
-    protected $dtModifiedGMT;
 
+    /**
+     * The date when post was last modified
+     *
+     * @var DateTime
+     */
+    protected $dtModified;
+
+    /**
+     * Original WP post that is being wrapped by this model
+     *
+     * @var WP_Post
+     */
     protected $wpPost;
-    
+
+    /**
+     * An array that contains posts cached by post ids
+     *
+     * @var array
+     */
     protected static $postsCacheById = array();
+
+    /**
+     * An array that contains posts cached by post slugs
+     *
+     * @var array
+     */
     protected static $postsCacheBySlug = array();
+
+    /**
+     * An array that contains set of meta field name
+     * that should be published when post is outputted in json
+     *
+     * @var array
+     */
     protected static $jsonMetaFields = array();
 
     /**
@@ -73,6 +279,9 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         $this->init();
     }
 
+    /**
+     * Post model initializer
+     */
     public function init(){
         $this->setId(0);
         $this->setDtCreated(new DateTime());
@@ -224,6 +433,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get post content
      * @param boolean $wpautop Set to true if you need auto-<p></p> (default: true)
+     *
      * @return string HTML content
      */
     public function getContent($wpautop = true) {
@@ -241,14 +451,14 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         return $this;
     }
 
+    /**
+     * Get content with all registered 'the_content' filters applied
+     *
+     * @return string
+     */
     public function getContentFiltered() {
-        return $this->contentFiltered;
+        return apply_filters('the_content', $this->content);
     }
-
-    public function setContentFiltered($contentFiltered) {
-        $this->contentFiltered = $contentFiltered;
-    }
-
 
     /**
      * Get post excerpt that was set or generated one
@@ -347,7 +557,8 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
-     * 
+     * Get the list of URLs to ping
+     *
      * @return string
      */
     public function getToPing() {
@@ -355,7 +566,8 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
-     * 
+     * Set the list of URLs to ping
+     *
      * @param string $toPing
      * @return PostModel
      */
@@ -365,7 +577,8 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
-     * 
+     * Get the list of URLs pinged
+     *
      * @return string
      */
     public function getPinged() {
@@ -373,7 +586,8 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
-     * 
+     * Set the list of URLs pinged
+     *
      * @param string $pinged
      * @return PostModel
      */
@@ -733,7 +947,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         $obj->setSlug(Util::getItem($wpRecord, 'post_name'));
         $obj->setTitle(Util::getItem($wpRecord, 'post_title'));
         $obj->setContent(Util::getItem($wpRecord, 'post_content'));
-        $obj->setContentFiltered(Util::getItem($wpRecord, 'post_content_filtered'));
+//        $obj->setContentFiltered(Util::getItem($wpRecord, 'post_content_filtered'));
         $obj->setExcerpt(Util::getItem($wpRecord, 'post_excerpt'));
         $obj->setStatus(Util::getItem($wpRecord, 'post_status'));
         $obj->setPingStatus(Util::getItem($wpRecord, 'ping_status'));
@@ -1132,11 +1346,11 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * 
      * @param integer $postId
      * @param string|array(string) $taxonomy
-     * @param array|TermQuery $args
+     * @param array|PostTermQuery $args
      * @return array(TermModel)
      */
     public static function selectTerms($postId, $taxonomy = 'post_tag', $args = array()){
-        if($args instanceof TermQuery){
+        if($args instanceof PostTermQuery){
             $args = $args->getVars();
         }
         $terms = wp_get_post_terms($postId, $taxonomy, $args);
@@ -1158,7 +1372,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * Utilizes selectTerms
      * 
      * @param string|array(string) $taxonomies
-     * @param array|TermQuery $args
+     * @param array|PostTermQuery $args
      * @return array(TermModel)
      */
     public function loadTerms($taxonomies = '', $args = array('fields'=>'names')){
@@ -1286,11 +1500,18 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
                 ->order_ASC()
                 ->orderBy('comment_ID');
     }
-    
-    public function getAttachments($type){
-        $rawAttacments = get_attached_media($type, $this->getId());
+
+    /**
+     * Get the list of media attachments
+     *
+     * @param string $mimeType
+     *
+     * @return array(PostModel)
+     */
+    public function getAttachments($mimeType){
+        $rawAttachments = get_attached_media($mimeType, $this->getId());
         $attachments = array();
-        foreach($rawAttacments as $id => $raw){
+        foreach($rawAttachments as $id => $raw){
             $attachments[$id] = PostModel::unpackDbRecord($raw);
         }
         return $attachments;
@@ -1298,6 +1519,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     
     /**
      * Get attachment url
+     *
      * @return string
      */
     public function getAttachmentUrl(){
@@ -1607,13 +1829,15 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         return static::$validationErrors;
     }
 
-	/**
-	 * Add validation errors after unpacking from request input
-	 *
-	 * @param array[field]='Error Text' $errors
-	 */
+    /**
+     * Add validation errors after unpacking from request input
+     *
+     * @param array [field]='Error Text' $errors
+     *
+     * @return mixed|void all validation errors
+     */
 	public static function addValidationErrors($errors) {
-		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+		return static::$validationErrors = array_merge(static::$validationErrors, $errors);
 	}
 
     /**
@@ -1722,6 +1946,9 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
 	/**
+     * Check if current $user has $privilege over this post,
+     * part of AclReady interface implementation
+     *
 	 * @param string $privilege
 	 * @param \Chayka\WP\Models\UserModel|null $user
 	 *

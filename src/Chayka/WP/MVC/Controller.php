@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: borismossounov
- * Date: 05.12.14
- * Time: 14:40
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
  */
 
 namespace Chayka\WP\MVC;
@@ -15,8 +14,19 @@ use Chayka\WP\Helpers\AngularHelper;
 use Chayka\WP\Helpers\ResourceHelper;
 use Chayka\WP\Models\PostModel;
 
+/**
+ * Class Controller Extends Chayka\MVC\Controller.
+ * It implements WP specific handy methods.
+ *
+ * @package Chayka\WP\MVC
+ */
 class Controller extends MVC\Controller{
 
+    /**
+     * Current application (plugin or theme) base url
+     *
+     * @var string
+     */
     protected $appUrl;
 
     /**
@@ -104,6 +114,9 @@ class Controller extends MVC\Controller{
     }
 
     /**
+     * Enqueue angular script. Utilizes AngularHelper::enqueueScript().
+     * See AngularHelper::enqueueScript() for more details.
+     *
      * @param $handle
      * @param bool $resRelativeSrc
      * @param array $dependencies

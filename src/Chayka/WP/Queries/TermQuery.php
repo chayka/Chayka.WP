@@ -1,15 +1,47 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Queries;
 
 use Chayka\WP\Models\TermModel;
 use Chayka\WP\Models\PostModel;
 
+/**
+ * Class TermQuery is a helper that allows to build $arguments array
+ * for get_terms()
+ * For more details see https://codex.wordpress.org/Function_Reference/get_terms
+ *
+ * Note that this class is used to query terms not in the context of some post,
+ * but for overall site statistics.
+ * E.g. for building a tag cloud, or showing most used tags.
+ *
+ * To get post terms, use PostTermQuery
+ *
+ * @package Chayka\WP\Queries
+ */
 class TermQuery{
+
+    /**
+     * Array that holds arguments for get_terms()
+     *
+     * @var array
+     */
     protected $vars = array();
+
+    /**
+     * List of taxonomies under which terms should be acquired
+     *
+     * @var array|null|string
+     */
     protected $taxonomies = null;
 
     /**
+     * The query constructor allows to specify taxonomies for the terms to retrieve
+     *
      * @param string|array(string) $taxonomies
      */
     public function __construct($taxonomies = null) {
@@ -95,17 +127,27 @@ class TermQuery{
     public function order($order){
         return $this->setVar('order', $order);
     }
-    
+
+    /**
+     * Designates the ascending order of the 'orderby' parameter.
+     *
+     * @return TermQuery
+     */
     public function order_ASC(){
         return $this->order('ASC');
     }
-   
+
+    /**
+     * Designates the descending order of the 'orderby' parameter.
+     *
+     * @return TermQuery
+     */
     public function order_DESC(){
         return $this->order('DESC');
     }
     
     /**
-     * Sort retrieved users by parameter. Defaults to 'login'.
+     * Sort retrieved terms by parameter.
      * 
      * @param string $orderBy
      * @return TermQuery
@@ -113,27 +155,57 @@ class TermQuery{
     public function orderBy($orderBy){
         return $this->setVar('orderby', $orderBy);
     }
-    
+
+    /**
+     * Sort retrieved terms by id.
+     *
+     * @return TermQuery
+     */
     public function orderBy_ID(){
         return $this->orderBy('id');
     }
-    
+
+    /**
+     * Sort retrieved terms by the number of associated posts.
+     *
+     * @return TermQuery
+     */
     public function orderBy_Count(){
         return $this->orderBy('count');
     }
 
+    /**
+     * Sort retrieved terms by name (not the slug).
+     *
+     * @return TermQuery
+     */
     public function orderBy_Name(){
         return $this->orderBy('name');
     }
-    
+
+    /**
+     * Sort retrieved terms by slug.
+     *
+     * @return TermQuery
+     */
     public function orderBy_Slug(){
         return $this->orderBy('slug');
     }
-    
+
+    /**
+     * Sort retrieved terms by parameter.
+     * Codex remark: Not fully implemented (avoid using)
+     * @return TermQuery
+     */
     public function orderBy_TermGroup(){
         return $this->orderBy('term_group');
     }
-    
+
+    /**
+     * Do not sort retrieved terms.
+     *
+     * @return TermQuery
+     */
     public function orderBy_None(){
         return $this->orderBy('none');
     }
@@ -286,11 +358,21 @@ class TermQuery{
     public function hierarchical($hierarchical){
         return $this->setVar('hierarchical', $hierarchical);
     }
-    
+
+    /**
+     * Include terms that have non-empty descendants
+     * (even if 'hide_empty' is set to true).
+     * @return TermQuery
+     */
     public function hierarchical_Yes(){
         return $this->hierarchical(true);
     }
-    
+
+    /**
+     * Do not to include terms that have non-empty descendants
+     * (if 'hide_empty' is set to true).
+     * @return TermQuery
+     */
     public function hierarchical_No(){
         return $this->hierarchical(false);
     }
@@ -374,13 +456,49 @@ class TermQuery{
     
     
 }
-    
+
+/**
+ * Class PostTermQuery is a helper that allows to build $arguments array
+ * for wp_get_object_terms()
+ * For more details see https://codex.wordpress.org/Function_Reference/wp_get_object_terms
+ *
+ * Note that this class is used to query terms in the context of some post,
+ * nad not for overall site statistics.
+ *
+ * To get overall site terms stats, use TermQuery
+ *
+ * @package Chayka\WP\Queries
+ */
 class PostTermQuery {
+
+    /**
+     * Array that holds arguments for wp_get_post_terms()
+     *
+     * @var array
+     */
     protected $vars = array();
+
+    /**
+     * List of taxonomies under which terms should be acquired
+     *
+     * @var array|null|string
+     */
     protected $taxonomies = null;
+
+    /**
+     * The post whose terms we are going to retrive
+     *
+     * @var POstModel|null
+     */
     protected $post = null;
 
-
+    /**
+     * The query constructor allows to specify the post and the list of
+     * taxonomies for the terms to retrieve
+     *
+     * @param PostModel null $post
+     * @param string|array(string) $taxonomies
+     */
     public function __construct($post = null, $taxonomies = null) {
         $this->taxonomies = $taxonomies;
         $this->post = $post;
@@ -472,17 +590,27 @@ class PostTermQuery {
     public function order($order){
         return $this->setVar('order', $order);
     }
-    
+
+    /**
+     * Designates the ascending order of the 'orderby' parameter.
+     *
+     * @return PostTermQuery
+     */
     public function order_ASC(){
         return $this->order('ASC');
     }
-   
+
+    /**
+     * Designates the descending order of the 'orderby' parameter.
+     *
+     * @return PostTermQuery
+     */
     public function order_DESC(){
         return $this->order('DESC');
     }
     
     /**
-     * Sort retrieved users by parameter. Defaults to 'login'.
+     * Sort retrieved terms by parameter.
      * 
      * @param string $orderBy
      * @return PostTermQuery
@@ -490,31 +618,66 @@ class PostTermQuery {
     public function orderBy($orderBy){
         return $this->setVar('orderby', $orderBy);
     }
-    
+
+    /**
+     * Sort retrieved terms by id.
+     *
+     * @return PostTermQuery
+     */
     public function orderBy_ID(){
-        return $this->orderBy('id');
+        return $this->orderBy('term_id');
     }
-    
+
+    /**
+     * Sort retrieved terms by number of posts associated with the term.
+     *
+     * @return PostTermQuery
+     */
     public function orderBy_Count(){
         return $this->orderBy('count');
     }
 
+    /**
+     * Sort retrieved terms by name (not a slug).
+     *
+     * @return PostTermQuery
+     */
     public function orderBy_Name(){
         return $this->orderBy('name');
     }
-    
+
+    /**
+     * Sort retrieved terms by slug.
+     *
+     * @return PostTermQuery
+     */
     public function orderBy_Slug(){
         return $this->orderBy('slug');
     }
-    
+
+    /**
+     * Sort retrieved terms by term order.
+     *
+     * @return PostTermQuery
+     */
     public function orderBy_TermOrder(){
         return $this->orderBy('term_order');
     }
-    
+
+    /**
+     * Sort retrieved terms by term group.
+     *
+     * @return PostTermQuery
+     */
     public function orderBy_TermGroup(){
         return $this->orderBy('term_group');
     }
-    
+
+    /**
+     * Do not sort retrieved terms.
+     *
+     * @return PostTermQuery
+     */
     public function orderBy_None(){
         return $this->orderBy('none');
     }

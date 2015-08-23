@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP\Models;
 
@@ -15,43 +20,161 @@ use Chayka\WP\Helpers\NlsHelper;
 use Chayka\WP\Queries\CommentQuery;
 use DateTime;
 
-//require_once 'helpers/JsonHelper.php';
-//require_once 'helpers/InputHelper.php';
-//require_once 'helpers/DbHelper.php';
-//require_once 'models/posts/CommentQuery.php';
-
 /**
- * Description of CommentModel
+ * CommentModel is a wrapper for WP comments.
+ * It has all the setters and getters, CRUD methods.
+ * All in one place, amazing!
  *
- * @author borismossounov
+ * @package Chayka\WP\Models
  */
 class CommentModel implements DbReady, JsonReady, InputReady, AclReady{
 
+    /**
+     * Comment unique id
+     *
+     * @var integer
+     */
     protected $id;
+
+    /**
+     * Comment post id
+     *
+     * @var integer
+     */
     protected $postId;
+
+    /**
+     * Parent comment id
+     *
+     * @var integer
+     */
     protected $parentId;
+
+    /**
+     * Comment author user id
+     *
+     * @var integer
+     */
     protected $userId;
+
+    /**
+     * Comment author name
+     *
+     * @var string
+     */
     protected $author;
+
+    /**
+     * Comment author email
+     *
+     * @var string
+     */
     protected $email;
+
+    /**
+     * Comment author website address
+     *
+     * @var string
+     */
     protected $url;
+
+    /**
+     * Comment author IP address
+     *
+     * @var string
+     */
     protected $ip;
+
+    /**
+     * Timestamp when comment was created
+     *
+     * @var DateTime
+     */
     protected $dtCreated;
-    protected $dtCreatedGMT;
+
+    /**
+     * Comment content
+     *
+     * @var string
+     */
     protected $content;
+
+    /**
+     * Comment karma - some score that can be modified using vote()
+     *
+     * @var integer
+     */
     protected $karma;
+
+    /**
+     * Karma delta is actually current user vote, can be -1, 0, 1.
+     * In current implementation is stored in the session,
+     * override if you need more sophisticated logic.
+     *
+     * @var integer
+     */
     protected $karmaDelta;
+
+    /**
+     * Comment approval status: 0, 1, 'spam'
+     *
+     * @var integer|string
+     */
     protected $isApproved;
+
+    /**
+     * User agent (browser) the comment is made from
+     *
+     * @var string
+     */
     protected $agent;
+
+    /**
+     * Comment type
+     *
+     * @var string
+     */
     protected $type;
 
+    /**
+     * Original WP comment object
+     *
+     * @var \stdClass
+     */
     protected $wpComment;
 
+    /**
+     * Hash map of validation errors. Part of InputReady interface implementation.
+     *
+     * @var array
+     */
     protected static $validationErrors = array();
 
+    /**
+     * Cache by comment id, second selectById() fetches comment from here.
+     *
+     * @var array
+     */
     protected static $commentsCacheById = array();
+
+    /**
+     * Cache by comment post id, second selectByPostId() fetches comments from here.
+     *
+     * @var array
+     */
     protected static $commentsCacheByPostId = array();
+
+    /**
+     * Stores set of meta fields that should be included in JSON
+     *
+     * @var array
+     */
     protected static $jsonMetaFields = array();
 
+    /**
+     * Comment model constructor, initializes all fields with default values,
+     * 'author' fields are initialized using current user data.
+     */
     public function __construct() {
         $this->init();
     }
@@ -567,13 +690,15 @@ class CommentModel implements DbReady, JsonReady, InputReady, AclReady{
         return static::$validationErrors;
     }
 
-	/**
-	 * Add validation errors after unpacking from request input
-	 *
-	 * @param array[field]='Error Text' $errors
-	 */
+    /**
+     * Add validation errors after unpacking from request input
+     *
+     * @param array [field]='Error Text' $errors
+     *
+     * @return array|mixed
+     */
 	public static function addValidationErrors($errors) {
-		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+		return static::$validationErrors = array_merge(static::$validationErrors, $errors);
 	}
 
 	/**
@@ -1074,6 +1199,8 @@ class CommentModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
 	/**
+     * Check if user has specified $privilege for this model
+     *
 	 * @param string $privilege
 	 * @param \Chayka\WP\Models\UserModel|null $user
 	 *

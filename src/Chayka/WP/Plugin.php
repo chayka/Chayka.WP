@@ -1,4 +1,9 @@
 <?php
+/**
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
+ */
 
 namespace Chayka\WP;
 
@@ -16,40 +21,143 @@ use Chayka\WP\Models\PostModel;
 use Exception;
 use WP_Post;
 
+/**
+ * Class Plugin implements plugin bootstrap file in Chayka.Framework.
+ *
+ * When you create a new plugin you define a bootstrap object class
+ * that is a descendant of this class
+ *
+ * All the plugin configuration and hooking must be done in such
+ * a bootstrap class implementation
+ *
+ * @package Chayka\WP
+ */
 abstract class Plugin{
 
+    /**
+     * A variable that defines whether black admin bar should be shown outside admin area
+     *  false - always hide
+     *  true - always show if the user is logged in
+     *  'admin' - show only if logged in user is administrator
+     *
+     * @var string|bool
+     */
     protected static $adminBar;
 
+    /**
+     * This variable can be used to block plugin's styles if you want to apply custom styles
+     * E.g. you can call \Chayka\Comments\Plugin::blockStyles(true) out of your theme definition
+     *
+     * @deprecated
+     *
+     * @var bool
+     */
     protected $needStyles = true;
-    
+
+    /**
+     * Current DB version, used in dbUpdate() method.
+     * TODO: Need DB install/update script guide
+     *
+     * @var string
+     */
     protected $currentDbVersion = '1.0';
-    
+
+    /**
+     * Array of console pages params used for console page creation hooking
+     *
+     * @var array
+     */
     protected $consolePageUris = array();
 
+    /**
+     * Array of meta boxes params used for meta boxes creation hooking
+     *
+     * @var array
+     */
     protected $metaBoxUris = array();
 
+    /**
+     * Array of short codes params used for shortcodes creation hooking
+     *
+     * @var array
+     */
     protected $shortcodeUris = array();
 
+    /**
+     * Base URL for this application (plugin or theme)
+     *
+     * @var string
+     */
     protected $baseUrl;
-    
+
+    /**
+     * Base path for this application (plugin or theme)
+     *
+     * @var string
+     */
     protected $basePath;
 
+    /**
+     * Variable to keep 'res/src' folder path, when using src & dist folders to keep your resources
+     *
+     * @var string
+     */
     protected $resSrcDir = "";
 
+    /**
+     * Variable to keep 'res/dist' folder path, when using src & dist folders to keep your resources
+     *
+     * @var string
+     */
     protected $resDistDir = "";
 
+    /**
+     * Flag that defines usage of minimized sources when available
+     *
+     * @var bool
+     */
     protected $mediaMinimized = false;
 
+    /**
+     * Application id
+     *
+     * @var string
+     */
     protected $appId;
 
+    /**
+     * Instance of Chayka\MVC\Application that is gonna be used for MVC url processing
+     *
+     * @var Application
+     */
     protected $application;
 
+    /**
+     * Hash map that holds bower configs (bower.json, .bowerrc, etc.)
+     *
+     * @var array|null
+     */
     protected $bower = null;
 
+    /**
+     * Hash map that holds composer configs (composer.json, composer.lock, etc.)
+     *
+     * @var array|null
+     */
     protected $composer = null;
 
+    /**
+     * Flag that enables uri processing
+     *
+     * @var bool
+     */
     protected static $uriProcessing = false;
 
+    /**
+     * Singleton instance to current application (plugin or theme)
+     *
+     * @var self
+     */
     protected static $instance = null;
 
     /**
@@ -269,6 +377,17 @@ abstract class Plugin{
     }
 
     /**
+     * Add route mapping that can be served using this application (plugin or theme)
+     *
+     * Here are some samples of url pattern
+     * :controller/?action/*
+     * my_controller/some_action/:some_part/*
+     * my/act/?some/*
+     *
+     * prefix ':' - means obligatory param
+     * prefix '?' - means optional param
+     * trailing '*' - means that all the rest params (/param1/value1/param2/value2) should be captured
+     *
      * @param string $label
      * @param string $urlPattern
      * @param array $defaults
@@ -633,6 +752,9 @@ abstract class Plugin{
 	}
 
     /**
+     * Alias to AngularHelper::registerScript(), but the path is relative to '/res'
+     * See AngularHelper::registerScript() for more details
+     *
      * @param $handle
      * @param $relativeResPath
      * @param array $dependencies
@@ -681,6 +803,8 @@ abstract class Plugin{
     }
 
 	/**
+     * Alias to ResourceHelper::enqueueScriptStyle()
+     *
 	 * @param string $handle
 	 * @param bool $scriptInFooter
 	 */
@@ -1285,36 +1409,56 @@ abstract class Plugin{
         return "";
     }
 
+    /**
+     * Setup whether black top admin bar should be shown outside of admin area:
+     *  false - always hide
+     *  true - always show if the user is logged in
+     *  'admin' - show only if logged in user is administrator
+     *
+     * TODO: fix it,
+     *
+     * @param bool|string $show
+     */
     public function showAdminBar($show = true){
         self::$adminBar = $show;
         $this->addFilter('show_admin_bar', 'isAdminBarShown', 1, 1);
     }
 
-    /** deprecated **/
+    /**
+     * Hide black top admin bar outside of admin area
+     */
     public function hideAdminBar(){
-        self::$adminBar = false;
-        $this->addFilter('show_admin_bar', 'isAdminBarShown', 1, 1);
+        $this->showAdminBar(false);
     }
 
-    /** deprecated **/
+    /**
+     * Show black top admin bar outside of admin area to admin only
+     */
     public function showAdminBarToAdminOnly(){
-        self::$adminBar = 'admin';
-        $this->addFilter('show_admin_bar', 'isAdminBarShown', 1, 1);
+        $this->showAdminBar('admin');
     }
 
-    /** deprecated **/
+    /**
+     * Hook that is called upon filter 'show_admin_bar'
+     *
+     * @param bool $show
+     *
+     * @return bool
+     */
     public function isAdminBarShown($show){
-        if(self::$adminBar){
-            if(self::$adminBar == 'admin'){
-                return current_user_can('administrator') || is_admin();
+        if(isset(self::$adminBar)){
+            if(self::$adminBar){
+                if(self::$adminBar == 'admin'){
+                    return current_user_can('administrator') || is_admin();
+                }
+
+                return true;
+            }else{
+                return false;
             }
-
-            return true;
         }
-
-        return false;
+        return $show;
     }
-
 
 }
 
