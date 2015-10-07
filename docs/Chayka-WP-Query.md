@@ -70,8 +70,36 @@ However you can specify custom output template using Query::setTemplate().
 * This property is **static**.
 
 
+### $requestUri
+
+    protected string $requestUri = null
+
+Request URI to process
+
+
+
+* Visibility: **protected**
+
+
 Methods
 -------
+
+
+### __construct
+
+    mixed Chayka\WP\Query::__construct(string $requestUri, array|string $query)
+
+Query constructor
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $requestUri **string**
+* $query **array|string**
+
 
 
 ### parseRequest

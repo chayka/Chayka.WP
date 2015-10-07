@@ -181,7 +181,7 @@ Accepts slq-prepare format (sql with placeholders and optional params as values)
 
 ### selectAll
 
-    array Chayka\WP\Models\ReadyModel::selectAll()
+    array Chayka\WP\Models\ReadyModel::selectAll(string $orderBy, string $order)
 
 Select all entities
 
@@ -191,11 +191,15 @@ Select all entities
 * This method is **static**.
 
 
+#### Arguments
+* $orderBy **string**
+* $order **string**
+
 
 
 ### selectLimitOffset
 
-    array Chayka\WP\Models\ReadyModel::selectLimitOffset(integer $limit, integer $offset)
+    array Chayka\WP\Models\ReadyModel::selectLimitOffset(integer $limit, integer $offset, string $orderBy, string $order)
 
 Limited sql select.
 
@@ -210,12 +214,14 @@ http://habrahabr.ru/post/217521/ -> join optimization
 #### Arguments
 * $limit **integer**
 * $offset **integer**
+* $orderBy **string**
+* $order **string**
 
 
 
 ### selectPage
 
-    array Chayka\WP\Models\ReadyModel::selectPage(integer $page, integer $perPage)
+    array Chayka\WP\Models\ReadyModel::selectPage(integer $page, integer $perPage, string $orderBy, string $order)
 
 Limited sql select.
 
@@ -228,6 +234,8 @@ Adds LIMIT $perPage OFFSET ($page - 1) * $perPage to $sql.
 #### Arguments
 * $page **integer**
 * $perPage **integer**
+* $orderBy **string**
+* $order **string**
 
 
 

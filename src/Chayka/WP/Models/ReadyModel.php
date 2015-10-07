@@ -88,7 +88,7 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @param $id
      * @param bool $useCache
-     * @return mixed
+     * @return self
      */
     public static function selectById($id, $useCache = true){
         $obj = new static();
@@ -127,46 +127,55 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
         return DbHelper::selectSql($sql, new static());
     }
 
-	/**
-	 * Select all entities
-	 *
-	 * @return array
-	 */
-	public static function selectAll(){
-        return static::selectSql('SELECT SQL_CALC_FOUND_ROWS * FROM {table}');
+    /**
+     * Select all entities
+     *
+     * @param string $orderBy
+     * @param string $order
+     *
+     * @return array
+     */
+	public static function selectAll($orderBy = '', $order = 'ASC'){
+        $orderSql = $orderBy?"ORDER BY $orderBy $order":'';
+        return static::selectSql("SELECT SQL_CALC_FOUND_ROWS * FROM {table} $orderSql");
     }
 
-	/**
-	 * Limited sql select.
-	 * Adds LIMIT $limit OFFSET $offset to $sql.
-	 *
-	 * http://habrahabr.ru/post/217521/ -> join optimization
-	 *
-	 * @param int $limit
-	 * @param int $offset
-	 *
-	 * @return array
-	 */
-	public static function selectLimitOffset($limit = 0, $offset = 0){
-		$sql=sprintf('SELECT SQL_CALC_FOUND_ROWS * FROM {table} LIMIT %d OFFSET %d', $limit, $offset);
+    /**
+     * Limited sql select.
+     * Adds LIMIT $limit OFFSET $offset to $sql.
+     *
+     * http://habrahabr.ru/post/217521/ -> join optimization
+     *
+     * @param int $limit
+     * @param int $offset
+     * @param string $orderBy
+     * @param string $order
+     *
+     * @return array
+     */
+	public static function selectLimitOffset($limit = 0, $offset = 0, $orderBy = '', $order = 'ASC'){
+        $orderSql = $orderBy?"ORDER BY $orderBy $order":'';
+		$sql=sprintf("SELECT SQL_CALC_FOUND_ROWS * FROM {table} $orderSql LIMIT %d OFFSET %d", $limit, $offset);
 		return self::selectSql($sql);
 	}
 
-	/**
-	 * Limited sql select.
-	 * Adds LIMIT $perPage OFFSET ($page - 1) * $perPage to $sql.
-	 *
-	 * @param int $page
-	 * @param int $perPage
-	 *
-	 * @return array
-	 */
-	public static function selectPage($page = 1, $perPage = 10){
+    /**
+     * Limited sql select.
+     * Adds LIMIT $perPage OFFSET ($page - 1) * $perPage to $sql.
+     *
+     * @param int $page
+     * @param int $perPage
+     * @param string $orderBy
+     * @param string $order
+     *
+     * @return array
+     */
+	public static function selectPage($page = 1, $perPage = 10, $orderBy = '', $order = 'ASC'){
 		if($page < 1){
 			$page = 1;
 		}
 		$offset = ($page - 1) * $perPage;
-		return self::selectLimitOffset($perPage, $offset);
+		return self::selectLimitOffset($perPage, $offset, $orderBy, $order);
 	}
 
     /**

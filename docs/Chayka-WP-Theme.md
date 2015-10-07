@@ -1117,6 +1117,23 @@ Set script rendering location (head|footer)
 
 
 
+### populateResUrl
+
+    mixed Chayka\WP\Plugin::populateResUrl(string $appId)
+
+Store application resource folder url for future use
+
+
+
+* Visibility: **public**
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $appId **string**
+
+
+
 ### enqueueStyle
 
     mixed Chayka\WP\Plugin::enqueueStyle(string $handle, string|boolean $relativeResPath, array $dependencies, boolean $version, string $media)

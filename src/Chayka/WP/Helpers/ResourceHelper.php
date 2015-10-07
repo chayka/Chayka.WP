@@ -67,6 +67,13 @@ class ResourceHelper {
     protected static $minimizedScripts = array();
 
     /**
+     * Mapping of plugins and themes resource folders
+     *
+     * @var array
+     */
+    protected static $applicationResourceFolderUrls = array();
+
+    /**
      * Check if we are working in the minimized media mode
      *
      * @return boolean
@@ -346,5 +353,35 @@ class ResourceHelper {
 	    self::setScriptLocation($handle, $scriptInFooter);
         static::enqueueScript($handle);
 	    static::enqueueStyle($handle);
+    }
+
+    /**
+     * Store application resource folder url for future use
+     *
+     * @param $appId
+     * @param $url
+     */
+    public static function setApplicationResourceFolderUrl($appId, $url){
+        self::$applicationResourceFolderUrls[$appId] = $url;
+    }
+
+    /**
+     * Get application resource folder url by application id
+     *
+     * @param $appId
+     *
+     * @return string
+     */
+    public static function getApplicationResourceFolderUrl($appId){
+        return Util::getItem(self::$applicationResourceFolderUrls, $appId, '');
+    }
+
+    /**
+     * Get application resource folder urls mapping by application id
+     *
+     * @return array
+     */
+    public static function getApplicationResourceFolderUrls(){
+        return self::$applicationResourceFolderUrls;
     }
 }

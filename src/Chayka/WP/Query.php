@@ -67,6 +67,24 @@ class Query extends WP_Query {
     protected static $template = null;
 
     /**
+     * Request URI to process
+     *
+     * @var string|null
+     */
+    protected $requestUri = null;
+
+    /**
+     * Query constructor
+     *
+     * @param string $requestUri
+     * @param array|string $query
+     */
+    public function __construct($requestUri = '', $query = ''){
+        parent::__construct($query);
+        $this->requestUri = $requestUri ? $requestUri: $_SERVER['REQUEST_URI'];
+    }
+
+    /**
      * This function is called on parse_request hook.
      * If it detects url that can be processed by any registered application it replaces
      * $wp_the_query with this modified WP_Query extended instance.
@@ -75,11 +93,9 @@ class Query extends WP_Query {
     public static function parseRequest(){
         global $wp_the_query, $wp_query;
 
-//        self::checkSingleDomain();
-//  TODO: implement BlockadeHelper
-//        BlockadeHelper::inspectUri($_SERVER['REQUEST_URI']);
-
         $requestUri = $_SERVER['REQUEST_URI'];
+
+        $requestUri = apply_filters('Chayka.WP.Query.parseRequest', $requestUri);
 
         $isForbidden = ApplicationDispatcher::isForbiddenRoute($requestUri);
         $canProcess = ApplicationDispatcher::canProcess($requestUri);
@@ -103,7 +119,7 @@ class Query extends WP_Query {
             add_filter('single_template', array('Chayka\\WP\\Query', 'renderResponse'), 1, 1);
             remove_action( 'template_redirect', 'wp_old_slug_redirect');
             remove_filter ('the_content','wpautop');
-            $q = new Query();
+            $q = new Query($requestUri);
             $q->copyFrom($wp_the_query);
             $wp_the_query = $wp_query = $q;
 
@@ -203,7 +219,6 @@ class Query extends WP_Query {
     /**
      * Check if current request is considered by WP as home page.
      * Alias to is_home()
-     * @deprecated
      *
      * @return bool
      */
@@ -213,7 +228,6 @@ class Query extends WP_Query {
 
     /**
      * Set is_home property
-     * @deprecated
      *
      * @param bool|true $is
      */
@@ -300,7 +314,7 @@ class Query extends WP_Query {
 
 	    $response = '';
 	    try{
-		    $response = ApplicationDispatcher::dispatch();
+		    $response = ApplicationDispatcher::dispatch($this->requestUri);
 	    }catch (\Exception $e){
 			self::setIs404(true);
 	    }

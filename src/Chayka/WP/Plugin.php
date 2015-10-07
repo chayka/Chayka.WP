@@ -332,7 +332,7 @@ abstract class Plugin{
      * @param $relativeResPath
      * @return String
      */
-    public function getUrlRes($relativeResPath){
+    public function getUrlRes($relativeResPath = ''){
         return $this->getUrl('res/'.$relativeResPath);
     }
 
@@ -653,7 +653,17 @@ abstract class Plugin{
 		ResourceHelper::setScriptLocation($handle, $inFooter);
 	}
 
-	/**
+    /**
+     * Store application resource folder url for future use
+     *
+     * @param string $appId
+     */
+    public function populateResUrl($appId = ''){
+        ResourceHelper::setApplicationResourceFolderUrl($appId?$appId:$this->appId, $this->getUrlRes($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()));
+    }
+
+
+    /**
 	 * Alias to wp_enqueue_style, but the path is relative to '/res'
 	 *
 	 * @param string $handle

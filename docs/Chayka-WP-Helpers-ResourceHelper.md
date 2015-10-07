@@ -81,6 +81,18 @@ Mapping of resource handles to the concatenated scripts
 * This property is **static**.
 
 
+### $applicationResourceFolderUrls
+
+    protected array $applicationResourceFolderUrls = array()
+
+Mapping of plugins and themes resource folders
+
+
+
+* Visibility: **protected**
+* This property is **static**.
+
+
 Methods
 -------
 
@@ -347,5 +359,54 @@ Uses minimized versions if detects.
 #### Arguments
 * $handle **string**
 * $scriptInFooter **boolean**
+
+
+
+### setApplicationResourceFolderUrl
+
+    mixed Chayka\WP\Helpers\ResourceHelper::setApplicationResourceFolderUrl($appId, $url)
+
+Store application resource folder url for future use
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $appId **mixed**
+* $url **mixed**
+
+
+
+### getApplicationResourceFolderUrl
+
+    string Chayka\WP\Helpers\ResourceHelper::getApplicationResourceFolderUrl($appId)
+
+Get application resource folder url by application id
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $appId **mixed**
+
+
+
+### getApplicationResourceFolderUrls
+
+    array Chayka\WP\Helpers\ResourceHelper::getApplicationResourceFolderUrls()
+
+Get application resource folder urls mapping by application id
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
 
 
