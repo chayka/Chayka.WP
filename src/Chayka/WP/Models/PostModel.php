@@ -50,14 +50,14 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @var array
      */
-	protected static $validationErrors = array();
+    protected static $validationErrors = array();
 
     /**
      * Post id
      *
      * @var int
      */
-	protected $id;
+    protected $id;
 
     /**
      * Post author user id
@@ -273,8 +273,8 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * PostModel constructor
      */
-    public function __construct() {
-        $void = new \stdClass();
+    public function __construct(){
+        $void         = new \stdClass();
         $this->wpPost = new WP_Post($void);
         $this->init();
     }
@@ -289,165 +289,182 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         $this->setCommentStatus('open');
         $this->setPingStatus('closed');
     }
-    
+
     /**
      * Get post id
-     * 
+     *
      * @return integer
      */
-    public function getId() {
+    public function getId(){
         return $this->id;
     }
 
     /**
      * Set post id
-     * 
+     *
      * @param integer $id
-     * @return PostModel 
+     *
+     * @return PostModel
      */
-    public function setId($id) {
+    public function setId($id){
         $this->id = $id;
+
         return $this;
     }
 
     /**
      * Get author user id
-     * 
+     *
      * @return integer
      */
-    public function getUserId() {
+    public function getUserId(){
         return $this->userId;
     }
 
     /**
      * Set author user id
-     * 
+     *
      * @param integer $userId
+     *
      * @return PostModel
      */
-    public function setUserId($userId) {
+    public function setUserId($userId){
         $this->userId = $userId;
+
         return $this;
     }
 
     /**
      * Get parent-post id
-     * 
+     *
      * @return integer
      */
-    public function getParentId() {
+    public function getParentId(){
         return $this->parentId;
     }
 
     /**
      * Set parent-post id
-     * 
+     *
      * @param integer $parentId
+     *
      * @return PostModel
      */
-    public function setParentId($parentId) {
+    public function setParentId($parentId){
         $this->parentId = $parentId;
+
         return $this;
     }
 
     /**
      * Get post guid
-     * 
+     *
      * @return string
      */
-    public function getGuid() {
+    public function getGuid(){
         return $this->guid;
     }
 
     /**
      * Set post guid
-     * 
+     *
      * @param string $guid
+     *
      * @return PostModel
      */
-    public function setGuid($guid) {
+    public function setGuid($guid){
         $this->guid = $guid;
+
         return $this;
     }
 
     /**
      * Get post type
-     * 
+     *
      * @return string
      */
-    public function getType() {
+    public function getType(){
         return $this->type;
     }
 
     /**
      * Set post type
-     * 
+     *
      * @param string $type
+     *
      * @return PostModel
      */
-    public function setType($type) {
+    public function setType($type){
         $this->type = $type;
+
         return $this;
     }
 
     /**
      * Get post name (slug)
-     * 
+     *
      * @return string
      */
-    public function getSlug() {
+    public function getSlug(){
         return $this->slug;
     }
 
     /**
      * Set post name (slug)
-     * 
+     *
      * @param string $slug
+     *
      * @return PostModel
      */
-    public function setSlug($slug) {
+    public function setSlug($slug){
         $this->slug = $slug;
+
         return $this;
     }
 
     /**
      * Get post title
-     * 
+     *
      * @return string
      */
-    public function getTitle() {
+    public function getTitle(){
         return $this->title;
     }
 
     /**
      * Set post title
-     * 
+     *
      * @param string $title
-     * @return PostModel 
+     *
+     * @return PostModel
      */
-    public function setTitle($title) {
+    public function setTitle($title){
         $this->title = $title;
+
         return $this;
     }
 
     /**
      * Get post content
+     *
      * @param boolean $wpautop Set to true if you need auto-<p></p> (default: true)
      *
      * @return string HTML content
      */
-    public function getContent($wpautop = true) {
-        return $wpautop?wpautop($this->content):$this->content;
+    public function getContent($wpautop = true){
+        return $wpautop ? wpautop($this->content) : $this->content;
     }
 
     /**
      * Set content
-     * 
+     *
      * @param string $content
+     *
      * @return PostModel
      */
-    public function setContent($content) {
+    public function setContent($content){
         $this->content = $content;
+
         return $this;
     }
 
@@ -456,7 +473,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return string
      */
-    public function getContentFiltered() {
+    public function getContentFiltered(){
         return apply_filters('the_content', $this->content);
     }
 
@@ -465,94 +482,104 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @param bool $generate set to true if you need excerpt autogeneration
      * @param bool $stripShortcodes set to true will strip shortcodes while generating excerpt
+     *
      * @return string
      */
-    public function getExcerpt($generate = true, $stripShortcodes = true) {
-        if($generate && !$this->excerpt && $this->content){
+    public function getExcerpt($generate = true, $stripShortcodes = true){
+        if($generate && ! $this->excerpt && $this->content){
             $text = $this->getContent();
 
             if($stripShortcodes){
-                $text = strip_shortcodes( $text );
+                $text = strip_shortcodes($text);
             }
 
-            $text = apply_filters('the_content', $text);
-            $text = str_replace(']]>', ']]&gt;', $text);
+            $text           = apply_filters('the_content', $text);
+            $text           = str_replace(']]>', ']]&gt;', $text);
             $excerpt_length = apply_filters('excerpt_length', 55);
-            $excerpt_more = apply_filters('excerpt_more', ' ' . '[...]');
-            $text = wp_trim_words( $text, $excerpt_length, $excerpt_more );
-            $this->excerpt = wp_trim_excerpt($text);
+            $excerpt_more   = apply_filters('excerpt_more', ' ' . '[...]');
+            $text           = wp_trim_words($text, $excerpt_length, $excerpt_more);
+            $this->excerpt  = wp_trim_excerpt($text);
         }
+
         return $this->excerpt;
     }
 
     /**
      * Set post excerpt
-     * 
+     *
      * @param string $excerpt
+     *
      * @return PostModel
      */
-    public function setExcerpt($excerpt) {
+    public function setExcerpt($excerpt){
         $this->excerpt = $excerpt;
+
         return $this;
     }
 
     /**
      * Get post status
-     * 
+     *
      * @return string
      */
-    public function getStatus() {
+    public function getStatus(){
         return $this->status;
     }
 
     /**
      * Set post status (publish|draft|deleted|future)
-     * 
+     *
      * @param string $status
+     *
      * @return PostModel
      */
-    public function setStatus($status) {
+    public function setStatus($status){
         $this->status = $status;
+
         return $this;
     }
 
     /**
      * Get post ping status
-     * 
+     *
      * @return string
      */
-    public function getPingStatus() {
+    public function getPingStatus(){
         return $this->pingStatus;
     }
 
     /**
      * Set ping status (closed|open)
-     * 
+     *
      * @param string $pingStatus
+     *
      * @return PostModel
      */
-    public function setPingStatus($pingStatus) {
+    public function setPingStatus($pingStatus){
         $this->pingStatus = $pingStatus;
+
         return $this;
     }
 
     /**
      * Get post password
-     * 
+     *
      * @return string
      */
-    public function getPassword() {
+    public function getPassword(){
         return $this->password;
     }
 
     /**
      * Set post password
-     * 
+     *
      * @param string $password
+     *
      * @return PostModel
      */
-    public function setPassword($password) {
+    public function setPassword($password){
         $this->password = $password;
+
         return $this;
     }
 
@@ -561,7 +588,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return string
      */
-    public function getToPing() {
+    public function getToPing(){
         return $this->toPing;
     }
 
@@ -569,10 +596,12 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * Set the list of URLs to ping
      *
      * @param string $toPing
+     *
      * @return PostModel
      */
-    public function setToPing($toPing) {
+    public function setToPing($toPing){
         $this->toPing = $toPing;
+
         return $this;
     }
 
@@ -581,7 +610,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return string
      */
-    public function getPinged() {
+    public function getPinged(){
         return $this->pinged;
     }
 
@@ -589,79 +618,87 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * Set the list of URLs pinged
      *
      * @param string $pinged
+     *
      * @return PostModel
      */
-    public function setPinged($pinged) {
+    public function setPinged($pinged){
         $this->pinged = $pinged;
+
         return $this;
     }
 
     /**
      * Get post order mark
-     * 
+     *
      * @return integer
      */
-    public function getMenuOrder() {
+    public function getMenuOrder(){
         return $this->menuOrder;
     }
 
     /**
      * Set post order mark
-     * 
+     *
      * @param integer $menuOrder
+     *
      * @return PostModel
      */
-    public function setMenuOrder($menuOrder) {
+    public function setMenuOrder($menuOrder){
         $this->menuOrder = $menuOrder;
+
         return $this;
     }
 
     /**
      * Get attachment mime type
-     * 
+     *
      * @return string
      */
-    public function getMimeType() {
+    public function getMimeType(){
         return $this->mimeType;
     }
 
     /**
      * Set attachment mime type
-     * 
+     *
      * @param string $mimeType
+     *
      * @return PostModel
      */
-    public function setMimeType($mimeType) {
+    public function setMimeType($mimeType){
         $this->mimeType = $mimeType;
+
         return $this;
     }
 
     /**
      * Check if post is attachment image
-     * 
+     *
      * @return boolean
      */
     public function isAttachmentImage(){
         return preg_match('%^image%', $this->getMimeType());
     }
-    
+
     /**
      * Get comment status
-     * 
+     *
      * @return string
      */
-    public function getCommentStatus() {
+    public function getCommentStatus(){
         return $this->commentStatus;
     }
 
     /**
      * Set comment status  (open|closed)
-     * 
+     *
      * @param string $commentStatus
+     *
      * @return PostModel
      */
-    public function setCommentStatus($commentStatus) {
+    public function setCommentStatus($commentStatus){
         $this->commentStatus = $commentStatus;
+
         return $this;
     }
 
@@ -670,7 +707,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return integer
      */
-    public function getCommentCount() {
+    public function getCommentCount(){
         return $this->commentCount;
     }
 
@@ -678,30 +715,34 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * Set comment count
      *
      * @param integer $commentCount
+     *
      * @return PostModel
      */
-    public function setCommentCount($commentCount) {
+    public function setCommentCount($commentCount){
         $this->commentCount = $commentCount;
+
         return $this;
     }
- 
+
     /**
      * Get post creation datetime
      *
      * @return DateTime
      */
-    public function getDtCreated() {
+    public function getDtCreated(){
         return $this->dtCreated;
     }
 
     /**
      * Set date creation datetime
-     * 
+     *
      * @param DateTime $dtCreated
+     *
      * @return PostModel
      */
-    public function setDtCreated($dtCreated) {
+    public function setDtCreated($dtCreated){
         $this->dtCreated = $dtCreated;
+
         return $this;
     }
 
@@ -710,28 +751,30 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return DateTime
      */
-    public function getDtCreatedGMT() {
+    public function getDtCreatedGMT(){
         // TODO Check this GMT issue closely
         return new DateTime(get_gmt_from_date(DateHelper::datetimeToDbStr($this->getDtCreated())));
     }
 
     /**
      * Get post modification datetime
-     * 
+     *
      * @return DateTime
      */
-    public function getDtModified() {
+    public function getDtModified(){
         return $this->dtModified;
     }
 
     /**
      * Set post modification datetime
-     * 
+     *
      * @param DateTime $dtModified
+     *
      * @return PostModel
      */
-    public function setDtModified($dtModified) {
+    public function setDtModified($dtModified){
         $this->dtModified = $dtModified;
+
         return $this;
     }
 
@@ -740,71 +783,74 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return DateTime
      */
-    public function getDtModifiedGMT() {
+    public function getDtModifiedGMT(){
         return new DateTime(get_gmt_from_date(DateHelper::datetimeToDbStr($this->getDtModified())));
     }
-    
+
     /**
      * Get count of page reviews.
      * Should be used in couple with incReviewsCount()
-     * 
+     *
      * @return integer
      */
-    public function getReviewsCount() {
-        if(!$this->reviewsCount){
+    public function getReviewsCount(){
+        if( ! $this->reviewsCount){
             $this->reviewsCount = $this->getMeta('reviews_count');
         }
-        return $this->reviewsCount?$this->reviewsCount:0;
+
+        return $this->reviewsCount ? $this->reviewsCount : 0;
     }
-    
+
     /**
      * Set post reviews count. Used for model only, no database modification made.
      * Use incReviewsCount() instead.
-     * 
+     *
      * @param integer $value
+     *
      * @return PostModel
      */
-    public function setReviewsCount($value) {
+    public function setReviewsCount($value){
         $this->reviewsCount = $value;
+
         return $this;
     }
-    
+
     /**
      * Increases post reviews count by one.
      * Should be called in PostController::viewAction() for example.
-     * 
+     *
      * @return int
      */
     public function incReviewsCount(){
-        if(!$this->getId()){
+        if( ! $this->getId()){
             return 0;
         }
         $visited = Util::getItem($_SESSION, 'visited', array());
-        if(!isset($_SESSION['visited'])){
+        if( ! isset($_SESSION['visited'])){
             $_SESSION['visited'] = array();
         }
         $today = date('Y-m-d');
-        foreach ($visited as $date => $posts) {
+        foreach($visited as $date => $posts){
             if($date != $today){
-                unset($_SESSION['visited'][$date]);
+                unset($_SESSION['visited'][ $date ]);
             }
         }
-        if(!isset($_SESSION['visited'][$today])){
-            $_SESSION['visited'][$today] = array();
+        if( ! isset($_SESSION['visited'][ $today ])){
+            $_SESSION['visited'][ $today ] = array();
         }
-        
-        $visit = Util::getItem($_SESSION['visited'][$today], $this->getId(), false);
-        
-        if(!$visit){
+
+        $visit = Util::getItem($_SESSION['visited'][ $today ], $this->getId(), false);
+
+        if( ! $visit){
             $this->getReviewsCount();
-            $this->reviewsCount++;
+            $this->reviewsCount ++;
             $this->updateMeta('reviews_count', $this->reviewsCount);
-            $_SESSION['visited'][$today][$this->getId()] = true;
+            $_SESSION['visited'][ $today ][ $this->getId() ] = true;
         }
-        
+
         return $this->reviewsCount;
     }
-    
+
     /**
      * Checks if post has been already visited today.
      * Works in couple with incReviewsCount() only
@@ -812,50 +858,55 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * @return boolean
      */
     public function isVisited(){
-        if(!isset($_SESSION['visited'])){
+        if( ! isset($_SESSION['visited'])){
             $_SESSION['visited'] = array();
         }
         $today = date('Y-m-d');
-        if(!isset($_SESSION['visited'][$today])){
-            $_SESSION['visited'][$today] = array();
+        if( ! isset($_SESSION['visited'][ $today ])){
+            $_SESSION['visited'][ $today ] = array();
         }
-        
-        $visit = Util::getItem($_SESSION['visited'][$today], $this->getId(), false);
+
+        $visit = Util::getItem($_SESSION['visited'][ $today ], $this->getId(), false);
+
         return $visit;
     }
-    
+
     /**
      * Get original WP_Post object if the one is preserved
-     * 
+     *
      * @return WP_Post
      */
-    public function getWpPost() {
+    public function getWpPost(){
         return $this->wpPost;
     }
 
     /**
      * Set original WP_Post object to be preserved
-     * 
+     *
      * @param WP_Post|object $wpPost
+     *
      * @return PostModel
      */
-    public function setWpPost($wpPost) {
+    public function setWpPost($wpPost){
         $this->wpPost = $wpPost;
+
         return $this;
     }
 
-	/**
-	 * Magic getter that allows to use PostModel where wpPost should be used
-	 *
-	 * @param $name
-	 * @return mixed
-	 */
-	public function __get($name) {
-		return Util::getItem($this->wpPost, $name);
-	}
+    /**
+     * Magic getter that allows to use PostModel where wpPost should be used
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
+    public function __get($name){
+        return Util::getItem($this->wpPost, $name);
+    }
+
     /**
      * Get post href. Utilizes get_permalink().
-     * 
+     *
      * @return string
      */
     public function getHref(){
@@ -864,24 +915,28 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
 
     /**
      * Get href to the next WP post
-     * 
+     *
      * @param boolean $in_same_cat
+     *
      * @return string
      */
     public function getHrefNext($in_same_cat = true){
         $post = get_next_post($in_same_cat);
-        return $post && $post->ID ? get_permalink($post->ID):null;
+
+        return $post && $post->ID ? get_permalink($post->ID) : null;
     }
-    
+
     /**
      * Get href to the previous WP post
-     * 
+     *
      * @param boolean $in_same_cat
+     *
      * @return string
      */
     public function getHrefPrev($in_same_cat = true){
         $post = get_previous_post($in_same_cat);
-        return $post && $post->ID ? get_permalink($post->ID):null;
+
+        return $post && $post->ID ? get_permalink($post->ID) : null;
     }
 
     /**
@@ -889,34 +944,35 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @param bool $checkPermissions
      * @param string $context
+     *
      * @return string
      */
     public function getHrefEdit($checkPermissions = false, $context = 'display'){
-	if ( 'revision' === $this->getType() ){
+        if('revision' === $this->getType()){
             $action = '';
-        }elseif ( 'display' == $context ){
+        }elseif('display' == $context){
             $action = '&amp;action=edit';
         }else{
             $action = '&action=edit';
         }
-	$post_type_object = get_post_type_object( $this->getType() );
-	if ( !$post_type_object ){
+        $post_type_object = get_post_type_object($this->getType());
+        if( ! $post_type_object){
             return '';
         }
-	if ( $checkPermissions && !current_user_can( 'edit_post', $this->getId() ) ){
+        if($checkPermissions && ! current_user_can('edit_post', $this->getId())){
             return '';
         }
 
-	    return apply_filters( 'get_edit_post_link', admin_url( sprintf($post_type_object->_edit_link . $action, $this->getId()) ), $this->getId(), $context );
-        
+        return apply_filters('get_edit_post_link', admin_url(sprintf($post_type_object->_edit_link . $action, $this->getId())), $this->getId(), $context);
+
     }
-    
+
     /**
      * DbReady method, returns corresponding DB Table ID column name
-     * 
+     *
      * @return string
      */
-    public static function getDbIdColumn() {
+    public static function getDbIdColumn(){
         return 'ID';
     }
 
@@ -925,18 +981,20 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return string
      */
-    public static function getDbTable() {
+    public static function getDbTable(){
         global $wpdb;
+
         return $wpdb->posts;
     }
 
     /**
-     * Unpacks db record while fetching model from DB 
-     * 
+     * Unpacks db record while fetching model from DB
+     *
      * @param object $wpRecord
+     *
      * @return PostModel
      */
-    public static function unpackDbRecord( $wpRecord){
+    public static function unpackDbRecord($wpRecord){
         $obj = new self();
 //		Util::print_r($wpRecord);
         $obj->setId(Util::getItem($wpRecord, 'ID'));
@@ -960,19 +1018,20 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         $obj->setMimeType(Util::getItem($wpRecord, 'post_mime_type'));
         $obj->setCommentStatus(Util::getItem($wpRecord, 'comment_status'));
         $obj->setCommentCount(Util::getItem($wpRecord, 'comment_count'));
-        
+
         $obj->setWpPost($wpRecord);
-        
-        self::$postsCacheById[$obj->getId()] = $obj;
-        self::$postsCacheBySlug[$obj->getSlug()] = $obj->getId();
-        
+
+        self::$postsCacheById[ $obj->getId() ]     = $obj;
+        self::$postsCacheBySlug[ $obj->getSlug() ] = $obj->getId();
+
         return $obj;
     }
 
     /**
      * Packs model into assoc array before committing to DB
-     * 
+     *
      * @param boolean $forUpdate
+     *
      * @return array
      */
     public function packDbRecord($forUpdate = true){
@@ -980,44 +1039,45 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         if($forUpdate){
             $dbRecord['ID'] = $this->getId();
         }
-        if(!empty($this->password)){
+        if( ! empty($this->password)){
             $dbRecord['post_password'] = $this->getPassword();
         }
-        $dbRecord['post_author'] = $this->getUserId();
-        $dbRecord['post_parent'] = $this->getParentId();
-        $dbRecord['post_type'] = $this->getType();
-        $dbRecord['post_name'] = $this->getSlug();
-        $dbRecord['post_title'] = $this->getTitle();
-        $dbRecord['post_content'] = $this->getContent(false);
-        $dbRecord['post_excerpt'] = $this->getExcerpt(false);
-        $dbRecord['post_status'] = $this->getStatus();
-        $dbRecord['post_date'] = DateHelper::datetimeToDbStr($this->getDtCreated());
-        $dbRecord['post_date_gmt'] = DateHelper::datetimeToDbStr($this->getDtCreatedGMT());
-        $dbRecord['ping_status'] = $this->getPingStatus();
-        $dbRecord['to_ping'] = $this->getToPing();
-        $dbRecord['pinged'] = $this->getPinged();
-        $dbRecord['menu_order'] = $this->getMenuOrder();
+        $dbRecord['post_author']    = $this->getUserId();
+        $dbRecord['post_parent']    = $this->getParentId();
+        $dbRecord['post_type']      = $this->getType();
+        $dbRecord['post_name']      = $this->getSlug();
+        $dbRecord['post_title']     = $this->getTitle();
+        $dbRecord['post_content']   = $this->getContent(false);
+        $dbRecord['post_excerpt']   = $this->getExcerpt(false);
+        $dbRecord['post_status']    = $this->getStatus();
+        $dbRecord['post_date']      = DateHelper::datetimeToDbStr($this->getDtCreated());
+        $dbRecord['post_date_gmt']  = DateHelper::datetimeToDbStr($this->getDtCreatedGMT());
+        $dbRecord['ping_status']    = $this->getPingStatus();
+        $dbRecord['to_ping']        = $this->getToPing();
+        $dbRecord['pinged']         = $this->getPinged();
+        $dbRecord['menu_order']     = $this->getMenuOrder();
         $dbRecord['comment_status'] = $this->getCommentStatus();
-        
+
         return $dbRecord;
     }
 
     /**
      * Inserts new model to DB, returns autogenerated ID
-     * 
+     *
      * @return integer
      */
     public function insert(){
         $this->setDtCreated(new DateTime());
         $dbRecord = $this->packDbRecord(false);
-        $id = wp_insert_post($dbRecord);
+        $id       = wp_insert_post($dbRecord);
         $this->setId($id);
+
         return $id;
     }
-    
+
     /**
      * Update db record
-     * 
+     *
      * @return int|WP_Error The value 0 or WP_Error on failure. The post ID on success.
      */
     public function update(){
@@ -1025,41 +1085,46 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         $dbRecord = $this->packDbRecord(true);
         unset($dbRecord['post_created']);
         unset($dbRecord['post_created_gmt']);
+
         return wp_update_post($dbRecord);
     }
-    
+
     /**
      * Delete record form DB
-     * 
+     *
      * @param bool $forceDelete Whether to bypass trash and force deletion. Defaults to false.
+     *
      * @return boolean False on failure
      */
     public function delete($forceDelete = false){
         return self::deleteById($this->getId(), $forceDelete);
     }
-    
+
     /**
      * Deletes post with the specified $post from db table
      *
      * @param integer $postId
      * @param bool $forceDelete Whether to bypass trash and force deletion. Defaults to false.
+     *
      * @return mixed False on failure
      */
-    public static function deleteById($postId = 0, $forceDelete = false) {
+    public static function deleteById($postId = 0, $forceDelete = false){
         $item = Util::getItem(self::$postsCacheById, $postId);
         if($item){
-            unset(self::$postsCacheBySlug[$item->getSlug()]);
-            unset(self::$postsCacheById[$postId]);
+            unset(self::$postsCacheBySlug[ $item->getSlug() ]);
+            unset(self::$postsCacheById[ $postId ]);
         }
-        return wp_delete_post( $postId, $forceDelete );
+
+        return wp_delete_post($postId, $forceDelete);
     }
 
     /**
      * Select model from DB by ID
-     * 
+     *
      * @param integer $id
      * @param boolean $useCache
-     * @return PostModel 
+     *
+     * @return PostModel
      */
     public static function selectById($id = 0, $useCache = true){
         if($useCache && $id){
@@ -1069,64 +1134,70 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
             }
         }
         $wpRecord = get_post($id);
-        return $wpRecord?self::unpackDbRecord($wpRecord):null;
+
+        return $wpRecord ? self::unpackDbRecord($wpRecord) : null;
     }
 
 
     /**
      * Select model from DB by slug
-     * 
+     *
      * @param string $slug
      * @param string $postType
      * @param bool $useCache
      * @param bool $isPreview
-     * @return PostModel 
+     *
+     * @return PostModel
      */
     public static function selectBySlug($slug, $postType = 'ANY', $useCache = true, $isPreview = false){
         if($useCache){
-            $id = Util::getItem(self::$postsCacheBySlug, $slug);
+            $id   = Util::getItem(self::$postsCacheBySlug, $slug);
             $item = Util::getItem(self::$postsCacheById, $id);
             if($item){
                 return $item;
             }
         }
-        $args = array('name'=>$slug);
+        $args = array('name' => $slug);
         if($postType){
             $args['post_type'] = $postType;
             if($isPreview){
                 $args['post_status'] = 'any';
-                $args['preview'] = true;
+                $args['preview']     = true;
             }else{
                 $args['post_status'] = 'publish';
             }
         }
         $posts = self::selectPosts($args);
-        return count($posts)?reset($posts):null;
+
+        return count($posts) ? reset($posts) : null;
     }
 
     /**
      * Selects post of specified post type by title.
-     * The use of this function is not recommended as WP 
-     * 
+     * The use of this function is not recommended as WP
+     *
      * @global object $wpdb
+     *
      * @param string $title
      * @param string $postType
+     *
      * @return PostModel
      */
     public static function selectByTitle($title, $postType = 'ANY'){
         global $wpdb;
-        $sql = $postType == 'ANY' ? 
+        $sql = $postType == 'ANY' ?
             DbHelper::prepare("
                 SELECT * FROM $wpdb->posts
-                WHERE post_title = %s AND post_status = 'publish'" , $title
-            ):
+                WHERE post_title = %s AND post_status = 'publish'", $title
+            ) :
             DbHelper::prepare("
                 SELECT * FROM $wpdb->posts
-                WHERE post_title = %s AND post_type = %s AND post_status = 'publish'" , $title, $postType
+                WHERE post_title = %s AND post_type = %s AND post_status = 'publish'", $title, $postType
             );
-        
+
         $posts = self::selectSql($sql);
-        return count($posts)?reset($posts):null;
+
+        return count($posts) ? reset($posts) : null;
     }
 
     /**
@@ -1135,54 +1206,59 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * The count of found rows can be found by calling postsFound() aftermath.
      *
      * @param boolean $globalImport set to true if you need import from $wp_query
+     *
      * @return PostQuery
      */
     public static function query($globalImport = false){
         $query = new PostQuery($globalImport);
+
         return $query;
     }
 
     /**
      * Select models using WP_Query syntax.
      * The count of found rows can be found by calling postsFound() aftermath.
-     * 
+     *
      * @param array $wpPostsQueryArgs
+     *
      * @return array(PostModel)
      */
     public static function selectPosts($wpPostsQueryArgs = array()){
-        
+
         global $wp_query;
-        
+
         if(empty($wpPostsQueryArgs)){
-            if(!self::$wpQuery){
+            if( ! self::$wpQuery){
                 self::$wpQuery = $wp_query;
             }
         }else{
             self::$wpQuery = new WP_Query($wpPostsQueryArgs);
         }
-        $posts = array();
-        self::$postsFound=self::$wpQuery->found_posts;
+        $posts            = array();
+        self::$postsFound = self::$wpQuery->found_posts;
         while(self::$wpQuery->have_posts()){
             $dbRecord = self::$wpQuery->next_post();
-            $posts[] = self::unpackDbRecord($dbRecord);
-            
+            $posts[]  = self::unpackDbRecord($dbRecord);
+
         }
-        
+
         return $posts;
 
     }
-    
+
     /**
      * Select models using SQL query.
      * Should start with 'SELECT * FROM {$wpdb->posts}'
      * The count of found rows can be found by calling postsFound() aftermath.
-     * 
+     *
      * @global object $wpdb
+     *
      * @param string $sql
+     *
      * @return array(PostModel)
      */
     public static function selectSql($sql){
-        $posts = DbHelper::selectSql($sql, __CLASS__);
+        $posts            = DbHelper::selectSql($sql, __CLASS__);
         self::$postsFound = DbHelper::rowsFound();
 
         return $posts;
@@ -1190,163 +1266,183 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
 
     /**
      * Get associated $wp_query if set
-     * 
+     *
      * @return WP_Query
      */
     public static function getWpQuery(){
         return self::$wpQuery;
     }
-    
+
     /**
      * Get number of posts found using last mass fetch from DB
-     * 
+     *
      * @return integer
      */
     public static function postsFound(){
-        return (int)max(self::$wpQuery?self::$wpQuery->found_posts:0, self::$postsFound);
+        return (int) max(self::$wpQuery ? self::$wpQuery->found_posts : 0, self::$postsFound);
     }
 
     /**
      * Get post meta single key-value pair or all key-values
-     * 
+     *
      * @param int $postId Post ID.
      * @param string $key Optional. The meta key to retrieve. By default, returns data for all keys.
      * @param bool $single Whether to return a single value.
+     *
      * @return mixed Will be an array if $single is false. Will be value of meta data field if $single
      */
     public static function getPostMeta($postId, $key = '', $single = true){
         $meta = get_post_meta($postId, $key, $single);
-        if(!$key && $single && $meta && is_array($meta)){
+        if( ! $key && $single && $meta && is_array($meta)){
             $m = array();
             foreach($meta as $k => $values){
-                $m[$k]= is_array($values)?reset($values):$values;
+                $m[ $k ] = is_array($values) ? reset($values) : $values;
             }
+
             return $m;
         }
+
         return $meta;
     }
-    
+
     /**
      * Update post meta value for the specified key in the DB
-     * 
+     *
      * @param integer $postId
      * @param string $key
      * @param string $value
      * @param string $oldValue
+     *
      * @return bool False on failure, true if success.
      */
     public static function updatePostMeta($postId, $key, $value, $oldValue = ''){
         return update_post_meta($postId, $key, $value, $oldValue);
     }
-    
+
     /**
      * Delete post meta value
-     * 
+     *
      * @param integer $postId
      * @param string $key
      * @param mixed $value
+     *
      * @return bool
      */
     public static function deletePostMeta($postId, $key, $value = ''){
         return delete_post_meta($postId, $key, $value);
     }
-    
+
     /**
      * Get post meta single key-value pair or all key-values
-     * 
+     *
      * @param string $key Optional. The meta key to retrieve. By default, returns data for all keys.
      * @param bool $single Whether to return a single value.
+     *
      * @return mixed Will be an array if $single is false. Will be value of meta data field if $single
      */
-    public function getMeta($key = '', $single = true) {
-        $k = $single?$key:$key.'_arr';
-        if(!isset($this->meta[$k])){
-            $this->meta[$k] = self::getPostMeta($this->getId(), $key, $single);
+    public function getMeta($key = '', $single = true){
+        if($key){
+            $k = $single ? $key : $key . '_arr';
+            if( ! isset($this->meta[ $k ])){
+                $this->meta[ $k ] = self::getPostMeta($this->getId(), $key, $single);
+            }
+
+            return $this->meta[ $k ];
+        }else{
+            return $this->meta = self::getPostMeta($this->getId(), $key, $single);
         }
-        return $this->meta[$k];
     }
 
     /**
      * Update post meta value for the specified key in the DB
      * If value is empty then delete it
-     * 
+     *
      * @param string $key
      * @param string $value
      * @param string $oldValue
+     *
      * @return bool False on failure, true if success.
      */
-    public function updateOrDeleteMeta($key, $value='', $oldValue = '') {
+    public function updateOrDeleteMeta($key, $value = '', $oldValue = ''){
         if($value){
             return $this->updateMeta($key, $value, $oldValue);
         }else{
             return $this->deleteMeta($key, $oldValue);
         }
     }
-    
+
     /**
      * Update post meta value for the specified key in the DB
-     * 
+     *
      * @param string $key
      * @param string $value
      * @param string $oldValue
+     *
      * @return bool False on failure, true if success.
      */
-    public function updateMeta($key, $value, $oldValue = '') {
+    public function updateMeta($key, $value, $oldValue = ''){
         if($oldValue){
-            unset($this->meta[$key]);
-            unset($this->meta[$key.'_arr']);
+            unset($this->meta[ $key ]);
+            unset($this->meta[ $key . '_arr' ]);
         }else{
-            $this->meta[$key] = $value;
+            $this->meta[ $key ] = $value;
         }
+
         return self::updatePostMeta($this->getId(), $key, $value, $oldValue);
     }
-    
+
     /**
      * Delete post meta value
-     * 
+     *
      * @param string $key
      * @param mixed $value
+     *
      * @return bool
      */
     public function deleteMeta($key, $value = ''){
-        unset($this->meta[$key]);
-        unset($this->meta[$key.'_arr']);
+        unset($this->meta[ $key ]);
+        unset($this->meta[ $key . '_arr' ]);
+
         return self::deletePostMeta($this->getId(), $key, $value);
     }
 
     /**
      * Get post terms. Should be set first by setTerms() or load by loadTerms() or queryTerms()
      * If taxonomy not set returns
-     * 
+     *
      * @param string|array $taxonomy
+     *
      * @return array(string|TermModel)
      */
-    public function getTerms($taxonomy = '') {
-        return $taxonomy?Util::getItem($this->terms, $taxonomy):$this->terms;
+    public function getTerms($taxonomy = ''){
+        return $taxonomy ? Util::getItem($this->terms, $taxonomy) : $this->terms;
     }
 
     /**
      * Set post terms
-     * 
+     *
      * @param array(string|WP_Term|TermModel) $terms
      * @param string $taxonomy taxonomy
+     *
      * @return PostModel
      */
-    public function setTerms($terms, $taxonomy = null) {
+    public function setTerms($terms, $taxonomy = null){
         if($taxonomy){
-            $this->terms[$taxonomy] = $terms;
+            $this->terms[ $taxonomy ] = $terms;
         }else{
             $this->terms = $terms;
         }
+
         return $this;
     }
-    
+
     /**
      * Select terms for the specified postId and taxonomy
-     * 
+     *
      * @param integer $postId
      * @param string|array(string) $taxonomy
      * @param array|PostTermQuery $args
+     *
      * @return array(TermModel)
      */
     public static function selectTerms($postId, $taxonomy = 'post_tag', $args = array()){
@@ -1356,149 +1452,158 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         $terms = wp_get_post_terms($postId, $taxonomy, $args);
         if(in_array(Util::getItem($args, 'fields', 'names'), array('all', 'all_with_object_id'))){
             $dbRecords = $terms;
-            $terms = array();
+            $terms     = array();
             foreach($dbRecords as $dbRecord){
                 $term = TermModel::unpackDbRecord($dbRecord);
                 if($term){
-                    $terms[]=$term;
+                    $terms[] = $term;
                 }
             }
         }
+
         return $terms;
     }
-    
+
     /**
      * Load terms for this post and taxonomy.
      * Utilizes selectTerms
-     * 
+     *
      * @param string|array(string) $taxonomies
      * @param array|PostTermQuery $args
+     *
      * @return array(TermModel)
      */
-    public function loadTerms($taxonomies = '', $args = array('fields'=>'names')){
+    public function loadTerms($taxonomies = '', $args = array('fields' => 'names')){
         if($taxonomies){
             if(is_string($taxonomies) && strpos($taxonomies, ',')){
                 $taxonomies = preg_split('%\s*,\s*%', $taxonomies);
             }
             if(is_array($taxonomies)){
-                foreach ($taxonomies as $t){
-                    $this->terms[$t] = self::selectTerms($this->getId(), $t, $args);
+                foreach($taxonomies as $t){
+                    $this->terms[ $t ] = self::selectTerms($this->getId(), $t, $args);
                 }
             }else{
-                $this->terms[$taxonomies] = self::selectTerms($this->getId(), $taxonomies, $args);
+                $this->terms[ $taxonomies ] = self::selectTerms($this->getId(), $taxonomies, $args);
             }
         }else{
             $taxonomies = $this->getTaxonomies();
-            foreach ($taxonomies as $t){
-                $this->terms[$t] = self::selectTerms($this->getId(), $t, $args);
+            foreach($taxonomies as $t){
+                $this->terms[ $t ] = self::selectTerms($this->getId(), $t, $args);
             }
         }
+
         return $this->terms;
     }
-    
+
     /**
      * Update set of post's terms in DB
+     *
      * @param array(string|int|WP_Term|TermModel) $terms if omitted $this->getTerms($taxonomy) is taken
      * @param string $taxonomy if omitted $terms should be like array('post_tag' => ... , 'category' => ... )
      * @param boolean $append append or replace
      */
     public function updateTerms($terms = null, $taxonomy = null, $append = false){
-        if(!$terms){
+        if( ! $terms){
             $terms = $this->getTerms($taxonomy);
             Util::print_r($terms);
         }
-        if(!$taxonomy){
-            foreach ($terms as $taxonomy=>$trms){
+        if( ! $taxonomy){
+            foreach($terms as $taxonomy => $trms){
                 $this->updateTerms($trms, $taxonomy, $append);
             }
         }else{
             $trms = $terms;
             if(is_array($terms) && count($terms)){
-                if(is_object(reset($terms))) {
+                if(is_object(reset($terms))){
                     $trms = array();
-                    foreach($terms as $key=>$value){
-                        $trms[$key]= is_taxonomy_hierarchical($taxonomy)?$value->term_id:$value->name;
+                    foreach($terms as $key => $value){
+                        $trms[ $key ] = is_taxonomy_hierarchical($taxonomy) ? $value->term_id : $value->name;
                     }
                 }
             }
             wp_set_post_terms($this->getId(), $trms, $taxonomy, $append);
         }
     }
-    
+
     /**
      * Get PostTermQuery object to query post terms.
      * Call ->select() at the end to load terms into this post
-     * 
+     *
      * @param string|array(string) $taxonomies
+     *
      * @return PostTermQuery
      */
     public function queryTerms($taxonomies = null){
         return PostTermQuery::query($this, $taxonomies);
     }
-    
+
     /**
      * Get taxonomy identifiers associated with this post type
      * @return array(string)
      */
     public function getTaxonomies(){
         $taxonomies = get_taxonomies(array(), 'objects');
-        $res = array();
+        $res        = array();
         foreach($taxonomies as $name => $taxonomy){
             if(in_array($this->getType(), $taxonomy->object_type)){
-                $res[]=$name;
+                $res[] = $name;
             }
         }
-        
+
         return $res;
     }
-    
+
     /**
      * Get post comments. Should set first by setComments() or load by loadComments() or queryComments()
-     * 
+     *
      * @return array(CommentModel)
      */
-    public function getComments() {
+    public function getComments(){
         return $this->comments;
     }
 
     /**
      * Set post comments
-     * 
+     *
      * @param array(CommentModel) $comments
+     *
      * @return PostModel
      */
-    public function setComments($comments) {
+    public function setComments($comments){
         $this->comments = $comments;
+
         return $this;
     }
 
     /**
      * Load post comments into the post object
-     * 
+     *
      * @param array $args WP_Comment_Query args
+     *
      * @return integer count of comments loaded
      */
     public function loadComments($args = array()){
         $args['post_id'] = $this->getId();
-        $defaults = array(
-            'order' => 'ASC',
+        $defaults        = array(
+            'order'   => 'ASC',
             'orderby' => 'comment_ID'
         );
-        $args = array_merge($defaults, $args);
-        $this->comments = CommentModel::selectComments($args);
+        $args            = array_merge($defaults, $args);
+        $this->comments  = CommentModel::selectComments($args);
+
         return count($this->comments);
     }
-    
+
     /**
      * Get CommentQuery object to query this post comments.
      * Call ->select() at the end to load comments into this model.
-     * 
+     *
      * @return CommentQuery
      */
     public function queryComments(){
         return CommentQuery::query($this)
-                ->order_ASC()
-                ->orderBy('comment_ID');
+                           ->order_ASC()
+                           ->orderBy('comment_ID');
     }
 
     /**
@@ -1510,13 +1615,14 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      */
     public function getAttachments($mimeType){
         $rawAttachments = get_attached_media($mimeType, $this->getId());
-        $attachments = array();
+        $attachments    = array();
         foreach($rawAttachments as $id => $raw){
-            $attachments[$id] = PostModel::unpackDbRecord($raw);
+            $attachments[ $id ] = PostModel::unpackDbRecord($raw);
         }
+
         return $attachments;
     }
-    
+
     /**
      * Get attachment url
      *
@@ -1525,97 +1631,102 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     public function getAttachmentUrl(){
         return wp_get_attachment_url($this->getId());
     }
-    
+
     /**
      * Get image data in case this post is an attachment image.
      * Should be set by setImageData or loaded by loadImageData().
      * loadImageData can be used instead
-     * 
+     *
      * @return mixed
      */
-    public function getImageData() {
+    public function getImageData(){
         return $this->imageData;
     }
 
     /**
      * Set image data in case this post is an attachment image.
      * Use within the model only.
-     * 
+     *
      * @param array $imageData
+     *
      * @return PostModel
      */
-    public function setImageData($imageData) {
+    public function setImageData($imageData){
         $this->imageData = $imageData;
+
         return $this;
     }
 
     /**
      * Loads image data if this post is an attachment
-     * 
+     *
      * @param string $size thumbnail|medium|large|full
+     *
      * @return array
      */
     public function loadImageData($size = ''){
         if($this->getType() == 'attachment'){
             $sizes = array();
             if($size){
-                $sizes[$size] = wp_get_attachment_image_src( $this->getId(), 'icon' == $size?'thumbnail':$size, 'icon' == $size );
+                $sizes[ $size ] = wp_get_attachment_image_src($this->getId(), 'icon' == $size ? 'thumbnail' : $size, 'icon' == $size);
             }else{
                 if($this->isAttachmentImage()){
                     foreach(array('thumbnail', 'medium', 'large', 'full') as $size){
-                        $d = wp_get_attachment_image_src( $this->getId(), $size );
+                        $d = wp_get_attachment_image_src($this->getId(), $size);
                         if($d){
-                            $sizes[$size] = $d;
+                            $sizes[ $size ] = $d;
                         }
                     }
                 }else{
-                    $sizes['thumbnail'] = wp_get_attachment_image_src( $this->getId(), 'thumbnail', true );
+                    $sizes['thumbnail'] = wp_get_attachment_image_src($this->getId(), 'thumbnail', true);
                 }
 //                $sizes['icon'] = wp_get_attachment_image_src( $this->getId(), "thumbnail", true);
             }
-            
+
             foreach($sizes as $size => $data){
-                $this->imageData[$size] = array(
-                    'url' => $data[0],
-                    'width' => $data[1],
+                $this->imageData[ $size ] = array(
+                    'url'    => $data[0],
+                    'width'  => $data[1],
                     'height' => $data[2],
                 );
             }
         }
-        
-        return $size?Util::getItem($this->imageData, $size):$this->imageData;
+
+        return $size ? Util::getItem($this->imageData, $size) : $this->imageData;
     }
-    
+
     /**
      * Get post thumbnail id (thumbnail is an attachment post associated with this post)
-     * 
+     *
      * @return integer
      */
     public function getThumbnailId(){
-        if(!$this->thumbnailId){
+        if( ! $this->thumbnailId){
             $this->thumbnailId = get_post_thumbnail_id($this->getId());
         }
-        
-        return $this->thumbnailId?$this->thumbnailId:0;
+
+        return $this->thumbnailId ? $this->thumbnailId : 0;
     }
-    
+
     /**
      * Get thumbnail image HTML code (<img src="..."/>)
      * of the specified size and with HTML attributes
-     * 
+     *
      * @param string $size thumbnail|post-thumbnail|medium|large|full|<custom>
-     * @param array[key]=value $attrs
+     * @param array [key]=value $attrs
+     *
      * @return string(html)
      */
     public function getThumbnailImage($size = 'post-thumbnail', $attrs = array()){
         return get_the_post_thumbnail($this->getId(), $size, $attrs);
     }
-    
+
     /**
      * Get thumbnail image HTML code (<img src="..."/>)
      * of the specified size and with HTML attributes
-     * 
-     * @param array[key]=value $attrs
+     *
+     * @param array [key]=value $attrs
+     *
      * @return string(html)
      */
     public function getThumbnailImage_Medium($attrs = array()){
@@ -1625,8 +1736,9 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get thumbnail image HTML code (<img src="..."/>)
      * of the specified size and with HTML attributes
-     * 
-     * @param array[key]=value $attrs
+     *
+     * @param array [key]=value $attrs
+     *
      * @return string(html)
      */
     public function getThumbnailImage_Large($attrs = array()){
@@ -1636,8 +1748,9 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get thumbnail image HTML code (<img src="..."/>)
      * of the specified size and with HTML attributes
-     * 
-     * @param array[key]=value $attrs
+     *
+     * @param array [key]=value $attrs
+     *
      * @return string(html)
      */
     public function getThumbnailImage_Full($attrs = array()){
@@ -1647,30 +1760,32 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get thumbnail image data (url, width, height, resized)
      * of the specified size
-     * 
+     *
      * @param string $size thumbnail|post-thumbnail|medium|large|full|<custom>
+     *
      * @return array[key]=value
      */
     public function getThumbnailData($size = 'thumbnail'){
         $attId = $this->getThumbnailId();
-        if(!$attId){
+        if( ! $attId){
             return null;
         }
         $image = wp_get_attachment_image_src($attId, $size);
         list($url, $width, $height, $resized) = $image;
+
         return array(
-            'url' => $url,
-            'width' => $width,
-            'height' => $height,
+            'url'     => $url,
+            'width'   => $width,
+            'height'  => $height,
             'resized' => $resized,
         );
         //thumbnail, medium, large or full
     }
-    
+
     /**
      * Get thumbnail image data (url, width, height, resized)
      * of the specified size
-     * 
+     *
      * @return array[key]=value
      */
     public function getThumbnailData_Thumbnail(){
@@ -1680,7 +1795,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get thumbnail image data (url, width, height, resized)
      * of the specified size
-     * 
+     *
      * @return array[key]=value
      */
     public function getThumbnailData_Medium(){
@@ -1690,7 +1805,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get thumbnail image data (url, width, height, resized)
      * of the specified size
-     * 
+     *
      * @return array[key]=value
      */
     public function getThumbnailData_Large(){
@@ -1700,7 +1815,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get thumbnail image data (url, width, height, resized)
      * of the specified size
-     * 
+     *
      * @return array[key]=value
      */
     public function getThumbnailData_Full(){
@@ -1719,14 +1834,15 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         global $post, $wp_the_query;
         $post = $this->getWpPost();
         setup_postdata($post);
-        $comments = $this->getComments()?$this->getComments():array();
+        $comments = $this->getComments() ? $this->getComments() : array();
         foreach($comments as $comment){
-	        /**
-	         * @var CommentModel $comment
-	         */
+            /**
+             * @var CommentModel $comment
+             */
             $wp_the_query->comments[] = $comment->getWpComment();
         }
         $wp_the_query->comment_count = $this->getCommentCount();
+
         return $post;
     }
 
@@ -1735,7 +1851,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @param array(string) $metaFields
      */
-    public static function setJsonMetaFields($metaFields) {
+    public static function setJsonMetaFields($metaFields){
         self::$jsonMetaFields = $metaFields;
     }
 
@@ -1746,7 +1862,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      */
     public static function addJsonMetaField($fieldName){
         if(false === array_search($fieldName, self::$jsonMetaFields)){
-            self::$jsonMetaFields[]=$fieldName;
+            self::$jsonMetaFields[] = $fieldName;
         }
     }
 
@@ -1765,67 +1881,67 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Packs this post into assoc array for JSON representation.
      * Used for API Output
-     * 
+     *
      * @return array
      */
-    public function packJsonItem() {
-        $jsonItem = array();
-        $jsonItem['id'] = (int)$this->getId();
-        $jsonItem['post_author'] = $this->getUserId();
-        $jsonItem['post_parent'] = $this->getParentId();
-        $jsonItem['post_type'] = $this->getType();
-        $jsonItem['post_name'] = $this->getSlug();
-        $jsonItem['post_title'] = $this->getTitle();
-        $jsonItem['post_content'] = $this->getContent();
-        $jsonItem['post_excerpt'] = $this->getExcerpt();
-        $jsonItem['post_status'] = $this->getStatus();
-        $jsonItem['post_date'] = DateHelper::datetimeToDbStr($this->getDtCreated());
-        $jsonItem['post_date_gmt'] = DateHelper::datetimeToDbStr($this->getDtCreatedGMT());
-        $jsonItem['ping_status'] = $this->getPingStatus();
-        $jsonItem['to_ping'] = $this->getToPing();
-        $jsonItem['pinged'] = $this->getPinged();
-        $jsonItem['menu_order'] = $this->getMenuOrder();
+    public function packJsonItem(){
+        $jsonItem                   = array();
+        $jsonItem['id']             = (int) $this->getId();
+        $jsonItem['post_author']    = $this->getUserId();
+        $jsonItem['post_parent']    = $this->getParentId();
+        $jsonItem['post_type']      = $this->getType();
+        $jsonItem['post_name']      = $this->getSlug();
+        $jsonItem['post_title']     = $this->getTitle();
+        $jsonItem['post_content']   = $this->getContent();
+        $jsonItem['post_excerpt']   = $this->getExcerpt();
+        $jsonItem['post_status']    = $this->getStatus();
+        $jsonItem['post_date']      = DateHelper::datetimeToDbStr($this->getDtCreated());
+        $jsonItem['post_date_gmt']  = DateHelper::datetimeToDbStr($this->getDtCreatedGMT());
+        $jsonItem['ping_status']    = $this->getPingStatus();
+        $jsonItem['to_ping']        = $this->getToPing();
+        $jsonItem['pinged']         = $this->getPinged();
+        $jsonItem['menu_order']     = $this->getMenuOrder();
         $jsonItem['comment_status'] = $this->getCommentStatus();
-        $jsonItem['comment_count'] = $this->getCommentCount();
-        $jsonItem['reviews_count'] = $this->getReviewsCount();
+        $jsonItem['comment_count']  = $this->getCommentCount();
+        $jsonItem['reviews_count']  = $this->getReviewsCount();
         $jsonItem['post_mime_type'] = $this->getMimeType();
-        $jsonItem['terms'] = $this->getTerms();
-        $jsonItem['href'] = $this->getHref();
+        $jsonItem['terms']          = $this->getTerms();
+        $jsonItem['href']           = $this->getHref();
         if('attachment' == $this->getType()){
             if(empty($this->imageData)){
                 $this->loadImageData();
             }
             $jsonItem['image'] = $this->imageData;
         }
-        $thumbId = $this->getThumbnailId();
+        $thumbId                  = $this->getThumbnailId();
         $jsonItem['thumbnail_id'] = $thumbId;
         if($thumbId){
-            $thumb = array(
+            $thumb                 = array(
                 'thumbnail' => $this->getThumbnailData_Thumbnail(),
-                'medium' => $this->getThumbnailData_Medium(),
-                'large' => $this->getThumbnailData_Large(),
-                'full' => $this->getThumbnailData_Full(),
+                'medium'    => $this->getThumbnailData_Medium(),
+                'large'     => $this->getThumbnailData_Large(),
+                'full'      => $this->getThumbnailData_Full(),
             );
             $jsonItem['thumbnail'] = $thumb;
         }
         $meta = array();
         foreach(self::$jsonMetaFields as $field){
-            $meta[$field] = $this->getMeta($field);
+            $meta[ $field ] = $this->getMeta($field);
         }
         if($meta){
             $jsonItem['meta'] = $meta;
         }
-        
+
         return $jsonItem;
     }
 
     /**
      * Get validation errors after unpacking from request input
      * Should be set by validateInput
-     * 
+     *
      * @return array[field]='Error Text'
      */
-    public static function getValidationErrors() {
+    public static function getValidationErrors(){
         return static::$validationErrors;
     }
 
@@ -1836,65 +1952,68 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @return mixed|void all validation errors
      */
-	public static function addValidationErrors($errors) {
-		return static::$validationErrors = array_merge(static::$validationErrors, $errors);
-	}
+    public static function addValidationErrors($errors){
+        return static::$validationErrors = array_merge(static::$validationErrors, $errors);
+    }
 
     /**
      * Unpacks request input.
      * Used by REST Controllers.
-     * 
+     *
      * @param array $input
+     *
      * @return PostModel
      */
-    public static function unpackJsonItem($input = array()) {
+    public static function unpackJsonItem($input = array()){
         if(empty($input)){
             $input = InputHelper::getParams();
         }
 
-	    $id = Util::getItem($input, 'id', 0);
+        $id = Util::getItem($input, 'id', 0);
 
-	    $obj = $id? static::selectById($id): new static();
+        $obj = $id ? static::selectById($id) : new static();
 
-	    $valid = static::validateInput($input, $id? $obj:null);
+        $valid = static::validateInput($input, $id ? $obj : null);
 
-	    if($valid){
-	        $input = array_merge($obj->packJsonItem(), $input);
+        if($valid){
+            $input = array_merge($obj->packJsonItem(), $input);
 
-		    $obj->setUserId(Util::getItem($input, 'post_author'));
-		    $obj->setParentId(Util::getItem($input, 'post_parent'));
-		    $obj->setGuid(Util::getItem($input, 'guid'));
-		    $obj->setType(Util::getItem($input, 'post_type'));
-		    $obj->setSlug(Util::getItem($input, 'post_name'));
-		    $obj->setTitle(Util::getItem($input, 'post_title'));
-		    $obj->setContent(Util::getItem($input, 'post_content'));
-		    $obj->setExcerpt(Util::getItem($input, 'post_excerpt'));
-		    $obj->setStatus(Util::getItem($input, 'post_status'));
-		    $obj->setPingStatus(Util::getItem($input, 'ping_status'));
-		    $obj->setPinged(Util::getItem($input, 'pinged'));
-		    $obj->setToPing(Util::getItem($input, 'to_ping'));
-		    $obj->setPassword(Util::getItem($input, 'post_password'));
-		    $obj->setDtModified(DateHelper::jsonStrToDatetime(Util::getItem($input, 'post_modified')));
-		    $obj->setMenuOrder(Util::getItem($input, 'menu_order'));
-	//        $obj->setMimeType(Util::getItem($input, 'post_mime_type'));
-		    $obj->setCommentStatus(Util::getItem($input, 'comment_status'));
-	        return $obj;
-	    }
+            $obj->setUserId(Util::getItem($input, 'post_author'));
+            $obj->setParentId(Util::getItem($input, 'post_parent'));
+            $obj->setGuid(Util::getItem($input, 'guid'));
+            $obj->setType(Util::getItem($input, 'post_type'));
+            $obj->setSlug(Util::getItem($input, 'post_name'));
+            $obj->setTitle(Util::getItem($input, 'post_title'));
+            $obj->setContent(Util::getItem($input, 'post_content'));
+            $obj->setExcerpt(Util::getItem($input, 'post_excerpt'));
+            $obj->setStatus(Util::getItem($input, 'post_status'));
+            $obj->setPingStatus(Util::getItem($input, 'ping_status'));
+            $obj->setPinged(Util::getItem($input, 'pinged'));
+            $obj->setToPing(Util::getItem($input, 'to_ping'));
+            $obj->setPassword(Util::getItem($input, 'post_password'));
+            $obj->setDtModified(DateHelper::jsonStrToDatetime(Util::getItem($input, 'post_modified')));
+            $obj->setMenuOrder(Util::getItem($input, 'menu_order'));
+            //        $obj->setMimeType(Util::getItem($input, 'post_mime_type'));
+            $obj->setCommentStatus(Util::getItem($input, 'comment_status'));
 
-	    return null;
+            return $obj;
+        }
+
+        return null;
     }
 
-	/**
-	 * Validates input and sets $validationErrors
-	 *
-	 * @param array $input
-	 * @param PostModel $oldState
-	 *
-	 * @return bool is input valid
-	 */
-    public static function validateInput($input = array(), $oldState = null) {
-	    static::$validationErrors = array();
-        $valid = apply_filters('PostModel.validateInput', true, $input, $oldState);
+    /**
+     * Validates input and sets $validationErrors
+     *
+     * @param array $input
+     * @param PostModel $oldState
+     *
+     * @return bool is input valid
+     */
+    public static function validateInput($input = array(), $oldState = null){
+        static::$validationErrors = array();
+        $valid                    = apply_filters('PostModel.validateInput', true, $input, $oldState);
+
         return $valid;
     }
 
@@ -1902,139 +2021,144 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
      * Flushes cache used for selectById() and selectBySlug
      */
     public static function flushCache(){
-        self::$postsCacheById = array();
+        self::$postsCacheById   = array();
         self::$postsCacheBySlug = array();
     }
-    
+
     /**
      * Get post by $id from cache.
      * It gets to cache once it was unpacked by unpackDbRecord()
-     * 
+     *
      * @param integer $id
+     *
      * @return PostModel
      */
     public static function getPostsCacheById($id = 0){
         if($id){
             return Util::getItem(self::$postsCacheById, $id);
         }
+
         return null;
     }
 
     /**
      * Get post by $slug from cache.
      * It gets to cache once it was unpacked by unpackDbRecord()
-     * 
+     *
      * @param string $slug
+     *
      * @return PostModel
      */
     public static function getPostsCacheBySlug($slug = ''){
         if($slug){
             $id = Util::getItem(self::$postsCacheBySlug, $slug);
-            return $id?self::getPostsCacheById($id):null;
+
+            return $id ? self::getPostsCacheById($id) : null;
         }
-        
+
         $ret = array();
-        
-        foreach (self::$postsCacheBySlug as $slug => $id){
-            $item = $id?self::getPostsCacheById($id):null;
+
+        foreach(self::$postsCacheBySlug as $slug => $id){
+            $item = $id ? self::getPostsCacheById($id) : null;
             if($item){
-                $ret[$slug]=$id;
+                $ret[ $slug ] = $id;
             }
         }
-        
+
         return $ret;
     }
 
-	/**
+    /**
      * Check if current $user has $privilege over this post,
      * part of AclReady interface implementation
      *
-	 * @param string $privilege
-	 * @param \Chayka\WP\Models\UserModel|null $user
-	 *
-	 * @return boolean
-	 */
-	public function userCan( $privilege, $user = null ) {
-		if(!$user){
-			$user = UserModel::currentUser();
-		}
-		$userCan = true;
-		$errors = array();
+     * @param string $privilege
+     * @param \Chayka\WP\Models\UserModel|null $user
+     *
+     * @return boolean
+     */
+    public function userCan($privilege, $user = null){
+        if( ! $user){
+            $user = UserModel::currentUser();
+        }
+        $userCan = true;
+        $errors  = array();
 
-		$isOwner = $this->getUserId() == $user->getId();
-		$isPage = $this->getType() == 'page';
-		$publish = $this->getStatus() == 'publish' || $this->getType() == 'attachment' && $this->getStatus() == 'inherit';
-		$isPrivate = $this->getStatus() == 'private';
-		$isProtected = $this->getId() && post_password_required($this->getId());
+        $isOwner     = $this->getUserId() == $user->getId();
+        $isPage      = $this->getType() == 'page';
+        $publish     = $this->getStatus() == 'publish' || $this->getType() == 'attachment' && $this->getStatus() == 'inherit';
+        $isPrivate   = $this->getStatus() == 'private';
+        $isProtected = $this->getId() && post_password_required($this->getId());
 
-		$permissions = array();
+        $permissions = array();
 
-		switch($privilege){
-			case 'create':
-				$permissions[]='edit_posts';
-				if($publish){
-					$permissions[]='publish_posts';
-				}
-				if(!$isOwner){
-					$permissions[]='edit_others_posts';
-					if($isPrivate){
-						$permissions[]='edit_private_posts';
-					}
-				}
-				break;
-			case 'read':
-				if(!$publish || $isProtected){
-					if(!$isOwner){
-						$permissions[]='edit_others_posts';
-						if($isPrivate){
-							$permissions[]='read_private_posts';
-						}
-					}
-				}
-				break;
-			case 'update':
-				$permissions[]='edit_posts';
-				if($publish){
-					$permissions[]='edit_published_posts';
-				}
-				if(!$isOwner){
-					$permissions[]='edit_others_posts';
-					if($isPrivate){
-						$permissions[]='edit_private_posts';
-					}
-				}
-				break;
-			case 'delete':
-				$permissions[]='delete_posts';
-				if($publish){
-					$permissions[]='delete_published_posts';
-				}
-				if(!$isOwner){
-					$permissions[]='delete_others_posts';
-					if($isPrivate){
-						$permissions[]='delete_private_posts';
-					}
-				}
-				break;
-			default:
+        switch($privilege){
+            case 'create':
+                $permissions[] = 'edit_posts';
+                if($publish){
+                    $permissions[] = 'publish_posts';
+                }
+                if( ! $isOwner){
+                    $permissions[] = 'edit_others_posts';
+                    if($isPrivate){
+                        $permissions[] = 'edit_private_posts';
+                    }
+                }
+                break;
+            case 'read':
+                if( ! $publish || $isProtected){
+                    if( ! $isOwner){
+                        $permissions[] = 'edit_others_posts';
+                        if($isPrivate){
+                            $permissions[] = 'read_private_posts';
+                        }
+                    }
+                }
+                break;
+            case 'update':
+                $permissions[] = 'edit_posts';
+                if($publish){
+                    $permissions[] = 'edit_published_posts';
+                }
+                if( ! $isOwner){
+                    $permissions[] = 'edit_others_posts';
+                    if($isPrivate){
+                        $permissions[] = 'edit_private_posts';
+                    }
+                }
+                break;
+            case 'delete':
+                $permissions[] = 'delete_posts';
+                if($publish){
+                    $permissions[] = 'delete_published_posts';
+                }
+                if( ! $isOwner){
+                    $permissions[] = 'delete_others_posts';
+                    if($isPrivate){
+                        $permissions[] = 'delete_private_posts';
+                    }
+                }
+                break;
+            default:
 
-		}
+        }
 
-		foreach($permissions as $perm){
-			if($isPage){
-				$perm = str_replace('post', 'page', $perm);
-			}
-			$userCan &= user_can($user->getWpUser(), $perm);
-			if(!$userCan){
-				$errors['permission_required']= 'Permission '.$perm.' required to '.$privilege.' post';
-				break;
-			}
-		}
+        foreach($permissions as $perm){
+            if($isPage){
+                $perm = str_replace('post', 'page', $perm);
+            }
+            $userCan &= user_can($user->getWpUser(), $perm);
+            if( ! $userCan){
+                $errors['permission_required'] = 'Permission ' . $perm . ' required to ' . $privilege . ' post';
+                break;
+            }
+        }
 
-		$userCan = apply_filters('PostModel.'.$privilege, $userCan, $this, $user);
-		if(!$userCan){
-			static::addValidationErrors($errors);
-		}
-		return $userCan;
-	}
+        $userCan = apply_filters('PostModel.' . $privilege, $userCan, $this, $user);
+        if( ! $userCan){
+            static::addValidationErrors($errors);
+        }
+
+        return $userCan;
+    }
 }
