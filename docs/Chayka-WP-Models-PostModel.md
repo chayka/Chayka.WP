@@ -1888,7 +1888,7 @@ Get post thumbnail id (thumbnail is an attachment post associated with this post
 
 ### getThumbnailImage
 
-    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage(string $size, \Chayka\WP\Models\array[key]=value $attrs)
+    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage(string $size, $attrs)
 
 Get thumbnail image HTML code (<img src=".
 
@@ -1900,13 +1900,13 @@ of the specified size and with HTML attributes
 
 #### Arguments
 * $size **string** - &lt;p&gt;thumbnail|post-thumbnail|medium|large|full|&lt;custom&gt;&lt;/p&gt;
-* $attrs **Chayka\WP\Models\array[key]=value**
+* $attrs **mixed**
 
 
 
 ### getThumbnailImage_Medium
 
-    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage_Medium(\Chayka\WP\Models\array[key]=value $attrs)
+    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage_Medium($attrs)
 
 Get thumbnail image HTML code (<img src=".
 
@@ -1917,13 +1917,13 @@ of the specified size and with HTML attributes
 
 
 #### Arguments
-* $attrs **Chayka\WP\Models\array[key]=value**
+* $attrs **mixed**
 
 
 
 ### getThumbnailImage_Large
 
-    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage_Large(\Chayka\WP\Models\array[key]=value $attrs)
+    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage_Large($attrs)
 
 Get thumbnail image HTML code (<img src=".
 
@@ -1934,13 +1934,13 @@ of the specified size and with HTML attributes
 
 
 #### Arguments
-* $attrs **Chayka\WP\Models\array[key]=value**
+* $attrs **mixed**
 
 
 
 ### getThumbnailImage_Full
 
-    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage_Full(\Chayka\WP\Models\array[key]=value $attrs)
+    \Chayka\WP\Models\string(html) Chayka\WP\Models\PostModel::getThumbnailImage_Full($attrs)
 
 Get thumbnail image HTML code (<img src=".
 
@@ -1951,7 +1951,7 @@ of the specified size and with HTML attributes
 
 
 #### Arguments
-* $attrs **Chayka\WP\Models\array[key]=value**
+* $attrs **mixed**
 
 
 

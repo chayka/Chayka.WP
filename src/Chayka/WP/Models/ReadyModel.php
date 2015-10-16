@@ -88,7 +88,7 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
      *
      * @param $id
      * @param bool $useCache
-     * @return self
+     * @return static
      */
     public static function selectById($id, $useCache = true){
         $obj = new static();
@@ -103,7 +103,7 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
      * @param $value
      * @param bool $multiple
      * @param string $format
-     * @return array|DbReady|null
+     * @return array|static|null
      */
     public static function selectBy($key, $value, $multiple = false, $format = '%s'){
         $obj = new static();

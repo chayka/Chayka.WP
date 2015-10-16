@@ -143,7 +143,7 @@ Select instance from db by id.
 
 ### selectBy
 
-    array|\Chayka\WP\Helpers\DbReady|null Chayka\WP\Models\ReadyModel::selectBy($key, $value, boolean $multiple, string $format)
+    array|static|null Chayka\WP\Models\ReadyModel::selectBy($key, $value, boolean $multiple, string $format)
 
 Select instance from db by some key.
 
