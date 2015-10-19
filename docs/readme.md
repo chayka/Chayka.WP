@@ -13,6 +13,7 @@ API Index
             * [HtmlHelper](Chayka-WP-Helpers-HtmlHelper.md)
             * [JsonHelper](Chayka-WP-Helpers-JsonHelper.md)
             * [NlsHelper](Chayka-WP-Helpers-NlsHelper.md)
+            * [NotificationHelper](Chayka-WP-Helpers-NotificationHelper.md)
             * [OptionHelper](Chayka-WP-Helpers-OptionHelper.md)
             * [ResourceHelper](Chayka-WP-Helpers-ResourceHelper.md)
         * Chayka\WP\Models
