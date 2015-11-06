@@ -210,6 +210,58 @@ Ensures SELECT SQL_CALC_FOUND_ROWS
 
 
 
+### selectSqlRow
+
+    mixed|null Chayka\WP\Helpers\DbHelper::selectSqlRow($sql, null $className)
+
+Select a single row, using sql query
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **mixed**
+* $className **null**
+
+
+
+### selectSqlColumn
+
+    mixed|null Chayka\WP\Helpers\DbHelper::selectSqlColumn($sql)
+
+Select a single column, using sql query
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **mixed**
+
+
+
+### selectSqlValue
+
+    mixed|null Chayka\WP\Helpers\DbHelper::selectSqlValue($sql)
+
+Select a single cell value, using sql query
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **mixed**
+
+
+
 ### rowsFound
 
     integer Chayka\WP\Helpers\DbHelper::rowsFound()
@@ -271,6 +323,23 @@ Use unique-indexed column.
 Prepare sql query.
 
 Alias of $wpdb->prepare(), provide substituted params after $sql query.
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **mixed**
+
+
+
+### query
+
+    false|integer Chayka\WP\Helpers\DbHelper::query($sql)
+
+Perform sql query, can pass arguments for placeholders.
+
+
 
 * Visibility: **public**
 * This method is **static**.

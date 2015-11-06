@@ -248,6 +248,64 @@ class DbHelper {
 	}
 
     /**
+     * Select a single row, using sql query
+     *
+     * @param $sql
+     * @param null $className
+     *
+     * @return mixed|null
+     */
+    public static function selectSqlRow($sql, $className = null){
+        $data = self::selectSql($sql, $className);
+        if(!empty($data)){
+            return reset($data);
+        }
+        return null;
+    }
+
+    /**
+     * Select a single column, using sql query
+     *
+     * @param $sql
+     *
+     * @return mixed|null
+     */
+    public static function selectSqlColumn($sql){
+        $data = self::selectSql($sql);
+        if(!empty($data)){
+            $result = [];
+            foreach($data as $row){
+                if(is_object($row)){
+                    $row = get_object_vars($row);
+                }
+                $result[]=reset($row);
+            }
+
+            return $result;
+        }
+        return null;
+    }
+
+    /**
+     * Select a single cell value, using sql query
+     *
+     * @param $sql
+     *
+     * @return mixed|null
+     */
+    public static function selectSqlValue($sql){
+        $data = self::selectSql($sql);
+        if(!empty($data)){
+            $row = reset($data);
+            if(is_object($row)){
+                $row = get_object_vars($row);
+            }
+            return reset($row);
+        }
+        return null;
+    }
+
+    /**
      * Get the number of rows found during last sql query.
      * 'SELECT FOUND_ROWS()' is utiliezed.
      *
@@ -315,6 +373,23 @@ class DbHelper {
         $args = func_get_args();
 
         return call_user_func_array(array($wpdb, 'prepare'), $args);
+    }
+
+    /**
+     * Perform sql query, can pass arguments for placeholders.
+     *
+     * @param $sql
+     *
+     * @return false|int
+     */
+    public static function query($sql){
+        global $wpdb;
+
+        $args = func_get_args();
+
+        $sql = call_user_func_array(array($wpdb, 'prepare'), $args);
+
+        return $wpdb->query($sql);
     }
 }
 

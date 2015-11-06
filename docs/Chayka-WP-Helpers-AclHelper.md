@@ -213,7 +213,7 @@ Respond with api error if user has no privilege for specified resource
 
 ### isOwner
 
-    boolean Chayka\WP\Helpers\AclHelper::isOwner(\Chayka\WP\Models\PostModel|\Chayka\WP\Models\CommentModel $obj, \Chayka\WP\Models\UserModel|null $user)
+    boolean Chayka\WP\Helpers\AclHelper::isOwner(\Chayka\WP\Models\PostModel|\Chayka\WP\Models\CommentModel|object $obj, \Chayka\WP\Models\UserModel|null $user)
 
 Check if user is the owner of specified object
 
@@ -224,14 +224,14 @@ Check if user is the owner of specified object
 
 
 #### Arguments
-* $obj **[Chayka\WP\Models\PostModel](Chayka-WP-Models-PostModel.md)|[Chayka\WP\Models\PostModel](Chayka-WP-Models-CommentModel.md)**
+* $obj **[Chayka\WP\Models\PostModel](Chayka-WP-Models-PostModel.md)|[Chayka\WP\Models\PostModel](Chayka-WP-Models-CommentModel.md)|object**
 * $user **[Chayka\WP\Models\UserModel](Chayka-WP-Models-UserModel.md)|null**
 
 
 
 ### apiOwnershipRequired
 
-    mixed Chayka\WP\Helpers\AclHelper::apiOwnershipRequired(\Chayka\WP\Models\PostModel|\Chayka\WP\Models\CommentModel $obj, string $message)
+    mixed Chayka\WP\Helpers\AclHelper::apiOwnershipRequired(\Chayka\WP\Models\PostModel|\Chayka\WP\Models\CommentModel|object $obj, string $message)
 
 Respond with api error if user is not the owner of specified object
 
@@ -242,14 +242,14 @@ Respond with api error if user is not the owner of specified object
 
 
 #### Arguments
-* $obj **[Chayka\WP\Models\PostModel](Chayka-WP-Models-PostModel.md)|[Chayka\WP\Models\PostModel](Chayka-WP-Models-CommentModel.md)**
+* $obj **[Chayka\WP\Models\PostModel](Chayka-WP-Models-PostModel.md)|[Chayka\WP\Models\PostModel](Chayka-WP-Models-CommentModel.md)|object**
 * $message **string**
 
 
 
 ### isNotOwner
 
-    boolean Chayka\WP\Helpers\AclHelper::isNotOwner(\Chayka\WP\Models\PostModel|\Chayka\WP\Models\CommentModel $obj, \Chayka\WP\Models\UserModel|null $user)
+    boolean Chayka\WP\Helpers\AclHelper::isNotOwner(\Chayka\WP\Models\PostModel|\Chayka\WP\Models\CommentModel|object $obj, \Chayka\WP\Models\UserModel|null $user)
 
 Check if user is not the owner of specified object
 
@@ -260,14 +260,14 @@ Check if user is not the owner of specified object
 
 
 #### Arguments
-* $obj **[Chayka\WP\Models\PostModel](Chayka-WP-Models-PostModel.md)|[Chayka\WP\Models\PostModel](Chayka-WP-Models-CommentModel.md)**
+* $obj **[Chayka\WP\Models\PostModel](Chayka-WP-Models-PostModel.md)|[Chayka\WP\Models\PostModel](Chayka-WP-Models-CommentModel.md)|object**
 * $user **[Chayka\WP\Models\UserModel](Chayka-WP-Models-UserModel.md)|null**
 
 
 
 ### apiOwnershipForbidden
 
-    mixed Chayka\WP\Helpers\AclHelper::apiOwnershipForbidden($obj, string $message)
+    mixed Chayka\WP\Helpers\AclHelper::apiOwnershipForbidden(object $obj, string $message)
 
 Respond with api error if user is the owner of specified object
 
@@ -278,7 +278,7 @@ Respond with api error if user is the owner of specified object
 
 
 #### Arguments
-* $obj **mixed**
+* $obj **object**
 * $message **string**
 
 

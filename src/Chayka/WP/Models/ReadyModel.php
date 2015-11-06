@@ -128,6 +128,23 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
+     * Select single entity using sql query.
+     * You can use {table} placeholder, that will be replaced with self::getDbTable().
+     * Accepts slq-prepare format (sql with placeholders and optional params as values)
+     * @param $sql
+     * @return static
+     */
+    public static function selectSqlRow($sql){
+        $args = func_get_args();
+
+        if(count($args)>1){
+            $sql = call_user_func_array(array('Chayka\\WP\\Helpers\\DbHelper', 'prepare'), $args);
+        }
+
+        return DbHelper::selectSqlRow($sql, new static());
+    }
+
+    /**
      * Select all entities
      *
      * @param string $orderBy

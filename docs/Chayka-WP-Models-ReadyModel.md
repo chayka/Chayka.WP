@@ -179,6 +179,24 @@ Accepts slq-prepare format (sql with placeholders and optional params as values)
 
 
 
+### selectSqlRow
+
+    static Chayka\WP\Models\ReadyModel::selectSqlRow($sql)
+
+Select single entity using sql query.
+
+You can use {table} placeholder, that will be replaced with self::getDbTable().
+Accepts slq-prepare format (sql with placeholders and optional params as values)
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **mixed**
+
+
+
 ### selectAll
 
     array Chayka\WP\Models\ReadyModel::selectAll(string $orderBy, string $order)

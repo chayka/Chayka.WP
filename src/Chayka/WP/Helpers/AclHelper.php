@@ -151,7 +151,7 @@ class AclHelper {
 	/**
 	 * Check if user is the owner of specified object
 	 *
-	 * @param PostModel|CommentModel $obj
+	 * @param PostModel|CommentModel|object $obj
 	 * @param UserModel|null $user
 	 *
 	 * @return bool
@@ -174,7 +174,7 @@ class AclHelper {
     /**
      * Respond with api error if user is not the owner of specified object
      *
-     * @param PostModel|CommentModel $obj
+     * @param PostModel|CommentModel|object $obj
      * @param string $message
      */
     public static function apiOwnershipRequired($obj, $message = ''){
@@ -190,7 +190,7 @@ class AclHelper {
 	/**
 	 * Check if user is not the owner of specified object
 	 *
-	 * @param PostModel|CommentModel $obj
+	 * @param PostModel|CommentModel|object $obj
 	 * @param UserModel|null $user
 	 *
 	 * @return bool
@@ -210,7 +210,7 @@ class AclHelper {
     /**
      * Respond with api error if user is the owner of specified object
      *
-     * @param $obj
+     * @param object $obj
      * @param string $message
      */
     public static function apiOwnershipForbidden($obj, $message = ''){
