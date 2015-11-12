@@ -70,7 +70,7 @@ class DbHelper {
             self::wpdb()->query($query);
         }
         
-        add_option($versionOptionName, $currentVersion);
+        update_option($versionOptionName, $currentVersion);
     }
 
     /**
