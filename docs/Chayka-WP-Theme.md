@@ -1176,6 +1176,28 @@ Alias to wp_register_style, but the path is relative to '/res'
 
 
 
+### enqueueNgStyle
+
+    mixed Chayka\WP\Plugin::enqueueNgStyle($handle, string|boolean $relativeResPath, array $dependencies, string|boolean $ver, boolean $in_footer)
+
+Enqueue style. Utilizes wp_enqueue_style().
+
+However if detects registered minimized and concatenated version enqueue it instead.
+Ensures 'angular' as dependency
+
+* Visibility: **public**
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $handle **mixed**
+* $relativeResPath **string|boolean**
+* $dependencies **array**
+* $ver **string|boolean**
+* $in_footer **boolean**
+
+
+
 ### registerNgStyle
 
     mixed Chayka\WP\Plugin::registerNgStyle(string $handle, string $relativeResPath, array $dependencies, boolean $version, string $media)
@@ -1277,6 +1299,28 @@ Alias to wp_register_script, but the path is relative to '/res'
 
 
 
+### enqueueNgScript
+
+    mixed Chayka\WP\Plugin::enqueueNgScript($handle, boolean $relativeResPath, array $dependencies, callable|null $enqueueCallback, boolean $ver, boolean $in_footer)
+
+Enqueue angular script. Utilizes AngularHelper::enqueueScript().
+
+See AngularHelper::enqueueScript() for more details.
+
+* Visibility: **public**
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $handle **mixed**
+* $relativeResPath **boolean**
+* $dependencies **array**
+* $enqueueCallback **callable|null**
+* $ver **boolean**
+* $in_footer **boolean**
+
+
+
 ### registerNgScript
 
     mixed Chayka\WP\Plugin::registerNgScript($handle, $relativeResPath, array $dependencies, callable|null $enqueueCallback, boolean $version, boolean $inFooter)
@@ -1372,6 +1416,25 @@ Alias to ResourceHelper::enqueueScriptStyle()
 #### Arguments
 * $handle **string**
 * $scriptInFooter **boolean**
+
+
+
+### enqueueNgScriptStyle
+
+    mixed Chayka\WP\Plugin::enqueueNgScriptStyle($handle)
+
+Enqueue both script and style with the same $handle.
+
+Uses minimized versions if detects.
+
+Should be used to enqueue angular scripts to bootstrap them correctly
+
+* Visibility: **public**
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $handle **mixed**
 
 
 

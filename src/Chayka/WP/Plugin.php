@@ -694,6 +694,26 @@ abstract class Plugin{
 	}
 
     /**
+     * Enqueue style. Utilizes wp_enqueue_style().
+     * However if detects registered minimized and concatenated version enqueue it instead.
+     * Ensures 'angular' as dependency
+     *
+     * @param $handle
+     * @param string|bool $relativeResPath
+     * @param array $dependencies
+     * @param string|bool $ver
+     * @param bool $in_footer
+     */
+    public function enqueueNgStyle($handle, $relativeResPath = false, $dependencies = array(), $ver = false, $in_footer = false) {
+        $src = false;
+        if($relativeResPath) {
+            $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+            $src = $this->getUrlRes($relativeResPath);
+        }
+        AngularHelper::enqueueStyle($handle, $src, $dependencies, $ver, $in_footer);
+    }
+
+    /**
      * Alias to wp_register_style, but the path is relative to '/res'.
      * Ensures 'angular' as dependency.
      *
@@ -762,6 +782,26 @@ abstract class Plugin{
 	}
 
     /**
+     * Enqueue angular script. Utilizes AngularHelper::enqueueScript().
+     * See AngularHelper::enqueueScript() for more details.
+     *
+     * @param $handle
+     * @param bool $relativeResPath
+     * @param array $dependencies
+     * @param callable|null $enqueueCallback
+     * @param bool $ver
+     * @param bool $in_footer
+     */
+    public function enqueueNgScript($handle, $relativeResPath = false, $dependencies = array(), $enqueueCallback = null, $ver = false, $in_footer = false){
+        $src = false;
+        if($relativeResPath) {
+            $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+            $src = $this->getUrlRes($relativeResPath);
+        }
+        AngularHelper::enqueueScript($handle, $src, $dependencies, $enqueueCallback, $ver, $in_footer);
+    }
+
+    /**
      * Alias to AngularHelper::registerScript(), but the path is relative to '/res'
      * See AngularHelper::registerScript() for more details
      *
@@ -821,6 +861,18 @@ abstract class Plugin{
 	public function enqueueScriptStyle($handle, $scriptInFooter = true){
 		ResourceHelper::enqueueScriptStyle($handle, $scriptInFooter);
 	}
+
+    /**
+     * Enqueue both script and style with the same $handle.
+     * Uses minimized versions if detects.
+     *
+     * Should be used to enqueue angular scripts to bootstrap them correctly
+     *
+     * @param $handle
+     */
+    public function enqueueNgScriptStyle($handle) {
+        AngularHelper::enqueueScriptStyle($handle);
+    }
 
     /**
      * Read and parse bower config
