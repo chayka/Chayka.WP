@@ -787,9 +787,15 @@ class UserModel implements DbReady, JsonReady, InputReady, AclReady{
             $dbRecord['ID'] = $this->getId();
         }
         if(!empty($this->password)){
-            $dbRecord['user_pass'] = $forUpdate?
-                wp_hash_password($this->getPassword()):
-                $this->getPassword();
+            /**
+             * Password set
+             */
+            $dbRecord['user_pass'] = $this->getPassword();
+        }elseif(!$forUpdate){
+            /**
+             * Inserting user without password, generating
+             */
+            $dbRecord['user_pass'] = wp_generate_password();
         }
         $dbRecord['user_login'] = $this->getLogin();
         $dbRecord['user_nicename'] = $this->getNicename();
