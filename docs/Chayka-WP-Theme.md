@@ -1176,6 +1176,26 @@ Alias to wp_register_style, but the path is relative to '/res'
 
 
 
+### updateStyle
+
+    \_WP_Dependency|null Chayka\WP\Plugin::updateStyle($handle, $relativeResPath, null|array $dependencies, string|boolean $version)
+
+A little helper to update already registered style.
+
+
+
+* Visibility: **public**
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $handle **mixed**
+* $relativeResPath **mixed**
+* $dependencies **null|array**
+* $version **string|boolean**
+
+
+
 ### enqueueNgStyle
 
     mixed Chayka\WP\Plugin::enqueueNgStyle($handle, string|boolean $relativeResPath, array $dependencies, string|boolean $ver, boolean $in_footer)
@@ -1296,6 +1316,26 @@ Alias to wp_register_script, but the path is relative to '/res'
 * $dependencies **array**
 * $version **boolean**
 * $inFooter **boolean**
+
+
+
+### updateScript
+
+    \_WP_Dependency|null Chayka\WP\Plugin::updateScript($handle, $relativeResPath, null|array $dependencies, string|boolean $version)
+
+A little helper to update already registered script.
+
+
+
+* Visibility: **public**
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $handle **mixed**
+* $relativeResPath **mixed**
+* $dependencies **null|array**
+* $version **string|boolean**
 
 
 

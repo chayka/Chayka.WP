@@ -166,7 +166,7 @@ Alias to wp_deregister_script
 
 ### registerScript
 
-    mixed Chayka\WP\Helpers\ResourceHelper::registerScript(string $handle, string $src, array $ngDependencies, boolean $version, boolean $inFooter)
+    mixed Chayka\WP\Helpers\ResourceHelper::registerScript(string $handle, string $src, array $dependencies, boolean $version, boolean $inFooter)
 
 Alias to wp_register_script but checks if dependencies can be found inside minimized files
 
@@ -179,7 +179,7 @@ Alias to wp_register_script but checks if dependencies can be found inside minim
 #### Arguments
 * $handle **string**
 * $src **string**
-* $ngDependencies **array**
+* $dependencies **array**
 * $version **boolean**
 * $inFooter **boolean**
 
@@ -203,6 +203,26 @@ Register script that contains minimized and concatenated scripts
 * $handles **array**
 * $version **boolean**
 * $inFooter **boolean**
+
+
+
+### updateScript
+
+    \_WP_Dependency|null Chayka\WP\Helpers\ResourceHelper::updateScript($handle, $src, null|array $dependencies, string|boolean $version)
+
+A little helper to update already registered script.
+
+For instance, you may want to upgrade jQuery
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $handle **mixed**
+* $src **mixed**
+* $dependencies **null|array**
+* $version **string|boolean**
 
 
 
@@ -320,6 +340,26 @@ Register script that contains minimized and concatenated styles
 * $handles **array**
 * $version **boolean**
 * $media **string**
+
+
+
+### updateStyle
+
+    \_WP_Dependency|null Chayka\WP\Helpers\ResourceHelper::updateStyle($handle, $src, null|array $dependencies, string|boolean $version)
+
+A little helper to update already registered style.
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $handle **mixed**
+* $src **mixed**
+* $dependencies **null|array**
+* $version **string|boolean**
 
 
 

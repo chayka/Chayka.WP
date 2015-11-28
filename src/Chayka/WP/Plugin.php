@@ -694,6 +694,21 @@ abstract class Plugin{
 	}
 
     /**
+     * A little helper to update already registered style.
+     *
+     * @param $handle
+     * @param $relativeResPath
+     * @param null|array $dependencies
+     * @param string|bool $version
+     *
+     * @return \_WP_Dependency|null
+     */
+    public function updateStyle($handle, $relativeResPath, $dependencies = null, $version = false){
+        $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+        return ResourceHelper::updateStyle($handle, $this->getUrlRes($relativeResPath), $dependencies, $version);
+    }
+
+    /**
      * Enqueue style. Utilizes wp_enqueue_style().
      * However if detects registered minimized and concatenated version enqueue it instead.
      * Ensures 'angular' as dependency
@@ -780,6 +795,21 @@ abstract class Plugin{
 		$relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
 		ResourceHelper::registerScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $version, $inFooter);
 	}
+
+    /**
+     * A little helper to update already registered script.
+     *
+     * @param $handle
+     * @param $relativeResPath
+     * @param null|array $dependencies
+     * @param string|bool $version
+     *
+     * @return \_WP_Dependency|null
+     */
+    public function updateScript($handle, $relativeResPath, $dependencies = null, $version = false){
+        $relativeResPath = ($this->isMediaMinimized() ? $this->getResDistDir() : $this->getResSrcDir()) . $relativeResPath;
+        return ResourceHelper::updateScript($handle, $this->getUrlRes($relativeResPath), $dependencies, $version);
+    }
 
     /**
      * Enqueue angular script. Utilizes AngularHelper::enqueueScript().

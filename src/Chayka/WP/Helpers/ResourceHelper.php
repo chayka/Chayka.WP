@@ -129,22 +129,22 @@ class ResourceHelper {
 	 *
 	 * @param string $handle
 	 * @param string $src
-	 * @param array $ngDependencies
+	 * @param array $dependencies
 	 * @param bool $version
 	 * @param bool $inFooter
 	 */
-    public static function registerScript($handle, $src, $ngDependencies = array(), $version = false, $inFooter = true){
+    public static function registerScript($handle, $src, $dependencies = array(), $version = false, $inFooter = true){
 
-        $callback = function() use ($handle, $src, $ngDependencies, $version, $inFooter){
+        $callback = function() use ($handle, $src, $dependencies, $version, $inFooter){
             if(self::$isMediaMinimized){
-                foreach($ngDependencies as $i => $d){
+                foreach($dependencies as $i => $d){
                     if(!empty(self::$minimizedScripts[$d])){
-                        $ngDependencies[$i] = self::$minimizedScripts[$d];
+                        $dependencies[$i] = self::$minimizedScripts[$d];
                     }
                 }
-                $ngDependencies = array_unique($ngDependencies);
+                $dependencies = array_unique($dependencies);
             }
-            wp_register_script($handle, $src, $ngDependencies, $version, $inFooter);
+            wp_register_script($handle, $src, $dependencies, $version, $inFooter);
         };
 
         self::addEnqueueScriptsCallback($callback);
@@ -186,6 +186,38 @@ class ResourceHelper {
         };
 
         self::addEnqueueScriptsCallback($callback);
+    }
+
+    /**
+     * A little helper to update already registered script.
+     * For instance, you may want to upgrade jQuery
+     *
+     * @param $handle
+     * @param $src
+     * @param null|array $dependencies
+     * @param string|bool $version
+     *
+     * @return \_WP_Dependency|null
+     */
+    public static function updateScript($handle, $src, $dependencies = null, $version = false){
+        $scripts = wp_scripts();
+        if($scripts->registered[$handle]){
+            /**
+             * @var \_WP_Dependency $script
+             */
+            $script = $scripts->registered[$handle];
+            $script->src = $src;
+            if(is_array($dependencies)){
+                $script->deps = $dependencies;
+            }
+            if($version){
+                $script->ver = $version;
+            }
+
+            return $script;
+        }
+
+        return null;
     }
 
 	/**
@@ -321,6 +353,36 @@ class ResourceHelper {
         self::addEnqueueScriptsCallback($callback);
     }
 
+    /**
+     * A little helper to update already registered style.
+     *
+     * @param $handle
+     * @param $src
+     * @param null|array $dependencies
+     * @param string|bool $version
+     *
+     * @return \_WP_Dependency|null
+     */
+    public static function updateStyle($handle, $src, $dependencies = null, $version = false){
+        $styles = wp_styles();
+        if($styles->registered[$handle]){
+            /**
+             * @var \_WP_Dependency $style
+             */
+            $style = $styles->registered[$handle];
+            $style->src = $src;
+            if(is_array($dependencies)){
+                $style->deps = $dependencies;
+            }
+            if($version){
+                $style->ver = $version;
+            }
+
+            return $style;
+        }
+
+        return null;
+    }
     /**
      * Enqueue style. Utilizes wp_enqueue_style().
      * However if detects registered minimized and concatenated version enqueue it instead.
