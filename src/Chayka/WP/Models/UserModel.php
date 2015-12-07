@@ -451,7 +451,7 @@ class UserModel implements DbReady, JsonReady, InputReady, AclReady{
      * @return boolean
      */
     public function hasCapability($capability){
-        return !!Util::getItem($this->getCapabilities(), $capability);
+        return user_can($this->getId(), $capability);
     }
 
     /**
