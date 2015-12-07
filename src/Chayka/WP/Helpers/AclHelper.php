@@ -31,6 +31,18 @@ class AclHelper {
     const ERROR_PERMISSION_REQUIRED = 'permission_required';
 
     /**
+     * Role levels assembled in array in level ascending order
+     */
+    protected static $levels = [
+        self::ROLE_GUEST,
+        self::ROLE_SUBSCRIBER,
+        self::ROLE_CONTRIBUTOR,
+        self::ROLE_AUTHOR,
+        self::ROLE_EDITOR,
+        self::ROLE_ADMINISTRATOR
+    ];
+
+    /**
      * Register role
      *
      * @param string $role
@@ -236,6 +248,28 @@ class AclHelper {
             $user = UserModel::unpackDbRecord($user);
         }
         return ($user->hasRole($role));
+    }
+
+    /**
+     * Check if user level equal or higher than specified
+     *
+     * @param string $role
+     * @param null|UserModel $user
+     *
+     * @return bool
+     */
+    public static function userHasRoleLevel($role, $user = null){
+        $index = array_search($role, self::$levels);
+
+        if($index !== false){
+            for($i = $index; $i < count(self::$levels); $i++){
+                if(self::userHasRole(self::$levels[$i], $user)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

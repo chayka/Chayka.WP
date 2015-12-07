@@ -79,6 +79,20 @@ Constants
 
 
 
+Properties
+----------
+
+
+### $levels
+
+    protected mixed $levels = array(self::ROLE_GUEST, self::ROLE_SUBSCRIBER, self::ROLE_CONTRIBUTOR, self::ROLE_AUTHOR, self::ROLE_EDITOR, self::ROLE_ADMINISTRATOR)
+
+Role levels assembled in array in level ascending order
+
+
+
+* Visibility: **protected**
+* This property is **static**.
 
 
 Methods
@@ -288,6 +302,24 @@ Respond with api error if user is the owner of specified object
     boolean Chayka\WP\Helpers\AclHelper::userHasRole(string $role, null|\Chayka\WP\Models\UserModel $user)
 
 Check if user has role
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $role **string**
+* $user **null|[null](Chayka-WP-Models-UserModel.md)**
+
+
+
+### userHasRoleLevel
+
+    boolean Chayka\WP\Helpers\AclHelper::userHasRoleLevel(string $role, null|\Chayka\WP\Models\UserModel $user)
+
+Check if user level equal or higher than specified
 
 
 
