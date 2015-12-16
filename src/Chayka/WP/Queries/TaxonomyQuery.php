@@ -242,4 +242,13 @@ class TaxonomyQuery{
         return $this->setVar('assign_cap', $cap);
     }
 
+    /**
+     * Get taxonomies under query
+     *
+     * @return array
+     */
+    public function select(){
+        return get_taxonomies($this->getVars());
+    }
+
 }

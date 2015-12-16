@@ -365,3 +365,16 @@ Select by assign_cap
 * $cap **mixed**
 
 
+
+### select
+
+    array Chayka\WP\Queries\TaxonomyQuery::select()
+
+Get taxonomies under query
+
+
+
+* Visibility: **public**
+
+
+
