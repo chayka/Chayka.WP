@@ -61,6 +61,7 @@ class Controller extends MVC\Controller{
 	 */
 	public function setNotFound404($notFound = true){
 		WP\Query::setIs404($notFound);
+        HttpHeaderHelper::setResponseCode(404);
 		return $notFound;
 	}
 
