@@ -489,7 +489,7 @@ class TermModel implements DbReady, JsonReady, InputReady, AclReady{
         $dbRecords = get_terms($taxonomies, $args);
         $terms = array();
         foreach($dbRecords as $dbRecord){
-            $fields = Util::getItem($args, 'fields');
+            $fields = Util::getItem($args, 'fields', 'all');
             $term = $fields === 'all' ?
                 self::unpackDbRecord($dbRecord) :
                 $dbRecord;
