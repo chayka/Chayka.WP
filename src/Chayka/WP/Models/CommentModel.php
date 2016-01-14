@@ -995,7 +995,22 @@ class CommentModel implements DbReady, JsonReady, InputReady, AclReady{
         
         return $comments;
     }
-    
+
+    /**
+     * Select models using SQL query.
+     * Should start with 'SELECT * FROM {$wpdb->comments}'
+     *
+     * @global object $wpdb
+     *
+     * @param string $sql
+     *
+     * @return self[]
+     */
+    public static function selectSql($sql){
+        $comments = DbHelper::selectSql($sql, __CLASS__);
+        return $comments;
+    }
+
     /**
      * Get CommentQuery object to create a query.
      * Call ->select() to fetch queried models;

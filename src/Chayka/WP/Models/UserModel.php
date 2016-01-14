@@ -13,6 +13,7 @@ use Chayka\Helpers\InputReady;
 use Chayka\Helpers\InputHelper;
 use Chayka\Helpers\DateHelper;
 use Chayka\WP\Helpers\AclReady;
+use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Helpers\AclHelper;
 use Chayka\WP\Queries\UserQuery;
@@ -954,6 +955,21 @@ class UserModel implements DbReady, JsonReady, InputReady, AclReady{
             $users[] = self::unpackDbRecord($dbRecord);
         }
         
+        return $users;
+    }
+
+    /**
+     * Select models using SQL query.
+     * Should start with 'SELECT * FROM {$wpdb->users}'
+     *
+     * @global object $wpdb
+     *
+     * @param string $sql
+     *
+     * @return self[]
+     */
+    public static function selectSql($sql){
+        $users = DbHelper::selectSql($sql, __CLASS__);
         return $users;
     }
 

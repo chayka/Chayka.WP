@@ -501,6 +501,21 @@ class TermModel implements DbReady, JsonReady, InputReady, AclReady{
     }
 
     /**
+     * Select models using SQL query.
+     * Should start with 'SELECT * FROM {$wpdb->term_taxonomy} LEFT JOIN {$wpdb->terms} USING(term_id)'
+     *
+     * @global object $wpdb
+     *
+     * @param string $sql
+     *
+     * @return self[]
+     */
+    public static function selectSql($sql){
+        $terms = DbHelper::selectSql($sql, __CLASS__);
+        return $terms;
+    }
+
+    /**
      * Get TermQuery helper instance
      *
      * @param string|array(string) $taxonomies
