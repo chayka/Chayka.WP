@@ -322,7 +322,7 @@ class Query extends WP_Query {
         if(!self::getIs404()){
             $richPost = self::getPost();
             $post = $richPost->getWpPost();
-            if($post){
+            if($post && $post instanceof \WP_Post){
                 $post = clone $post;
             }else{
                 $post = (object)$richPost->packDbRecord();
