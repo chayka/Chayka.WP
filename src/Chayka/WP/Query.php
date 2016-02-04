@@ -321,8 +321,13 @@ class Query extends WP_Query {
 
         if(!self::getIs404()){
             $richPost = self::getPost();
-            $richPost->setContent($response);
-            $post = (object)$richPost->packDbRecord();
+            $post = $richPost->getWpPost();
+            if($post){
+                $post = clone $post;
+            }else{
+                $post = (object)$richPost->packDbRecord();
+            }
+            $post->post_content = $response;
             $this->post = $post;
             $this->is_single = true;
             $this->posts = array($post);
