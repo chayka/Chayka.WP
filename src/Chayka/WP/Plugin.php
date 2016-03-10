@@ -220,7 +220,12 @@ abstract class Plugin{
      */
     protected static function dirUrl($__file__){
         $path = self::dirPath($__file__);
-        $relPath = preg_replace('%^.*wp-content%', '/wp-content', $path);
+
+        if(strpos($path, ABSPATH) === 0){
+            $relPath = str_replace(ABSPATH, '/', $path);
+        }else{
+            $relPath = preg_replace('%^.*wp-content%', '/wp-content', $path);
+        }
         return str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
     }
 
