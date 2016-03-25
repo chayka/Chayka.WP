@@ -1217,6 +1217,23 @@ Use UserModel::query() helper instead.
 
 
 
+### selectSql
+
+    array<mixed,self> Chayka\WP\Models\UserModel::selectSql(string $sql)
+
+Select models using SQL query.
+
+Should start with 'SELECT * FROM {$wpdb->users}'
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **string**
+
+
+
 ### query
 
     \Chayka\WP\Queries\UserQuery Chayka\WP\Models\UserModel::query()

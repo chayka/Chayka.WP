@@ -1060,6 +1060,23 @@ The total count of comments of the specified post is stored in post model.
 
 
 
+### selectSql
+
+    array<mixed,self> Chayka\WP\Models\CommentModel::selectSql(string $sql)
+
+Select models using SQL query.
+
+Should start with 'SELECT * FROM {$wpdb->comments}'
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **string**
+
+
+
 ### query
 
     \Chayka\WP\Queries\CommentQuery Chayka\WP\Models\CommentModel::query(integer $postId)

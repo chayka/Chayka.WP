@@ -635,7 +635,7 @@ Set post title
 
 ### getContent
 
-    string Chayka\WP\Models\PostModel::getContent(boolean $wpautop)
+    string Chayka\WP\Models\PostModel::getContent(boolean $applyFilters)
 
 Get post content
 
@@ -645,7 +645,7 @@ Get post content
 
 
 #### Arguments
-* $wpautop **boolean** - &lt;p&gt;Set to true if you need auto-&lt;p&gt;&lt;/p&gt; (default: true)&lt;/p&gt;
+* $applyFilters **boolean**
 
 
 

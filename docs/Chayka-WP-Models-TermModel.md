@@ -604,6 +604,23 @@ Use TermModel::query() or TermModel::queryPostTerms() instead.
 
 
 
+### selectSql
+
+    array<mixed,self> Chayka\WP\Models\TermModel::selectSql(string $sql)
+
+Select models using SQL query.
+
+Should start with 'SELECT * FROM {$wpdb->term_taxonomy} LEFT JOIN {$wpdb->terms} USING(term_id)'
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **string**
+
+
+
 ### query
 
     \Chayka\WP\Queries\TermQuery Chayka\WP\Models\TermModel::query(string|\Chayka\WP\Models\array(string) $taxonomies)

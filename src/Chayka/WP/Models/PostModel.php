@@ -447,12 +447,12 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
     /**
      * Get post content
      *
-     * @param boolean $wpautop Set to true if you need auto-<p></p> (default: true)
+     * @param boolean $applyFilters
      *
      * @return string HTML content
      */
-    public function getContent($wpautop = true){
-        return $wpautop ? wpautop($this->content) : $this->content;
+    public function getContent($applyFilters = true){
+        return $applyFilters ? apply_filters('the_content', $this->content) : $this->content;
     }
 
     /**
