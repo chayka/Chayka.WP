@@ -135,6 +135,9 @@ class ResourceHelper {
 	 */
     public static function registerScript($handle, $src, $dependencies = array(), $version = false, $inFooter = true){
 
+        if(empty($dependencies)){
+            $dependencies = array();
+        }
         $callback = function() use ($handle, $src, $dependencies, $version, $inFooter){
             if(self::$isMediaMinimized){
                 foreach($dependencies as $i => $d){
@@ -248,6 +251,9 @@ class ResourceHelper {
      * @param bool $inFooter
      */
     public static function enqueueScript($handle, $src = false, $dependencies = array(), $ver = false, $inFooter = true){
+        if(empty($dependencies)){
+            $dependencies = array();
+        }
         $callback = function() use ($handle, $src, $dependencies, $ver, $inFooter) {
             if ( self::$isMediaMinimized && ! empty( self::$minimizedScripts[ $handle ] ) ) {
                 wp_enqueue_script( self::$minimizedScripts[ $handle ] );
@@ -302,6 +308,9 @@ class ResourceHelper {
 	 * @param string $media
 	 */
     public static function registerStyle($handle, $src, $dependencies = array(), $version = false, $media = 'all'){
+        if(empty($dependencies)){
+            $dependencies = array();
+        }
         $callback = function() use ($handle, $src, $dependencies, $version, $media){
             if(self::$isMediaMinimized) {
                 foreach ($dependencies as $i => $d) {
@@ -394,6 +403,9 @@ class ResourceHelper {
      * @param string $media
      */
     public static function enqueueStyle($handle, $src = false, $dependencies = array(), $ver = false, $media = 'all'){
+        if(empty($dependencies)){
+            $dependencies = array();
+        }
         $callback = function() use ($handle, $src, $dependencies, $ver, $media){
             if(self::$isMediaMinimized && !empty(self::$minimizedStyles[$handle])){
                 wp_enqueue_style(self::$minimizedStyles[$handle]);
