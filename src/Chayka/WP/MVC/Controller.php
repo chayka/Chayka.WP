@@ -77,7 +77,12 @@ class Controller extends MVC\Controller{
      */
     public function setTitle($title){
         WP\Helpers\HtmlHelper::setHeadTitle($title);
-        WP\Query::getPost()->setTitle($title);
+        $post = WP\Query::getPost();
+        $post->setTitle($title);
+        $wpPost = $post->getWpPost();
+        if($wpPost){
+            $wpPost->post_title = $title;
+        }
     }
 
     /**
