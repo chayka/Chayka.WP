@@ -1160,12 +1160,12 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
         $args = array('name' => $slug);
         if($postType){
             $args['post_type'] = $postType;
-            if($isPreview){
-                $args['post_status'] = 'any';
-                $args['preview']     = true;
-            }else{
-                $args['post_status'] = 'publish';
-            }
+        }
+        if($isPreview){
+            $args['post_status'] = 'any';
+            $args['preview']     = true;
+        }else{
+            $args['post_status'] = 'publish';
         }
         $posts = self::selectPosts($args);
 
