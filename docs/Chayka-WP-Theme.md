@@ -94,9 +94,9 @@ Array of console pages params used for console page creation hooking
 * Visibility: **protected**
 
 
-### $metaBoxUris
+### $metaboxUris
 
-    protected array $metaBoxUris = array()
+    protected array $metaboxUris = array()
 
 Array of meta boxes params used for meta boxes creation hooking
 
@@ -1786,7 +1786,7 @@ but instead of callback you provide some controller uri (e.g. 'admin/some-action
 
 Enable metaboxes rendering using MetaboxController.
 
-You should implement registerMetaBoxes().
+You should implement registerMetaboxes().
 
 * Visibility: **public**
 * This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
@@ -1794,11 +1794,11 @@ You should implement registerMetaBoxes().
 
 
 
-### registerMetaBoxes
+### registerMetaboxes
 
-    mixed Chayka\WP\Plugin::registerMetaBoxes()
+    mixed Chayka\WP\Plugin::registerMetaboxes()
 
-Override to add addMetaBox() calls;
+Override to add addMetabox() calls;
 
 
 
@@ -1808,9 +1808,9 @@ Override to add addMetaBox() calls;
 
 
 
-### renderMetaBox
+### renderMetabox
 
-    mixed Chayka\WP\Plugin::renderMetaBox(\WP_Post $post, string $box)
+    mixed Chayka\WP\Plugin::renderMetabox(\WP_Post $post, string $box)
 
 Callback for rendering metaboxes.
 
@@ -1826,9 +1826,9 @@ Callback for rendering metaboxes.
 
 
 
-### updateMetaBoxes
+### updateMetaboxes
 
-    mixed Chayka\WP\Plugin::updateMetaBoxes(integer $postId, \WP_Post $post)
+    mixed Chayka\WP\Plugin::updateMetaboxes(integer $postId, \WP_Post $post)
 
 Callback for 'save_post' hook, updating metabox, should be revised (implement logic here).
 
@@ -1844,9 +1844,9 @@ Callback for 'save_post' hook, updating metabox, should be revised (implement lo
 
 
 
-### addMetaBox
+### addMetabox
 
-    mixed Chayka\WP\Plugin::addMetaBox(string $id, string $title, string $renderUri, string $context, string $priority, string|array $screen)
+    mixed Chayka\WP\Plugin::addMetabox(string $id, string $title, string $renderUri, string $context, string $priority, string|array $screen)
 
 Add Metabox
 
@@ -1866,9 +1866,9 @@ Add Metabox
 
 
 
-### addMetaBoxes
+### addMetaboxes
 
-    mixed Chayka\WP\Plugin::addMetaBoxes()
+    mixed Chayka\WP\Plugin::addMetaboxes()
 
 Callback method for 'add_meta_boxes' hook,
 adding metaboxes when rendering post editor page
@@ -1881,9 +1881,9 @@ adding metaboxes when rendering post editor page
 
 
 
-### removeMetaBox
+### removeMetabox
 
-    mixed Chayka\WP\Plugin::removeMetaBox(string $id, string|array $pages, string $context)
+    mixed Chayka\WP\Plugin::removeMetabox(string $id, string|array $pages, string $context)
 
 Remove registered metabox.
 
@@ -1902,9 +1902,9 @@ more info http://codex.wordpress.org/Function_Reference/remove_meta_box
 
 
 
-### unregisterMetaBoxes
+### unregisterMetaboxes
 
-    mixed Chayka\WP\Plugin::unregisterMetaBoxes()
+    mixed Chayka\WP\Plugin::unregisterMetaboxes()
 
 Callback method for 'add_meta_boxes' hook,
 adding metaboxes when rendering post editor page

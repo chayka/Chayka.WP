@@ -74,7 +74,7 @@ abstract class Plugin{
      *
      * @var array
      */
-    protected $metaBoxUris = array();
+    protected $metaboxUris = array();
 
     /**
      * Array of short codes params used for shortcodes creation hooking
@@ -1322,19 +1322,19 @@ abstract class Plugin{
     
     /**
      * Enable metaboxes rendering using MetaboxController.
-     * You should implement registerMetaBoxes().
+     * You should implement registerMetaboxes().
      */
     public function addSupport_Metaboxes(){
-        $this->addAction('add_meta_boxes', 'addMetaBoxes');
-        $this->addAction('do_meta_boxes', 'unregisterMetaBoxes');
-        $this->addAction('save_post', 'updateMetaBoxes', 50, 2);
-        $this->registerMetaBoxes();
+        $this->addAction('add_meta_boxes', 'addMetaboxes');
+        $this->addAction('do_meta_boxes', 'unregisterMetaboxes');
+        $this->addAction('save_post', 'updateMetaboxes', 50, 2);
+        $this->registerMetaboxes();
     }
     
     /**
-     * Override to add addMetaBox() calls;
+     * Override to add addMetabox() calls;
      */
-    public function registerMetaBoxes(){
+    public function registerMetaboxes(){
         
     }
 
@@ -1344,9 +1344,9 @@ abstract class Plugin{
      * @param WP_Post $post
      * @param string $box
      */
-    public function renderMetaBox($post, $box){
+    public function renderMetabox($post, $box){
         $boxId = Util::getItem($box, 'id');
-        $params = Util::getItem($this->metaBoxUris, $boxId, array());
+        $params = Util::getItem($this->metaboxUris, $boxId, array());
         $requestUri = Util::getItem($params, 'renderUri');
         $this->renderRequest($requestUri);
     }
@@ -1357,7 +1357,7 @@ abstract class Plugin{
      * @param integer $postId
      * @param WP_Post $post
      */
-    public function updateMetaBoxes($postId, $post){
+    public function updateMetaboxes($postId, $post){
 
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
@@ -1367,7 +1367,7 @@ abstract class Plugin{
             return;
         }
 
-        foreach($this->metaBoxUris as $id=>$uri){
+        foreach($this->metaboxUris as $id=>$uri){
             $action = preg_replace(array('%^\/?metabox\/%', '%\/$%'), '', $uri['renderUri']);
 //            $nonce = Util::getItem($_POST, $id.'_nonce');
             $nonce = Util::getItem($_POST, $action.'_nonce');
@@ -1402,8 +1402,8 @@ abstract class Plugin{
      * @param string $priority 'high', 'core', 'default' or 'low'
      * @param string|array $screen post type
      */
-    public function addMetaBox($id, $title, $renderUri, $context = 'advanced', $priority = 'default', $screen = null){
-        $this->metaBoxUris[$id] = array(
+    public function addMetabox($id, $title, $renderUri, $context = 'advanced', $priority = 'default', $screen = null){
+        $this->metaboxUris[$id] = array(
             'title' => $title,
             'renderUri' => $renderUri,
             'context' => $context,
@@ -1417,18 +1417,18 @@ abstract class Plugin{
      * Callback method for 'add_meta_boxes' hook,
      * adding metaboxes when rendering post editor page
      */
-    public function addMetaBoxes(){
-        foreach($this->metaBoxUris as $id => $params){
+    public function addMetaboxes(){
+        foreach($this->metaboxUris as $id => $params){
             $title = Util::getItem($params, 'title');
             $context = Util::getItem($params, 'context');
             $priority = Util::getItem($params, 'priority');
             $screens = Util::getItem($params, 'screen');
             if(is_array($screens)){
                 foreach($screens as $screen){
-                    add_meta_box($id, $title, $this->getCallbackMethod('renderMetaBox'), $screen, $context, $priority);
+                    add_meta_box($id, $title, $this->getCallbackMethod('renderMetabox'), $screen, $context, $priority);
                 }
             }else{
-                add_meta_box($id, $title, $this->getCallbackMethod('renderMetaBox'), $screens, $context, $priority);
+                add_meta_box($id, $title, $this->getCallbackMethod('renderMetabox'), $screens, $context, $priority);
             }
         }
         //  TODO: revise style naming
@@ -1445,7 +1445,7 @@ abstract class Plugin{
      * @param string|array $pages
      * @param string $context 'normal', 'advanced', or 'side'.
      */
-    public function removeMetaBox($id, $pages, $context = 'advanced'){
+    public function removeMetabox($id, $pages, $context = 'advanced'){
         if(is_string($pages)){
             $pages = preg_split('%\s+%', $pages);
         }
@@ -1458,7 +1458,7 @@ abstract class Plugin{
      * Callback method for 'add_meta_boxes' hook,
      * adding metaboxes when rendering post editor page
      */
-    public function unregisterMetaBoxes(){
+    public function unregisterMetaboxes(){
 
     }
 
