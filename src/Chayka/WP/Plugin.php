@@ -161,6 +161,15 @@ abstract class Plugin{
     protected static $instance = null;
 
     /**
+     * Required classes to check before loading plugin
+     * 
+     * @var array
+     */
+    protected static $requiredClasses = [
+    //    "Chayka\\WP\\Plugin" => 'Chayka.Framework functionality is required in order for '.__NAMESPACE__.' to work properly',
+    ];
+
+    /**
      * Plugin Constructor.
      *
      * @param string $__file__ pass __FILE__
@@ -200,6 +209,44 @@ abstract class Plugin{
             static::$instance = static::init();
         }
         return static::$instance;
+    }
+
+    /**
+     * Output notification in admin area
+     *
+     * @param $message
+     * @param string $type allowed types are 'info', 'warning', 'error'
+     */
+    public static function addAdminNotice($message, $type = 'info'){
+        add_action( 'admin_notices', function () use ($message, $type){
+            ?>
+            <div class="notice notice-<?php echo $type?>">
+                <p><?php echo $message; ?></p>
+            </div>
+            <?php
+        });
+
+    }
+
+    /**
+     * Check if required classes are available.
+     * 
+     * @param array $requiredClasses array [className => errorMessage]
+     *
+     * @return bool
+     */
+    public static function areRequiredClassesAvailable($requiredClasses = []){
+        if(!empty($requiredClasses)){
+            static::$requiredClasses = array_merge(static::$requiredClasses, $requiredClasses);
+        }
+        $requirementsMet = true;
+        foreach(static::$requiredClasses as $cls => $message){
+            if(!class_exists($cls)){
+                $requirementsMet &= false;
+                self::addAdminNotice($message, 'error');
+            }
+        }
+        return $requirementsMet;
     }
 
     /**
@@ -498,7 +545,7 @@ abstract class Plugin{
      * This is a hook for save_post
      *
      * @param integer $postId
-     * @param WP_Post $post
+     * @param \WP_Post $post
      */
     public function savePost($postId, $post){
         
@@ -538,14 +585,15 @@ abstract class Plugin{
      * This is a hook for post_link and post_type_link
      *
      * @param string    $permalink
-     * @param WP_Post   $post
-     * @param boolean   $leavename
+     * @param \WP_Post   $post
+     * @param boolean   $leaveName
+     *
      * @return string
      */
-    public function postPermalink($permalink, $post, $leavename = false){
+    public function postPermalink($permalink, $post, $leaveName = false){
         switch($post->post_type){
             case 'post':
-                return '/entry/'.$post->ID.'/'.($leavename?'%postname%':$post->post_name);
+                return '/entry/'.$post->ID.'/' . ($leaveName?'%postname%':$post->post_name);
         }
         return $permalink;
     }
@@ -1341,7 +1389,7 @@ abstract class Plugin{
     /**
      * Callback for rendering metaboxes.
      *
-     * @param WP_Post $post
+     * @param \WP_Post $post
      * @param string $box
      */
     public function renderMetabox($post, $box){
@@ -1355,7 +1403,7 @@ abstract class Plugin{
      * Callback for 'save_post' hook, updating metabox, should be revised (implement logic here).
      *
      * @param integer $postId
-     * @param WP_Post $post
+     * @param \WP_Post $post
      */
     public function updateMetaboxes($postId, $post){
 
