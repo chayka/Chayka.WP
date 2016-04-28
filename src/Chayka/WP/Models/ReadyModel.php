@@ -249,10 +249,13 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
 	/**
 	 * Add validation errors after unpacking from request input
 	 *
-	 * @param array[field]='Error Text' $errors
+	 * @param array [field]='Error Text' $errors
+	 *
+	 * @return array
 	 */
 	public static function addValidationErrors($errors) {
 		static::$validationErrors = array_merge(static::$validationErrors, $errors);
+		return static::$validationErrors;
 	}
 
 	/**

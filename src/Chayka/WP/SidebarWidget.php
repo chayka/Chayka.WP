@@ -140,6 +140,7 @@ class SidebarWidget extends WP_Widget {
         }  catch (\Exception $e){
             return parent::form($instance);
         }
+        return '';
     }
 
     /**

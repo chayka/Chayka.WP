@@ -17,7 +17,6 @@ use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Helpers\DbHelper;
 use Chayka\WP\Queries\PostQuery;
 use Chayka\WP\Queries\CommentQuery;
-use Chayka\WP\Queries\TermQuery;
 use Chayka\WP\Queries\PostTermQuery;
 use DateTime;
 use WP_Query;

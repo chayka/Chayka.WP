@@ -10,7 +10,6 @@ namespace Chayka\WP;
 use Chayka\Helpers\Util;
 use Chayka\MVC\ApplicationDispatcher;
 use Chayka\WP\Helpers\JsonHelper;
-use Chayka\WP\Helpers\OptionHelper;
 use Chayka\WP\Models\PostModel;
 use WP_Query;
 use WP_Post;
