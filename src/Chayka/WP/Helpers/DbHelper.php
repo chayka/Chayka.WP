@@ -61,6 +61,7 @@ class DbHelper {
             /**
              * Custom db is installed but the version is outdated.
              */
+            set_time_limit(0);
             $found = false;
             foreach ($versionHistory as $key => $value){
                 $ver = null;
