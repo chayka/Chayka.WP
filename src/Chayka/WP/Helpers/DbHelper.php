@@ -37,8 +37,12 @@ class DbHelper {
     public static function dbInstall($currentVersion, $versionOptionName, $sqlPath, $versionHistory = array('1.0')) {
         global $wpdb;
         $installedVer = get_option($versionOptionName);
-        $queries = array();
+        $queries = [];
+
         if(!$installedVer){
+            /**
+             * No custom db installed
+             */
             $filename = $sqlPath.'/install.'.$currentVersion.'.sql';
             if(file_exists($filename)){
                 $cnt = file_get_contents($filename);
@@ -47,9 +51,26 @@ class DbHelper {
                     $queries[] = str_replace('{prefix}', $wpdb->prefix, $query);
                 }
             }
+            foreach($queries as $query){
+                self::wpdb()->query($query);
+            }
+
+            update_option($versionOptionName, $currentVersion);
+            
         }elseif ($installedVer != $currentVersion){
+            /**
+             * Custom db is installed but the version is outdated.
+             */
             $found = false;
-            foreach ($versionHistory as $ver){
+            foreach ($versionHistory as $key => $value){
+                $ver = null;
+                $callback = null;
+                if(is_callable($value)){
+                    $ver = $key;
+                    $callback = $value;
+                }else{
+                    $ver = $value;
+                }
                 if($found){
                     $filename = $sqlPath.'/update.'.$ver.'.sql';
                     if(file_exists($filename)){
@@ -59,18 +80,23 @@ class DbHelper {
                             $queries[] = str_replace('{prefix}', $wpdb->prefix, $query);
                         }
                     }
+                    
+                    foreach($queries as $query){
+                        self::wpdb()->query($query);
+                    }
+
+                    if($callback){
+                        call_user_func($callback, $ver);
+                    }
+                    update_option($versionOptionName, $ver);
+                    $queries = [];
                 }
-                if(!$found && $ver==$installedVer){
+                if(!$found && $ver===$installedVer){
                     $found = true;
                 }
             }
         }
         
-        foreach($queries as $query){
-            self::wpdb()->query($query);
-        }
-        
-        update_option($versionOptionName, $currentVersion);
     }
 
     /**

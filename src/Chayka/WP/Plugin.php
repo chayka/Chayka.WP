@@ -397,6 +397,9 @@ abstract class Plugin{
     public function dbUpdate($versionHistory = array('1.0')){
         if(count($versionHistory)){
             $this->currentDbVersion = end($versionHistory);
+            if(is_callable($this->currentDbVersion)){
+                $this->currentDbVersion = key($versionHistory);
+            }
             reset($versionHistory);
             DbHelper::dbUpdate($this->currentDbVersion, $this->getAppId().'.dbVersion', $this->getBasePath().'app/sql', $versionHistory);
         }
