@@ -338,7 +338,7 @@ Should be set by validateInput
 
 ### addValidationErrors
 
-    mixed Chayka\WP\Models\ReadyModel::addValidationErrors($errors)
+    array Chayka\WP\Models\ReadyModel::addValidationErrors($errors)
 
 Add validation errors after unpacking from request input
 

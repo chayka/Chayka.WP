@@ -482,23 +482,24 @@ abstract class Plugin{
 		$this->application->getRouter()->addRestRoutes($modelSlug, $modelsSlug, $restUrlPattern, $restParamPatterns, $modelClassName, $controller, $listAction, $defaults);
 	}
     /**
-     * Processes request uri and returns response
+     * Processes request and returns response
      *
-     * @param $requestUri
+     * @param string|array $request uri or param hash map
+     * 
      * @return string
      * @throws Exception
      */
-    public function processRequest($requestUri){
-        return $this->application->dispatch($requestUri);
+    public function processRequest($request){
+        return $this->application->dispatch($request);
     }
 
     /**
      * Processes request uri and outputs response
      *
-     * @param $requestUri
+     * @param $request
      */
-    public function renderRequest($requestUri){
-        echo $this->processRequest($requestUri);
+    public function renderRequest($request){
+        echo $this->processRequest($request);
     }
 
     /**

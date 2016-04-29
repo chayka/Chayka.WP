@@ -52,7 +52,9 @@ class DbHelper {
                 }
             }
             foreach($queries as $query){
-                self::wpdb()->query($query);
+                if(trim($query)){
+                    self::wpdb()->query($query);
+                }
             }
 
             update_option($versionOptionName, $currentVersion);
@@ -83,7 +85,9 @@ class DbHelper {
                     }
                     
                     foreach($queries as $query){
-                        self::wpdb()->query($query);
+                        if(trim($query)){
+                            self::wpdb()->query($query);
+                        }
                     }
 
                     if($callback){

@@ -239,6 +239,18 @@ Singleton instance to current application (plugin or theme)
 * This property is **static**.
 
 
+### $requiredClasses
+
+    protected array $requiredClasses = array()
+
+Required classes to check before loading plugin
+
+
+
+* Visibility: **protected**
+* This property is **static**.
+
+
 Methods
 -------
 
@@ -380,6 +392,43 @@ Get singleton instance
 * This method is **static**.
 * This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
 
+
+
+
+### addAdminNotice
+
+    mixed Chayka\WP\Plugin::addAdminNotice($message, string $type)
+
+Output notification in admin area
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $message **mixed**
+* $type **string** - &lt;p&gt;allowed types are &#039;info&#039;, &#039;warning&#039;, &#039;error&#039;&lt;/p&gt;
+
+
+
+### areRequiredClassesAvailable
+
+    boolean Chayka\WP\Plugin::areRequiredClassesAvailable(array $requiredClasses)
+
+Check if required classes are available.
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [Chayka\WP\Plugin](Chayka-WP-Plugin.md)
+
+
+#### Arguments
+* $requiredClasses **array** - &lt;p&gt;array [className =&gt; errorMessage]&lt;/p&gt;
 
 
 
@@ -739,9 +788,9 @@ Add set of routes to rest controller
 
 ### processRequest
 
-    string Chayka\WP\Plugin::processRequest($requestUri)
+    string Chayka\WP\Plugin::processRequest(string|array $request)
 
-Processes request uri and returns response
+Processes request and returns response
 
 
 
@@ -750,13 +799,13 @@ Processes request uri and returns response
 
 
 #### Arguments
-* $requestUri **mixed**
+* $request **string|array** - &lt;p&gt;uri or param hash map&lt;/p&gt;
 
 
 
 ### renderRequest
 
-    mixed Chayka\WP\Plugin::renderRequest($requestUri)
+    mixed Chayka\WP\Plugin::renderRequest($request)
 
 Processes request uri and outputs response
 
@@ -767,7 +816,7 @@ Processes request uri and outputs response
 
 
 #### Arguments
-* $requestUri **mixed**
+* $request **mixed**
 
 
 
@@ -916,7 +965,7 @@ You need to implement postPermalink(), termLink(), userLink() and commentPermali
 
 ### postPermalink
 
-    string Chayka\WP\Plugin::postPermalink(string $permalink, \WP_Post $post, boolean $leavename)
+    string Chayka\WP\Plugin::postPermalink(string $permalink, \WP_Post $post, boolean $leaveName)
 
 This is a hook for post_link and post_type_link
 
@@ -929,7 +978,7 @@ This is a hook for post_link and post_type_link
 #### Arguments
 * $permalink **string**
 * $post **WP_Post**
-* $leavename **boolean**
+* $leaveName **boolean**
 
 
 
