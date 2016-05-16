@@ -131,3 +131,114 @@ Alias to get_site_option but with custom prefix
 * $value **mixed**
 
 
+
+### encrypt
+
+    string Chayka\WP\Helpers\OptionHelper::encrypt($value, string $key)
+
+Encrypt provided data.
+
+Encrypts with NONCE_KEY constant as a key by default
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $value **mixed**
+* $key **string**
+
+
+
+### decrypt
+
+    string Chayka\WP\Helpers\OptionHelper::decrypt($value, string $key)
+
+Decrypt provided data.
+
+Decrypts with NONCE_KEY constant as a key by default.
+If decryption failed, returns initial data.
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $value **mixed**
+* $key **string**
+
+
+
+### getEncryptedOption
+
+    mixed|void Chayka\WP\Helpers\OptionHelper::getEncryptedOption(string $option, string $default, boolean $reload)
+
+Get previously encrypted and stored option (with custom prefix)
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $option **string**
+* $default **string**
+* $reload **boolean**
+
+
+
+### setEncryptedOption
+
+    boolean Chayka\WP\Helpers\OptionHelper::setEncryptedOption(string $option, $value)
+
+Encrypt and store option
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $option **string**
+* $value **mixed**
+
+
+
+### getEncryptedSiteOption
+
+    mixed Chayka\WP\Helpers\OptionHelper::getEncryptedSiteOption($option, string $default, boolean $reload)
+
+Get previously encrypted and stored site option (with custom prefix)
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $option **mixed**
+* $default **string**
+* $reload **boolean**
+
+
+
+### setEncryptedSiteOption
+
+    boolean Chayka\WP\Helpers\OptionHelper::setEncryptedSiteOption($option, $value)
+
+Encrypt and store site option (with custom prefix)
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $option **mixed**
+* $value **mixed**
+
+

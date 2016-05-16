@@ -58,7 +58,8 @@ class OptionHelper {
     public static function getOption($option, $default='', $reload = false){
         $key = static::getPrefix().$option;
         if(!isset(self::$cache[$key]) || $reload){
-            self::$cache[$key] = get_option($key, $default);
+            $value = get_option($key, $default);
+            self::$cache[$key] = $value;
         }
         return self::$cache[$key];
     }
@@ -87,7 +88,8 @@ class OptionHelper {
     public static function getSiteOption($option, $default='', $reload = false){
         $key = static::getPrefix().$option;
         if(!isset(self::$cache['site_'.$key]) || $reload){
-            self::$cache['site_'.$key] = get_site_option($key, $default, !$reload);
+            $value = get_site_option($key, $default);
+            self::$cache['site_'.$key] = $value;
         }
         return self::$cache['site_'.$key];
     }
@@ -104,5 +106,110 @@ class OptionHelper {
         self::$cache['site_'.$key] = $value;
         return update_site_option($key, $value);
     }
-    
+
+    /**
+     * Encrypt provided data.
+     * Encrypts with NONCE_KEY constant as a key by default
+     *
+     * @param $value
+     * @param string $key
+     *
+     * @return string
+     */
+    public static function encrypt($value, $key = ''){
+        if(!$key && defined('NONCE_KEY')){
+            $key = NONCE_KEY;
+        }
+        if(function_exists('mcrypt_encrypt')){
+            $value = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC);
+        }
+        return $value;
+    }
+
+    /**
+     * Decrypt provided data.
+     * Decrypts with NONCE_KEY constant as a key by default.
+     * If decryption failed, returns initial data.
+     *
+     * @param $value
+     * @param string $key
+     *
+     * @return string
+     */
+    public static function decrypt($value, $key = ''){
+        if(!$key && defined('NONCE_KEY')){
+            $key = NONCE_KEY;
+        }
+        if(function_exists('mcrypt_decrypt')){
+            $decrypted = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC);
+            if($decrypted!==false){
+                $value = $decrypted;
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * Get previously encrypted and stored option (with custom prefix)
+     *
+     * @param string $option
+     * @param string $default
+     * @param bool $reload
+     * @return mixed|void
+     */
+    public static function getEncryptedOption($option, $default='', $reload = false){
+        $key = static::getPrefix().$option;
+        if(!isset(self::$cache[$key]) || $reload){
+            $value = get_option($key, $default);
+            $value = self::decrypt($value);
+            self::$cache[$key] = $value;
+        }
+        return self::$cache[$key];
+    }
+
+    /**
+     * Encrypt and store option
+     *
+     * @param string $option
+     * @param $value
+     * @return bool
+     */
+    public static function setEncryptedOption($option, $value){
+        $key = static::getPrefix().$option;
+        self::$cache[$key] = $value;
+        $value = self::encrypt($value);
+        return update_option($key, $value);
+    }
+
+    /**
+     * Get previously encrypted and stored site option (with custom prefix)
+     *
+     * @param $option
+     * @param string $default
+     * @param bool $reload
+     * @return mixed
+     */
+    public static function getEncryptedSiteOption($option, $default='', $reload = false){
+        $key = static::getPrefix().$option;
+        if(!isset(self::$cache['site_'.$key]) || $reload){
+            $value = get_site_option($key, $default);
+            $value = self::decrypt($value);
+            self::$cache['site_'.$key] = $value;
+        }
+        return self::$cache['site_'.$key];
+    }
+
+    /**
+     * Encrypt and store site option (with custom prefix)
+     *
+     * @param $option
+     * @param $value
+     * @return bool
+     */
+    public static function setEncryptedSiteOption($option, $value){
+        $key = static::getPrefix().$option;
+        self::$cache['site_'.$key] = $value;
+        $value = self::encrypt($value);
+        return update_site_option($key, $value);
+    }
 }
