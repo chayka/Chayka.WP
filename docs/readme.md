@@ -39,4 +39,5 @@ API Index
         * [Query](Chayka-WP-Query.md)
         * [SidebarWidget](Chayka-WP-SidebarWidget.md)
         * [Theme](Chayka-WP-Theme.md)
+        * [UnitTestCase](Chayka-WP-UnitTestCase.md)
 
