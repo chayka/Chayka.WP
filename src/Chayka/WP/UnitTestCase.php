@@ -42,15 +42,15 @@ class UnitTestCase extends \WP_UnitTestCase{
      *
      * @return array
      */
-    public function assertApiResponse($response, $expectedResponseCode = 0){
+    public static function assertApiResponse($response, $expectedResponseCode = 0){
 
-        $this->assertNotEmpty($response, 'API response should be non-empty');
+        self::assertNotEmpty($response, 'API response should be non-empty');
 
         $data = json_decode($response, true);
 
-        $this->assertNotEmpty($data, 'API response should be parseable JSON');
+        self::assertNotEmpty($data, 'API response should be parseable JSON');
 
-        $this->assertEquals($expectedResponseCode, $data['code'], 'Unexpected response code');
+        self::assertEquals($expectedResponseCode, $data['code'], 'Unexpected response code');
 
         return $data;
     }
