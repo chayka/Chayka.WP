@@ -54,4 +54,19 @@ class UnitTestCase extends \WP_UnitTestCase{
 
         return $data;
     }
+
+    /**
+     * print_r some variable to output stream
+     * 
+     * @param $var
+     * @param string $title
+     */
+    public function varDump($var, $title = ''){
+        $dump = print_r($var, true);
+        if($title){
+            $dump = $title . ':' .$dump;
+        }
+        $dump.="\n";
+        fwrite(STDOUT, $dump);
+    }
 }
