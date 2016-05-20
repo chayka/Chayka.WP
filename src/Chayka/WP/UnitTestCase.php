@@ -15,7 +15,7 @@ use Chayka\WP\Helpers\JsonHelper;
  *
  * @package Chayka\WP
  */
-class UnitTestCase extends \WP_UnitTestCase{
+abstract class UnitTestCase extends \WP_UnitTestCase{
 
     /**
      * UnitTestCase constructor
