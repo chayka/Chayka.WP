@@ -989,18 +989,19 @@ class UserModel implements DbReady, JsonReady, InputReady, AclReady{
      */
     public static function currentUser(){
 
-        if(empty(self::$currentUser)){
+        $current_user = wp_get_current_user();
 
-            $current_user = wp_get_current_user();
-
-            if($current_user && $current_user->ID){
+        if($current_user && $current_user->ID){
+            if(!self::$currentUser || self::$currentUser->getId() !== $current_user->ID){
+                /**
+                 * If self::currentUser is not set or changed then unpack WP $current_user
+                 */
                 self::$currentUser = self::unpackDbRecord($current_user);
-            }else{
-                self::$currentUser = new UserModel();
             }
-
+        }else{
+            self::$currentUser = new UserModel();
         }
-        
+
         return self::$currentUser;
     }
 
