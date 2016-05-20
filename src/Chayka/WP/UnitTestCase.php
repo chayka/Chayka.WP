@@ -40,6 +40,7 @@ class UnitTestCase extends \WP_UnitTestCase{
      * @param string $response
      * @param int $expectedResponseCode
      *
+     * @return array
      */
     public static function assertApiResponse($response, $expectedResponseCode = 0){
 
@@ -51,6 +52,6 @@ class UnitTestCase extends \WP_UnitTestCase{
 
         self::assertEquals($expectedResponseCode, $data['code'], 'Unexpected response code');
 
-//        return $data;
+        return $data;
     }
 }
