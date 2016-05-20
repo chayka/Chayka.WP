@@ -232,7 +232,7 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
 	 */
 	public static function validateInput($input = array(), $oldState = null) {
 		static::$validationErrors = array();
-		$valid = apply_filters(self::getDbTable().'.validateInput', true, $input, $oldState);
+		$valid = apply_filters(static::getDbTable().'.validateInput', true, $input, $oldState);
 		return $valid;
 	}
 
