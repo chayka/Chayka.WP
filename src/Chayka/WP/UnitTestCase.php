@@ -57,17 +57,18 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
 
     /**
      * print_r some variable to output stream
-     * 
+     *
      * @param $var
      * @param string $title
+     * @param resource $stdout
      */
-    public function varDump($var, $title = ''){
+    public function varDump($var, $title = '', $stdout = STDOUT){
         $dump = print_r($var, true);
         if($title){
             $dump = $title . ':' .$dump;
         }
         $dump.="\n";
-        fwrite(STDOUT, $dump);
+        fwrite($stdout, $dump);
     }
 
     /**
@@ -84,7 +85,7 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
         foreach($errors as $error){
             $e = $error->thrownException();
             if($e){
-                $this->varDump($error->exceptionToString($e), 'Thrown Exception');
+                $this->varDump($error->exceptionToString($e), 'Thrown Exception', STDERR);
             }
         }
     }
