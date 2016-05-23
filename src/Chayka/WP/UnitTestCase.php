@@ -69,4 +69,23 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
         $dump.="\n";
         fwrite(STDOUT, $dump);
     }
+
+    /**
+     * Show errors on test case tear-down (on finish)
+     */
+    public function tearDown(){
+        parent::tearDown();
+
+        /**
+         * @var \PHPUnit_Framework_TestFailure[] $errors
+         */
+        $errors = $this->getTestResultObject()->errors();
+
+        foreach($errors as $error){
+            $e = $error->thrownException();
+            if($e){
+                $this->varDump($error->exceptionToString($e), 'Thrown Exception');
+            }
+        }
+    }
 }
