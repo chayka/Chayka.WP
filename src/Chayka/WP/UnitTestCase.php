@@ -65,7 +65,7 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
     public function varDump($var, $title = '', $stdout = STDOUT){
         $dump = print_r($var, true);
         if($title){
-            $dump = $title . ':' .$dump;
+            $dump = $title . ': ' .$dump;
         }
         $dump.="\n";
         fwrite($stdout, $dump);
@@ -85,7 +85,7 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
         foreach($errors as $error){
             $e = $error->thrownException();
             if($e){
-                $this->varDump($error->exceptionToString($e), 'Thrown Exception', STDERR);
+                $this->varDump($error->exceptionToString($e)."\nStackTrace:\n".$e->getTraceAsString(), 'Thrown Exception', STDERR);
             }
         }
     }
