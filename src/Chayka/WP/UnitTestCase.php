@@ -85,7 +85,7 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
         foreach($errors as $error){
             $e = $error->thrownException();
             if($e){
-                $this->varDump($error->exceptionToString($e)."\nStackTrace:\n".$e->getTraceAsString(), 'Thrown Exception', STDERR);
+                $this->varDump($error->exceptionToString($e)."StackTrace:\n".$e->getTraceAsString()."\n", 'Thrown Exception');
             }
         }
     }
