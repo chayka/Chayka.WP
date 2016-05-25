@@ -10,6 +10,7 @@ namespace Chayka\WP\Helpers;
 /**
  * Class NotificationHelper allows to create user notifications.
  * Currently only in Admin Area
+ * @deprecated
  *
  * @package Chayka\WP\Helpers
  */

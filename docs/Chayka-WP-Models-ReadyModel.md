@@ -73,6 +73,20 @@ Update corresponding db row in db and return object id.
 
 
 
+### save
+
+    boolean Chayka\WP\Models\ReadyModel::save()
+
+Insert if it's a new model,
+update if it's an existing one
+
+
+
+* Visibility: **public**
+
+
+
+
 ### delete
 
     boolean Chayka\WP\Helpers\DbReady::delete()

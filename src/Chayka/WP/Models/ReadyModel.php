@@ -53,6 +53,16 @@ abstract class ReadyModel implements DbReady, JsonReady, InputReady, AclReady{
         return DbHelper::update($this);
     }
 
+	/**
+	 * Insert if it's a new model,
+	 * update if it's an existing one
+	 *
+	 * @return bool
+	 */
+	public function save(){
+		return !!($this->getId()?$this->update():$this->insert());
+	}
+
     /**
      * Delete corresponding db row from db.
      *
