@@ -13,7 +13,7 @@ Basically it is a wrapper for all those
 
 However this helper loads them carefully at the appropriate hooks.
 
-One more thing - this helper enables usage of minimized & concatenated (by GruntJS) scripts & styles.
+One more thing - this helper enables usage of minimized & combined (by GruntJS|GulpJS) scripts & styles.
 Do it like that:
      ResourceHelper::registerScript('jquery', 'js/jquery.js', ...);
      ResourceHelper::registerScript('angular', 'js/angular.js',...);
@@ -57,11 +57,11 @@ if available.
 * This property is **static**.
 
 
-### $minimizedStyles
+### $combinedStyles
 
-    protected array $minimizedStyles = array()
+    protected array $combinedStyles = array()
 
-Mapping of resource handles to the concatenated styles
+Mapping of resource handles to the combined styles
 
 
 
@@ -69,11 +69,11 @@ Mapping of resource handles to the concatenated styles
 * This property is **static**.
 
 
-### $minimizedScripts
+### $combinedScripts
 
-    protected array $minimizedScripts = array()
+    protected array $combinedScripts = array()
 
-Mapping of resource handles to the concatenated scripts
+Mapping of resource handles to the combined scripts
 
 
 
@@ -90,6 +90,18 @@ Mapping of plugins and themes resource folders
 
 
 * Visibility: **protected**
+* This property is **static**.
+
+
+### $callbackCounter
+
+    public integer $callbackCounter
+
+This counter is responsible for the right order of the callbacks called on hooks
+
+
+
+* Visibility: **public**
 * This property is **static**.
 
 
@@ -164,6 +176,26 @@ Alias to wp_deregister_script
 
 
 
+### resolveCombinedDependencies
+
+    \_WP_Dependency Chayka\WP\Helpers\ResourceHelper::resolveCombinedDependencies(string $handle, \WP_Dependencies $wpMedia, array $combined)
+
+Replace dependencies with combined handles
+Heads up: This function should be called only if self::isMediaMinimized.
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $handle **string**
+* $wpMedia **WP_Dependencies**
+* $combined **array**
+
+
+
 ### registerScript
 
     mixed Chayka\WP\Helpers\ResourceHelper::registerScript(string $handle, string $src, array $dependencies, boolean $version, boolean $inFooter)
@@ -185,11 +217,11 @@ Alias to wp_register_script but checks if dependencies can be found inside minim
 
 
 
-### registerMinimizedScript
+### registerCombinedScript
 
-    mixed Chayka\WP\Helpers\ResourceHelper::registerMinimizedScript(string $minHandle, string $src, array $handles, boolean $version, boolean $inFooter)
+    mixed Chayka\WP\Helpers\ResourceHelper::registerCombinedScript(string $minHandle, string $src, array $handles, boolean $version, boolean $inFooter)
 
-Register script that contains minimized and concatenated scripts
+Register script that contains minimized and combined scripts
 
 
 
@@ -250,7 +282,7 @@ This function can change default script rendering location: head or footer
 
 Enqueue script. Utilizes wp_enqueue_script().
 
-However if detects registered minimized and concatenated version enqueue it instead.
+However if detects registered minimized and combined version enqueue it instead.
 
 * Visibility: **public**
 * This method is **static**.
@@ -322,11 +354,11 @@ Alias to wp_register_style but checks if dependencies can be found inside minimi
 
 
 
-### registerMinimizedStyle
+### registerCombinedStyle
 
-    mixed Chayka\WP\Helpers\ResourceHelper::registerMinimizedStyle(string $minHandle, string $src, array $handles, boolean $version, string $media)
+    mixed Chayka\WP\Helpers\ResourceHelper::registerCombinedStyle(string $minHandle, string $src, array $handles, boolean $version, string $media)
 
-Register script that contains minimized and concatenated styles
+Register script that contains minimized and combined styles
 
 
 
@@ -369,7 +401,7 @@ A little helper to update already registered style.
 
 Enqueue style. Utilizes wp_enqueue_style().
 
-However if detects registered minimized and concatenated version enqueue it instead.
+However if detects registered minimized and combined version enqueue it instead.
 
 * Visibility: **public**
 * This method is **static**.

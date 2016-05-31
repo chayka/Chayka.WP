@@ -118,10 +118,13 @@ class OptionHelper {
      */
     public static function encrypt($value, $key = ''){
         if(!$key && defined('NONCE_KEY')){
-            $key = NONCE_KEY;
+            $key = substr(NONCE_KEY, 0, 32);
         }
         if(function_exists('mcrypt_encrypt')){
-            $value = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC);
+            $ivSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+            $iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
+            $encrypted = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC, $iv);
+            $value = base64_encode($iv.$encrypted);
         }
         return $value;
     }
@@ -138,12 +141,16 @@ class OptionHelper {
      */
     public static function decrypt($value, $key = ''){
         if(!$key && defined('NONCE_KEY')){
-            $key = NONCE_KEY;
+            $key = substr(NONCE_KEY, 0, 32);
         }
-        if(function_exists('mcrypt_decrypt')){
-            $decrypted = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC);
+        if(function_exists('mcrypt_decrypt') && preg_match('/^[\w\d\+\/]+==$/', $value)){
+            $ivSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+//            $iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
+            $decoded = base64_decode($value);
+            $iv = substr($decoded, 0, $ivSize);
+            $decrypted = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, substr($decoded, $ivSize), MCRYPT_MODE_CBC, $iv);
             if($decrypted!==false){
-                $value = $decrypted;
+                $value = preg_replace('/\x00*$/', '', $decrypted);
             }
         }
         return $value;

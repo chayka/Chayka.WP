@@ -89,11 +89,11 @@ if available.
 * This property is **static**.
 
 
-### $minimizedStyles
+### $combinedStyles
 
-    protected array $minimizedStyles = array()
+    protected array $combinedStyles = array()
 
-Mapping of resource handles to the concatenated styles
+Mapping of resource handles to the combined styles
 
 
 
@@ -101,11 +101,11 @@ Mapping of resource handles to the concatenated styles
 * This property is **static**.
 
 
-### $minimizedScripts
+### $combinedScripts
 
-    protected array $minimizedScripts = array()
+    protected array $combinedScripts = array()
 
-Mapping of resource handles to the concatenated scripts
+Mapping of resource handles to the combined scripts
 
 
 
@@ -122,6 +122,18 @@ Mapping of plugins and themes resource folders
 
 
 * Visibility: **protected**
+* This property is **static**.
+
+
+### $callbackCounter
+
+    public integer $callbackCounter
+
+This counter is responsible for the right order of the callbacks called on hooks
+
+
+
+* Visibility: **public**
 * This property is **static**.
 
 
@@ -157,7 +169,7 @@ Alias to wp_register_script but checks if dependencies can be found inside minim
 
 Enqueue script. Utilizes wp_enqueue_script().
 
-However if detects registered minimized and concatenated version enqueue it instead.
+However if detects registered minimized and combined version enqueue it instead.
 
 * Visibility: **public**
 * This method is **static**.
@@ -201,7 +213,7 @@ Alias to wp_register_style but checks if dependencies can be found inside minimi
 
 Enqueue style. Utilizes wp_enqueue_style().
 
-However if detects registered minimized and concatenated version enqueue it instead.
+However if detects registered minimized and combined version enqueue it instead.
 
 * Visibility: **public**
 * This method is **static**.
@@ -302,11 +314,32 @@ Alias to wp_deregister_script
 
 
 
-### registerMinimizedScript
+### resolveCombinedDependencies
 
-    mixed Chayka\WP\Helpers\ResourceHelper::registerMinimizedScript(string $minHandle, string $src, array $handles, boolean $version, boolean $inFooter)
+    \_WP_Dependency Chayka\WP\Helpers\ResourceHelper::resolveCombinedDependencies(string $handle, \WP_Dependencies $wpMedia, array $combined)
 
-Register script that contains minimized and concatenated scripts
+Replace dependencies with combined handles
+Heads up: This function should be called only if self::isMediaMinimized.
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [Chayka\WP\Helpers\ResourceHelper](Chayka-WP-Helpers-ResourceHelper.md)
+
+
+#### Arguments
+* $handle **string**
+* $wpMedia **WP_Dependencies**
+* $combined **array**
+
+
+
+### registerCombinedScript
+
+    mixed Chayka\WP\Helpers\ResourceHelper::registerCombinedScript(string $minHandle, string $src, array $handles, boolean $version, boolean $inFooter)
+
+Register script that contains minimized and combined scripts
 
 
 
@@ -402,11 +435,11 @@ Alias to wp_deregister_style
 
 
 
-### registerMinimizedStyle
+### registerCombinedStyle
 
-    mixed Chayka\WP\Helpers\ResourceHelper::registerMinimizedStyle(string $minHandle, string $src, array $handles, boolean $version, string $media)
+    mixed Chayka\WP\Helpers\ResourceHelper::registerCombinedStyle(string $minHandle, string $src, array $handles, boolean $version, string $media)
 
-Register script that contains minimized and concatenated styles
+Register script that contains minimized and combined styles
 
 
 

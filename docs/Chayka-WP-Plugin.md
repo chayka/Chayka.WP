@@ -1104,9 +1104,9 @@ Ensures 'angular' as dependency.
 
 
 
-### registerMinimizedStyle
+### registerCombinedStyle
 
-    mixed Chayka\WP\Plugin::registerMinimizedStyle(string $minHandle, string $relativeResDistPath, array $handles, boolean $version, string $media)
+    mixed Chayka\WP\Plugin::registerCombinedStyle(string $minHandle, string $relativeResDistPath, array $handles, boolean $version, string $media)
 
 Register minimized style file that contains all the min-cat styles defined by $handles.
 
@@ -1242,9 +1242,9 @@ See AngularHelper::registerScript() for more details
 
 
 
-### registerMinimizedScript
+### registerCombinedScript
 
-    mixed Chayka\WP\Plugin::registerMinimizedScript(string $minHandle, string $relativeResDistPath, array $handles, boolean $version, boolean $inFooter)
+    mixed Chayka\WP\Plugin::registerCombinedScript(string $minHandle, string $relativeResDistPath, array $handles, boolean $version, boolean $inFooter)
 
 Register minimized script file that contains all the min-cat scripts defined by $handles.
 

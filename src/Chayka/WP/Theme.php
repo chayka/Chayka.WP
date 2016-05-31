@@ -55,7 +55,7 @@ abstract class Theme extends Plugin{
 
         ApplicationDispatcher::registerApplication($this->application, $routes);
 
-        $minimize = OptionHelper::getOption('minimizeMedia');
+        $minimize = OptionHelper::getOption('MinimizeMedia');
         ResourceHelper::setMediaMinimized($minimize);
         $this->setMediaMinimized($minimize);
         $this->registerResources($minimize);

@@ -809,9 +809,9 @@ abstract class Plugin{
 	 * @param bool $version
 	 * @param string $media
 	 */
-    public function registerMinimizedStyle($minHandle, $relativeResDistPath, $handles, $version = false, $media = 'all'){
+    public function registerCombinedStyle($minHandle, $relativeResDistPath, $handles, $version = false, $media = 'all'){
         $relativeResPath = $this->getResDistDir() . $relativeResDistPath;
-        ResourceHelper::registerMinimizedStyle($minHandle, $this->getUrlRes($relativeResPath), $handles, $version, $media);
+        ResourceHelper::registerCombinedStyle($minHandle, $this->getUrlRes($relativeResPath), $handles, $version, $media);
     }
 
 	/**
@@ -913,9 +913,9 @@ abstract class Plugin{
 	 * @param bool $version
 	 * @param bool $inFooter
 	 */
-    public function registerMinimizedScript($minHandle, $relativeResDistPath, $handles, $version = false, $inFooter = true){
+    public function registerCombinedScript($minHandle, $relativeResDistPath, $handles, $version = false, $inFooter = true){
         $relativeResPath = $this->getResDistDir() . $relativeResDistPath;
-        ResourceHelper::registerMinimizedScript($minHandle, $this->getUrlRes($relativeResPath), $handles, $inFooter);
+        ResourceHelper::registerCombinedScript($minHandle, $this->getUrlRes($relativeResPath), $handles, $inFooter);
     }
 
 	/**
