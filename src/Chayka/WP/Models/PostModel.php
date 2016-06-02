@@ -1670,10 +1670,10 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
                 $sizes[ $size ] = wp_get_attachment_image_src($this->getId(), 'icon' == $size ? 'thumbnail' : $size, 'icon' == $size);
             }else{
                 if($this->isAttachmentImage()){
-                    foreach(array('thumbnail', 'medium', 'large', 'full') as $size){
-                        $d = wp_get_attachment_image_src($this->getId(), $size);
+                    foreach(array('thumbnail', 'medium', 'large', 'full') as $sz){
+                        $d = wp_get_attachment_image_src($this->getId(), $sz);
                         if($d){
-                            $sizes[ $size ] = $d;
+                            $sizes[ $sz ] = $d;
                         }
                     }
                 }else{
@@ -1682,8 +1682,8 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
 //                $sizes['icon'] = wp_get_attachment_image_src( $this->getId(), "thumbnail", true);
             }
 
-            foreach($sizes as $size => $data){
-                $this->imageData[ $size ] = array(
+            foreach($sizes as $sz => $data){
+                $this->imageData[ $sz ] = array(
                     'url'    => $data[0],
                     'width'  => $data[1],
                     'height' => $data[2],
