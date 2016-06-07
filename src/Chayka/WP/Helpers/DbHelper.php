@@ -211,6 +211,8 @@ class DbHelper {
      * Select several rows using sql.
      * If DbReady $className provided, then raw data will be unpacked.
      * You can use {table} placeholder, that will be replaced with $className::getDbTable()
+     * You can use {wpdb:_tableName_} placeholder, that will be replaced with $wpdb->$_tableName_
+     * You can use {prefix:_tableName_} placeholder, that will be replaced with $wpdb->prefix.$_tableName_
      *
      * @param $sql
      * @param string/DbReady $className
@@ -225,6 +227,22 @@ class DbHelper {
             $table = call_user_func(array($className, 'getDbTable'));
 
             $sql = str_replace('{table}', $table, $sql);
+        }
+        if(preg_match_all('/\{(wpdb|prefix):([\w\d_]+)\}/', $sql, $m, PREG_SET_ORDER)){
+            foreach($m as $prefixedTable){
+                $source = $prefixedTable[1];
+                $tableName = $prefixedTable[2];
+                if('wpdb' === $source && in_array($tableName, [
+                        'blogs', 'blog_versions', 'comment_meta', 'comments', 'links',
+                        'options', 'postmeta', 'posts', 'registration_log', 'signups',
+                        'site', 'sitemeta', 'termmeta', 'terms', 'term_relationships',
+                        'term_taxonomy', 'usermeta', 'users'
+                    ])){
+                    $sql = str_replace('{wpdb:' . $tableName . '}', $wpdb->$tableName, $sql);
+                }else if('prefix' === $wpdb){
+                    $sql = str_replace('{prefix:' . $tableName . '}', $wpdb->prefix . $tableName, $sql);
+                }
+            }
         }
         $dbRecords = $wpdb->get_results($sql);
         if($className) {

@@ -155,6 +155,8 @@ Select several rows using sql.
 
 If DbReady $className provided, then raw data will be unpacked.
 You can use {table} placeholder, that will be replaced with $className::getDbTable()
+You can use {wpdb:_tableName_} placeholder, that will be replaced with $wpdb->$_tableName_
+You can use {prefix:_tableName_} placeholder, that will be replaced with $wpdb->prefix.$_tableName_
 
 * Visibility: **public**
 * This method is **static**.

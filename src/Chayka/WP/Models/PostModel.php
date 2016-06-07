@@ -1164,7 +1164,7 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
             $args['post_status'] = 'any';
             $args['preview']     = true;
         }else{
-            $args['post_status'] = 'publish';
+            $args['post_status'] = ['publish', 'private'];
         }
         $posts = self::selectPosts($args);
 
