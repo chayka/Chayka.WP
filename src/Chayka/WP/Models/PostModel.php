@@ -12,6 +12,7 @@ use Chayka\Helpers\JsonReady;
 use Chayka\Helpers\InputReady;
 use Chayka\Helpers\InputHelper;
 use Chayka\Helpers\DateHelper;
+use Chayka\WP\Helpers\AclHelper;
 use Chayka\WP\Helpers\AclReady;
 use Chayka\WP\Helpers\DbReady;
 use Chayka\WP\Helpers\DbHelper;
@@ -1164,7 +1165,10 @@ class PostModel implements DbReady, JsonReady, InputReady, AclReady{
             $args['post_status'] = 'any';
             $args['preview']     = true;
         }else{
-            $args['post_status'] = ['publish', 'private'];
+            $args['post_status'] = ['publish'];
+            if(AclHelper::isAdmin()){
+                $args['post_status'][] = 'private';
+            }
         }
         $posts = self::selectPosts($args);
 
