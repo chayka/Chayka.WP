@@ -71,6 +71,11 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
         fwrite($stdout, $dump);
     }
 
+    public function setUp(){
+        parent::setUp();
+        JsonHelper::dieOnRespond(false);
+    }
+
     /**
      * Show errors on test case tear-down (on finish)
      */
