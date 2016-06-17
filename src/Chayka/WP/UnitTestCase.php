@@ -77,11 +77,13 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
         try{
             $data = $appInstance->processRequest($request);
         }catch(\Exception $e){
+            ob_end_clean();
             $data = JsonHelper::encode([
                 'payload' => $e,
                 'code' => $e->getCode(),
                 'message' => $e->getMessage()
             ]);
+            
         }
         return self::assertApiResponse($data, $expectedResponseCode);
     }
