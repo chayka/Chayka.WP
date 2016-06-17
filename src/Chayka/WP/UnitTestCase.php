@@ -52,12 +52,38 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
 
         if($expectedResponseCode === 'ERROR'){
             self::assertNotEmpty($data['code'], 'Unexpected response code');
-        }else{
-            self::assertEquals($expectedResponseCode, $data['code'], 'Unexpected response code');
-
+        }elseif($expectedResponseCode === 'EXCEPTION'){
+            self::assertNotEmpty($data['payload']['file'], 'Exception should have file');
+            self::assertNotEmpty($data['payload']['line'], 'Exception should have line');
+            self::assertNotEmpty($data['payload']['trace'], 'Exception should have trace');
         }
 
         return $data;
+    }
+
+    /**
+     * Assert api response, check if:
+     * - the response is non empty,
+     * - response is parseable json
+     * - error code matches expected
+     *
+     * @param Plugin $appInstance
+     * @param array $request
+     * @param int|string $expectedResponseCode
+     *
+     * @return array
+     */
+    public static function assertApiRequest($appInstance, $request, $expectedResponseCode = 0){
+        try{
+            $data = $appInstance->processRequest($request);
+        }catch(\Exception $e){
+            $data = JsonHelper::encode([
+                'payload' => $e,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+        return self::assertApiResponse($data, $expectedResponseCode);
     }
 
     /**
@@ -76,6 +102,9 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
         fwrite($stdout, $dump);
     }
 
+    /**
+     * Set up unit test case
+     */
     public function setUp(){
         parent::setUp();
         JsonHelper::dieOnRespond(false);
