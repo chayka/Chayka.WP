@@ -50,7 +50,12 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
 
         self::assertNotEmpty($data, 'API response should be parseable JSON');
 
-        self::assertEquals($expectedResponseCode, $data['code'], 'Unexpected response code');
+        if($expectedResponseCode === 'ERROR'){
+            self::assertNotEmpty($data['code'], 'Unexpected response code');
+        }else{
+            self::assertEquals($expectedResponseCode, $data['code'], 'Unexpected response code');
+
+        }
 
         return $data;
     }
