@@ -75,6 +75,7 @@ abstract class UnitTestCase extends \WP_UnitTestCase{
      */
     public static function assertApiRequest($appInstance, $request, $expectedResponseCode = 0){
         try{
+            self::expectException('\Exception');
             $data = $appInstance->processRequest($request);
         }catch(\Exception $e){
             $data = JsonHelper::encode([
