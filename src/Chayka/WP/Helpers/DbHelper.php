@@ -130,6 +130,49 @@ class DbHelper {
     }
 
     /**
+     * Replaces table aliases by absolute values.
+     * 
+     * You can use {table} placeholder, that will be replaced with $className::getDbTable()
+     * You can use {wpdb:_tableName_} placeholder, that will be replaced with $wpdb->$_tableName_
+     * You can use {prefix:_tableName_} placeholder, that will be replaced with $wpdb->prefix.$_tableName_
+     *
+     * @param $sql
+     *
+     * @param DbReady|null $className
+     *
+     * @return mixed
+     */
+    public static function replaceTableAliases($sql, $className = null){
+        $wpdb = self::wpdb();
+        if($className) {
+            if (is_object($className)) {
+                $className = get_class($className);
+            }
+            $table = call_user_func(array($className, 'getDbTable'));
+
+            $sql = str_replace('{table}', $table, $sql);
+        }
+        if(preg_match_all('/\{(wpdb|prefix):([\w\d_]+)\}/', $sql, $m, PREG_SET_ORDER)){
+            foreach($m as $prefixedTable){
+                $source = $prefixedTable[1];
+                $tableName = $prefixedTable[2];
+                if('wpdb' === $source && in_array($tableName, [
+                        'blogs', 'blog_versions', 'comment_meta', 'comments', 'links',
+                        'options', 'postmeta', 'posts', 'registration_log', 'signups',
+                        'site', 'sitemeta', 'termmeta', 'terms', 'term_relationships',
+                        'term_taxonomy', 'usermeta', 'users'
+                    ])){
+                    $sql = str_replace('{wpdb:' . $tableName . '}', $wpdb->$tableName, $sql);
+                }else if('prefix' === $source){
+                    $sql = str_replace('{prefix:' . $tableName . '}', $wpdb->prefix . $tableName, $sql);
+                }
+            }
+        }
+
+        return $sql;
+    }
+
+    /**
      * Insert provided data to a table.
      * If $data is DbReady, omit other params.
      *
@@ -215,35 +258,36 @@ class DbHelper {
      * You can use {prefix:_tableName_} placeholder, that will be replaced with $wpdb->prefix.$_tableName_
      *
      * @param $sql
-     * @param string/DbReady $className
+     * @param string|DbReady $className
      * @return array
      */
     public static function selectSql($sql, $className = null){
         $wpdb = self::wpdb();
-        if($className) {
-            if (is_object($className)) {
-                $className = get_class($className);
-            }
-            $table = call_user_func(array($className, 'getDbTable'));
-
-            $sql = str_replace('{table}', $table, $sql);
-        }
-        if(preg_match_all('/\{(wpdb|prefix):([\w\d_]+)\}/', $sql, $m, PREG_SET_ORDER)){
-            foreach($m as $prefixedTable){
-                $source = $prefixedTable[1];
-                $tableName = $prefixedTable[2];
-                if('wpdb' === $source && in_array($tableName, [
-                        'blogs', 'blog_versions', 'comment_meta', 'comments', 'links',
-                        'options', 'postmeta', 'posts', 'registration_log', 'signups',
-                        'site', 'sitemeta', 'termmeta', 'terms', 'term_relationships',
-                        'term_taxonomy', 'usermeta', 'users'
-                    ])){
-                    $sql = str_replace('{wpdb:' . $tableName . '}', $wpdb->$tableName, $sql);
-                }else if('prefix' === $wpdb){
-                    $sql = str_replace('{prefix:' . $tableName . '}', $wpdb->prefix . $tableName, $sql);
-                }
-            }
-        }
+        $sql = self::replaceTableAliases($sql, $className);
+//        if($className) {
+//            if (is_object($className)) {
+//                $className = get_class($className);
+//            }
+//            $table = call_user_func(array($className, 'getDbTable'));
+//
+//            $sql = str_replace('{table}', $table, $sql);
+//        }
+//        if(preg_match_all('/\{(wpdb|prefix):([\w\d_]+)\}/', $sql, $m, PREG_SET_ORDER)){
+//            foreach($m as $prefixedTable){
+//                $source = $prefixedTable[1];
+//                $tableName = $prefixedTable[2];
+//                if('wpdb' === $source && in_array($tableName, [
+//                        'blogs', 'blog_versions', 'comment_meta', 'comments', 'links',
+//                        'options', 'postmeta', 'posts', 'registration_log', 'signups',
+//                        'site', 'sitemeta', 'termmeta', 'terms', 'term_relationships',
+//                        'term_taxonomy', 'usermeta', 'users'
+//                    ])){
+//                    $sql = str_replace('{wpdb:' . $tableName . '}', $wpdb->$tableName, $sql);
+//                }else if('prefix' === $wpdb){
+//                    $sql = str_replace('{prefix:' . $tableName . '}', $wpdb->prefix . $tableName, $sql);
+//                }
+//            }
+//        }
         $dbRecords = $wpdb->get_results($sql);
         if($className) {
             foreach ($dbRecords as $i=>$dbRecord) {
@@ -437,6 +481,8 @@ class DbHelper {
         $args = func_get_args();
 
         $sql = call_user_func_array(array($wpdb, 'prepare'), $args);
+
+        $sql = self::replaceTableAliases($sql);
 
         return $wpdb->query($sql);
     }
