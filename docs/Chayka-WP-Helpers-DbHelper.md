@@ -90,6 +90,26 @@ Get wp instance prefixed table name
 
 
 
+### replaceTableAliases
+
+    mixed Chayka\WP\Helpers\DbHelper::replaceTableAliases($sql, \Chayka\WP\Helpers\DbReady|null $className)
+
+Replaces table aliases by absolute values.
+
+You can use {table} placeholder, that will be replaced with $className::getDbTable()
+You can use {wpdb:_tableName_} placeholder, that will be replaced with $wpdb->$_tableName_
+You can use {prefix:_tableName_} placeholder, that will be replaced with $wpdb->prefix.$_tableName_
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $sql **mixed**
+* $className **[Chayka\WP\Helpers\DbReady](Chayka-WP-Helpers-DbReady.md)|null**
+
+
+
 ### insert
 
     integer Chayka\WP\Helpers\DbHelper::insert(array|object|\Chayka\WP\Helpers\DbReady $data, null $table)
@@ -149,7 +169,7 @@ If $table is DbReady, omit other params.
 
 ### selectSql
 
-    array Chayka\WP\Helpers\DbHelper::selectSql($sql, \Chayka\WP\Helpers\string/DbReady $className)
+    array Chayka\WP\Helpers\DbHelper::selectSql($sql, string|\Chayka\WP\Helpers\DbReady $className)
 
 Select several rows using sql.
 
@@ -164,7 +184,7 @@ You can use {prefix:_tableName_} placeholder, that will be replaced with $wpdb->
 
 #### Arguments
 * $sql **mixed**
-* $className **Chayka\WP\Helpers\string/DbReady**
+* $className **string|[string](Chayka-WP-Helpers-DbReady.md)**
 
 
 
