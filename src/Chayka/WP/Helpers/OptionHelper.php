@@ -151,7 +151,7 @@ class OptionHelper {
             $key = 'Chayka.Framework';
         }
         $key = substr(str_pad($key, 32, $key), 0, 32);
-        if(function_exists('mcrypt_decrypt') && preg_match('/^[\w\d\+\/]+==$/', $value)){
+        if(function_exists('mcrypt_decrypt') && $value /*&& preg_match('/^[\w\d\+\/]+==$/', $value)*/){
             $ivSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
             $decoded = base64_decode($value);
             $iv = substr($decoded, 0, $ivSize);
