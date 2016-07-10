@@ -160,7 +160,7 @@ class ResourceHelper {
                  * we don't need it as dependency, otherwise replace it with
                  * combined handle
                  */
-                if($combined[$handle] === $combinedHandle){
+                if(isset($combined[$handle]) && $combined[$handle] === $combinedHandle){
                     unset($itemDependencies[$i]);
                 }else{
                     $itemDependencies[$i] = $combinedHandle;
