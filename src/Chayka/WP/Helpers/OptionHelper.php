@@ -108,62 +108,6 @@ class OptionHelper {
     }
 
     /**
-     * Encrypt provided data.
-     * Encrypts with NONCE_KEY constant as a key by default
-     *
-     * @param $value
-     * @param string $key
-     *
-     * @return string
-     */
-    public static function encrypt($value, $key = ''){
-        if(!$key && defined('NONCE_KEY')){
-            $key = NONCE_KEY;
-        }
-        if(!$key){
-            $key = 'Chayka.Framework';
-        }
-        $key = substr(str_pad($key, 32, $key), 0, 32);
-        if(function_exists('mcrypt_encrypt')){
-            $ivSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-            $iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
-            $encrypted = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC, $iv);
-            $value = base64_encode($iv.$encrypted);
-        }
-        return $value;
-    }
-
-    /**
-     * Decrypt provided data.
-     * Decrypts with NONCE_KEY constant as a key by default.
-     * If decryption failed, returns initial data.
-     *
-     * @param $value
-     * @param string $key
-     *
-     * @return string
-     */
-    public static function decrypt($value, $key = ''){
-        if(!$key && defined('NONCE_KEY')){
-            $key = NONCE_KEY;
-        }
-        if(!$key){
-            $key = 'Chayka.Framework';
-        }
-        $key = substr(str_pad($key, 32, $key), 0, 32);
-        if(function_exists('mcrypt_decrypt') && $value /*&& preg_match('/^[\w\d\+\/]+==$/', $value)*/){
-            $ivSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-            $decoded = base64_decode($value);
-            $iv = substr($decoded, 0, $ivSize);
-            $decrypted = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, substr($decoded, $ivSize), MCRYPT_MODE_CBC, $iv);
-            if($decrypted!==false){
-                $value = preg_replace('/\x00*$/', '', $decrypted);
-            }
-        }
-        return $value;
-    }
-
-    /**
      * Get previously encrypted and stored option (with custom prefix)
      *
      * @param string $option
@@ -175,7 +119,7 @@ class OptionHelper {
         $key = static::getPrefix().$option;
         if(!isset(self::$cache[$key]) || $reload){
             $value = get_option($key, $default);
-            $value = self::decrypt($value);
+            $value = EncryptionHelper::decrypt($value);
             self::$cache[$key] = $value;
         }
         return self::$cache[$key];
@@ -191,7 +135,7 @@ class OptionHelper {
     public static function setEncryptedOption($option, $value){
         $key = static::getPrefix().$option;
         self::$cache[$key] = $value;
-        $value = self::encrypt($value);
+        $value = EncryptionHelper::encrypt($value);
         return update_option($key, $value);
     }
 
@@ -207,7 +151,7 @@ class OptionHelper {
         $key = static::getPrefix().$option;
         if(!isset(self::$cache['site_'.$key]) || $reload){
             $value = get_site_option($key, $default);
-            $value = self::decrypt($value);
+            $value = EncryptionHelper::decrypt($value);
             self::$cache['site_'.$key] = $value;
         }
         return self::$cache['site_'.$key];
@@ -223,7 +167,7 @@ class OptionHelper {
     public static function setEncryptedSiteOption($option, $value){
         $key = static::getPrefix().$option;
         self::$cache['site_'.$key] = $value;
-        $value = self::encrypt($value);
+        $value = EncryptionHelper::encrypt($value);
         return update_site_option($key, $value);
     }
 }
