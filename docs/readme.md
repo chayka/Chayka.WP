@@ -11,6 +11,7 @@ API Index
             * [DbHelper](Chayka-WP-Helpers-DbHelper.md)
             * [DbReady](Chayka-WP-Helpers-DbReady.md)
             * [EmailHelper](Chayka-WP-Helpers-EmailHelper.md)
+            * [EncryptionHelper](Chayka-WP-Helpers-EncryptionHelper.md)
             * [HtmlHelper](Chayka-WP-Helpers-HtmlHelper.md)
             * [JsonHelper](Chayka-WP-Helpers-JsonHelper.md)
             * [NlsHelper](Chayka-WP-Helpers-NlsHelper.md)

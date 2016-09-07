@@ -1,14 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: borismossounov
- * Date: 07.09.16
- * Time: 12:49
+ * Chayka.Framework is a framework that enables WordPress development in a MVC/OOP way.
+ *
+ * More info: https://github.com/chayka/Chayka.Framework
  */
 
 namespace Chayka\WP\Helpers;
 
-
+/**
+ * Class EncryptionHelper provides methods to encrypt and decrypt data.
+ *
+ * @package Chayka\Helpers
+ */
 class EncryptionHelper extends \Chayka\Helpers\EncryptionHelper{
 
     /**

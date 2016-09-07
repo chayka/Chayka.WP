@@ -132,43 +132,6 @@ Alias to get_site_option but with custom prefix
 
 
 
-### encrypt
-
-    string Chayka\WP\Helpers\OptionHelper::encrypt($value, string $key)
-
-Encrypt provided data.
-
-Encrypts with NONCE_KEY constant as a key by default
-
-* Visibility: **public**
-* This method is **static**.
-
-
-#### Arguments
-* $value **mixed**
-* $key **string**
-
-
-
-### decrypt
-
-    string Chayka\WP\Helpers\OptionHelper::decrypt($value, string $key)
-
-Decrypt provided data.
-
-Decrypts with NONCE_KEY constant as a key by default.
-If decryption failed, returns initial data.
-
-* Visibility: **public**
-* This method is **static**.
-
-
-#### Arguments
-* $value **mixed**
-* $key **string**
-
-
-
 ### getEncryptedOption
 
     mixed|void Chayka\WP\Helpers\OptionHelper::getEncryptedOption(string $option, string $default, boolean $reload)
