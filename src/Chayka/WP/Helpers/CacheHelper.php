@@ -69,7 +69,12 @@ class CacheHelper {
                 if($default instanceof \Closure){
                     $value = $default($key);
                 }else if(is_callable($default)){
+                    ob_start();
                     $value = call_user_func($default, $key);
+                    $output = ob_get_clean();
+                    if (!$value){
+                        $value = $output;
+                    }
                 }else{
                     $value = $default;
                 }
