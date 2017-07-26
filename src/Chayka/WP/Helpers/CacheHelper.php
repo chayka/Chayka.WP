@@ -67,7 +67,12 @@ class CacheHelper {
             $value = get_transient($key);
             if(!$value && $default){
                 if($default instanceof \Closure){
+                    ob_start();
                     $value = $default($key);
+                    $output = ob_get_clean();
+                    if (!$value){
+                        $value = $output;
+                    }
                 }else if(is_callable($default)){
                     ob_start();
                     $value = call_user_func($default, $key);
